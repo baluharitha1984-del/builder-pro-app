@@ -45,7 +45,7 @@ jobs:
           mkdir -p www
           
           # Copy static files to web assets directory, avoiding copying the www directory into itself
-          find . -maxdepth 1 -type f -not -name "package.json" -not -name "package-lock.json" -not -name "yarn.lock" -not -name "package-lock.json" -exec cp {} www/ ; || true
+          find . -maxdepth 1 -type f -not -name "package.json" -not -name "package-lock.json" -not -name "yarn.lock" -not -name "package-lock.json" -exec cp {} www/ \; || true
           
           # Copy separate directories if present
           for dir in assets images css js static public; do
