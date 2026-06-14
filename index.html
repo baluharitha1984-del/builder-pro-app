@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Neon Clock (Copy)</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<!-- Retro Digital Glowing Neon Clock -->
+<div class="clock-container">
+  <div class="glow-orb"></div>
+  <div class="glow-orb secondary"></div>
+  
+  <div class="glass-board">
+    <div class="app-header">
+      <span class="status-dot"></span>
+      <span class="header-title">LIVE NEON CLOCK</span>
+    </div>
+    
+    <div class="time-display">
+      <span id="hours">00</span>
+      <span class="colon">:</span>
+      <span id="minutes">00</span>
+      <span class="colon">:</span>
+      <span id="seconds">00</span>
+      <span id="ampm" class="ampm">AM</span>
+    </div>
+    
+    <div class="date-display" id="date">Loading Today's Date...</div>
+    
+    <div class="controls-row">
+      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
+      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
+    </div>
+  </div>
+</div>
+  
+  <script src="script.js"></script>
+</body>
+</html>
