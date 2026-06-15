@@ -65,15 +65,7 @@ jobs:
           npx cap sync android
         fi
 
-    - name: Audit and Refactor Kotlin Gradle dependencies
-      run: |
-        echo "Solving duplicate class conflicts by enforcing strict compilation strategies..."
-        find . -name "build.gradle" -not -path "*/node_modules/*" | while read -r gradle_file; do
-          echo "Patching $gradle_file..."
-          cat << 'EOF' >> "$gradle_file"
-
-
-
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
