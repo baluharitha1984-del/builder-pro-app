@@ -39,7 +39,7 @@ jobs:
           fi
           
           # Install Capacitor CLI, core, and Android platform
-          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
           
           # Prepare static web assets directory
           mkdir -p www
