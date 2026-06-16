@@ -39,13 +39,13 @@ jobs:
           fi
           
           # Install Capacitor CLI, core, and Android platform
-          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+          npm install @capacitor/core @capacitor/cli @capacitor/android
           
           # Prepare static web assets directory
           mkdir -p www
           
           # Copy static files to web assets directory, avoiding copying the www directory into itself
-          find . -maxdepth 1 -type f -not -name "package.json" -not -name "package-lock.json" -not -name "yarn.lock" -not -name "package-lock.json" -exec cp {} www/ \; || true
+          find . -maxdepth 1 -type f -not -name "package.json" -not -name "package-lock.json" -not -name "yarn.lock" -not -name "package-lock.json" -exec cp {} www/ ; || true
           
           # Copy separate directories if present
           for dir in assets images css js static public; do
@@ -65,11 +65,32 @@ jobs:
           npx cap sync android
         fi
 
-    
-    - name: Set up JDK 21
+    - name: Audit and Refactor Kotlin Gradle dependencies
+      run: |
+        echo "Solving duplicate class conflicts by enforcing strict compilation strategies..."
+        find . -name "build.gradle" -not -path "*/node_modules/*" | while read -r gradle_file; do
+          echo "Patching $gradle_file..."
+          cat << 'EOF' >> "$gradle_file"
+
+// Automated Kotlin standard library duplicate class conflict resolution
+allprojects {
+    configurations.all {
+         resolutionStrategy {
+             force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+             force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
+             force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+         }
+         exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib-jdk7"
+         exclude group: "org.jetbrains.kotlin", module: "kotlin-stdlib-jdk8"
+    }
+}
+EOF
+        done
+
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: '17'
         distribution: 'temurin'
         cache: gradle
 
