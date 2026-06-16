@@ -1,50 +1,156 @@
-// Interactive Neon Clock Mechanics
+// Retro Snake Interaction Code
 
-function updateClock() {
-  const now = new Date();
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const gridCount = 20;
+const gridSize = canvas.width / gridCount;
+
+let snake = [{x: 10, y: 10}];
+let food = {x: 15, y: 15};
+let dx = 1;
+let dy = 0;
+let score = 0;
+let highScore = localStorage.getItem('snake_high_score') || 0;
+let gameInterval = null;
+let gameSpeed = 110;
+let isGameActive = false;
+
+document.getElementById('high-score').innerText = highScore;
+
+function startGame() {
+  snake = [
+    {x: 10, y: 10},
+    {x: 9, y: 10},
+    {x: 8, y: 10}
+  ];
+  dx = 1;
+  dy = 0;
+  score = 0;
+  document.getElementById('current-score').innerText = score;
+  document.getElementById('game-overlay').style.display = 'none';
   
-  // Hours
-  let hours = now.getHours();
-  const ampmStr = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours ? hours : 12; // convert 0 to 12
-  const hoursStr = String(hours).padStart(2, '0');
-  
-  // Minutes / Seconds
-  const minutesStr = String(now.getMinutes()).padStart(2, '0');
-  const secondsStr = String(now.getSeconds()).padStart(2, '0');
-  
-  // Update elements
-  document.getElementById('hours').innerText = hoursStr;
-  document.getElementById('minutes').innerText = minutesStr;
-  document.getElementById('seconds').innerText = secondsStr;
-  document.getElementById('ampm').innerText = ampmStr;
-  
-  // Format Date beautifully
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  const dateStr = now.toLocaleDateString(undefined, options);
-  document.getElementById('date').innerText = dateStr;
+  generateFood();
+  if (gameInterval) clearInterval(gameInterval);
+  isGameActive = true;
+  gameInterval = setInterval(gameStep, gameSpeed);
+  console.log("Snake Game Started!");
 }
 
-// Run immediately & set interval
-updateClock();
-setInterval(updateClock, 1000);
+function generateFood() {
+  food.x = Math.floor(Math.random() * gridCount);
+  food.y = Math.floor(Math.random() * gridCount);
+  
+  // Make sure food is not on snake
+  for (let part of snake) {
+    if (part.x === food.x && part.y === food.y) {
+      generateFood();
+      break;
+    }
+  }
+}
 
-// Interaction functions
-let swirlPaused = false;
-function toggleAnimation() {
-  swirlPaused = !swirlPaused;
-  const orbs = document.querySelectorAll('.glow-orb');
-  orbs.forEach(orb => {
-    orb.style.animationPlayState = swirlPaused ? 'paused' : 'running';
+function gameStep() {
+  // Move snake
+  const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+  
+  // Wall collision check
+  if (head.x < 0 || head.x >= gridCount || head.y < 0 || head.y >= gridCount) {
+    gameOver();
+    return;
+  }
+  
+  // Self collision check
+  for (let part of snake) {
+    if (part.x === head.x && part.y === head.y) {
+      gameOver();
+      return;
+    }
+  }
+  
+  snake.unshift(head);
+  
+  // Food dynamic eating
+  if (head.x === food.x && head.y === food.y) {
+    score += 10;
+    document.getElementById('current-score').innerText = score;
+    generateFood();
+  } else {
+    snake.pop();
+  }
+  
+  draw();
+}
+
+function draw() {
+  // Clear canvas
+  ctx.fillStyle = '#05010b';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Grid Lines
+  ctx.strokeStyle = '#120524';
+  ctx.lineWidth = 0.5;
+  for (let i = 0; i < gridCount; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * gridSize, 0);
+    ctx.lineTo(i * gridSize, canvas.height);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(0, i * gridSize);
+    ctx.lineTo(canvas.width, i * gridSize);
+    ctx.stroke();
+  }
+  
+  // Draw Snake
+  snake.forEach((part, index) => {
+    ctx.fillStyle = index === 0 ? '#d946ef' : '#a855f7';
+    ctx.shadowBlur = index === 0 ? 8 : 4;
+    ctx.shadowColor = '#d946ef';
+    ctx.fillRect(part.x * gridSize + 1, part.y * gridSize + 1, gridSize - 2, gridSize - 2);
   });
   
-  const title = document.querySelector('.header-title');
-  title.innerText = swirlPaused ? "SWIRL PAUSED" : "LIVE NEON CLOCK";
+  // Draw Food
+  ctx.fillStyle = '#10b981';
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = '#10b981';
+  ctx.beginPath();
+  ctx.arc(food.x * gridSize + gridSize/2, food.y * gridSize + gridSize/2, gridSize/3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  ctx.shadowBlur = 0; // reset
 }
 
-function changeTheme() {
-  document.body.classList.toggle('light-theme');
-  const isLight = document.body.classList.contains('light-theme');
-  console.log("Visual atmosphere set to: " + (isLight ? "Daylight Mode" : "Cosmic Dark Mode"));
+function changeDirection(dir) {
+  if (!isGameActive) return;
+  if (dir === 'UP' && dy !== 1) { dx = 0; dy = -1; }
+  if (dir === 'DOWN' && dy !== -1) { dx = 0; dy = 1; }
+  if (dir === 'LEFT' && dx !== 1) { dx = -1; dy = 0; }
+  if (dir === 'RIGHT' && dx !== -1) { dx = 1; dy = 0; }
 }
+
+// Arrow Keys support
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowUp') changeDirection('UP');
+  if (e.key === 'ArrowDown') changeDirection('DOWN');
+  if (e.key === 'ArrowLeft') changeDirection('LEFT');
+  if (e.key === 'ArrowRight') changeDirection('RIGHT');
+});
+
+function gameOver() {
+  clearInterval(gameInterval);
+  isGameActive = false;
+  
+  console.log("Game Over! Score: " + score);
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('snake_high_score', highScore);
+    document.getElementById('high-score').innerText = highScore;
+  }
+  
+  document.getElementById('overlay-text').innerText = 'GAME OVER\nSCORE: ' + score;
+  document.getElementById('btn-start').innerText = 'RESTART';
+  document.getElementById('game-overlay').style.display = 'flex';
+}
+
+// Init draw
+draw();
