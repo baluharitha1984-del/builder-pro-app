@@ -3,40 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retro Neon Clock (Copy)</title>
+  <title>Retro Neon Snake Adventure (Copy)</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<!-- Retro Digital Glowing Neon Clock -->
-<div class="clock-container">
-  <div class="glow-orb"></div>
-  <div class="glow-orb secondary"></div>
-  
-  <div class="glass-board">
-    <div class="app-header">
-      <span class="status-dot"></span>
-      <span class="header-title">LIVE NEON CLOCK</span>
+  <!-- Retro Neon Snake -->
+<div class="arcade-cabinet">
+  <div class="cabinet-header">
+    <div class="neon-title font-mono font-bold">NEON SNAKE</div>
+    <div class="scores-panel font-mono text-xs">
+      <div>SCORE: <span id="current-score" class="text-fuchsia-400 font-bold">0</span></div>
+      <div>HIGH: <span id="high-score" class="text-emerald-400">0</span></div>
     </div>
-    
-    <div class="time-display">
-      <span id="hours">00</span>
-      <span class="colon">:</span>
-      <span id="minutes">00</span>
-      <span class="colon">:</span>
-      <span id="seconds">00</span>
-      <span id="ampm" class="ampm">AM</span>
+  </div>
+
+  <div class="canvas-container relative w-full bg-black border-2 border-purple-900 rounded-xl overflow-hidden aspect-square">
+    <canvas id="gameCanvas" width="400" height="400" class="block w-full h-full"></canvas>
+    <div id="game-overlay" class="absolute inset-0 bg-black/90 flex flex-col justify-center items-center gap-4 transition-all">
+      <div id="overlay-text" class="text-cyan-400 font-mono font-bold text-lg tracking-wide text-center">PRESS PLAY TO START</div>
+      <button class="play-btn font-mono font-bold text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-2.5 rounded-xl shadow-[0_4px_15px_rgba(168,85,247,0.4)] hover:scale-105 transition-all cursor-pointer" id="btn-start" onclick="startGame()">PLAY GAME</button>
     </div>
-    
-    <div class="date-display" id="date">Loading Today's Date...</div>
-    
-    <div class="controls-row">
-      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
-      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
+  </div>
+
+  <div class="mobile-directions-pad flex flex-col items-center gap-1 mt-2">
+    <div class="pad-row flex gap-1">
+      <button class="pad-btn cursor-pointer w-12 h-10 bg-indigo-950 border border-indigo-800 text-indigo-300 rounded-lg flex items-center justify-center font-bold active:scale-95 transition-all" onclick="changeDirection('UP')">▲</button>
+    </div>
+    <div class="pad-row flex gap-1 items-center">
+      <button class="pad-btn cursor-pointer w-12 h-10 bg-indigo-950 border border-indigo-800 text-indigo-300 rounded-lg flex items-center justify-center font-bold active:scale-95 transition-all" onclick="changeDirection('LEFT')">◀</button>
+      <div class="pad-center w-12 h-10"></div>
+      <button class="pad-btn cursor-pointer w-12 h-10 bg-indigo-950 border border-indigo-800 text-indigo-300 rounded-lg flex items-center justify-center font-bold active:scale-95 transition-all" onclick="changeDirection('RIGHT')">▶</button>
+    </div>
+    <div class="pad-row flex gap-1">
+      <button class="pad-btn cursor-pointer w-12 h-10 bg-indigo-950 border border-indigo-800 text-indigo-300 rounded-lg flex items-center justify-center font-bold active:scale-95 transition-all" onclick="changeDirection('DOWN')">▼</button>
     </div>
   </div>
 </div>
