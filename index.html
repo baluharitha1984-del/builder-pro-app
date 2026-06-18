@@ -3,36 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GlassCalc</title>
+  <title>ZenCalc</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm border border-slate-100">
-    <div class="mb-6 text-right">
-      <div id="prev-display" class="text-slate-400 text-sm h-6 overflow-hidden"></div>
-      <div id="display" class="text-4xl font-semibold text-slate-800 tracking-tight truncate">0</div>
+  <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+    <div class="p-6 bg-slate-900 text-right">
+      <div id="prev-op" class="text-slate-400 text-sm h-6"></div>
+      <div id="current-val" class="text-white text-5xl font-light truncate">0</div>
     </div>
-    <div class="grid grid-cols-4 gap-3">
-      <button onclick="clearDisplay()" class="col-span-2 bg-rose-50 text-rose-500 hover:bg-rose-100 p-4 rounded-2xl font-bold transition-all">AC</button>
-      <button onclick="appendOperator('/')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 p-4 rounded-2xl font-bold transition-all">÷</button>
-      <button onclick="appendOperator('*')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 p-4 rounded-2xl font-bold transition-all">×</button>
-      <button onclick="appendNumber('7')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">7</button>
-      <button onclick="appendNumber('8')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">8</button>
-      <button onclick="appendNumber('9')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">9</button>
-      <button onclick="appendOperator('-')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 p-4 rounded-2xl font-bold transition-all">-</button>
-      <button onclick="appendNumber('4')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">4</button>
-      <button onclick="appendNumber('5')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">5</button>
-      <button onclick="appendNumber('6')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">6</button>
-      <button onclick="appendOperator('+')" class="bg-slate-100 text-slate-600 hover:bg-slate-200 p-4 rounded-2xl font-bold transition-all">+</button>
-      <button onclick="appendNumber('1')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">1</button>
-      <button onclick="appendNumber('2')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">2</button>
-      <button onclick="appendNumber('3')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">3</button>
-      <button onclick="calculate()" class="row-span-2 bg-indigo-600 text-white hover:bg-indigo-700 p-4 rounded-2xl font-bold transition-all">=</button>
-      <button onclick="appendNumber('0')" class="col-span-2 bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">0</button>
-      <button onclick="appendDecimal('.')" class="bg-slate-50 hover:bg-slate-100 p-4 rounded-2xl font-semibold transition-all">.</button>
+    <div class="grid grid-cols-4 gap-2 p-6">
+      <button onclick="clearDisplay()" class="col-span-2 p-4 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 transition">AC</button>
+      <button onclick="deleteDigit()" class="p-4 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition">DEL</button>
+      <button onclick="appendOp('/')" class="p-4 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition">÷</button>
+      <button onclick="appendNum('7')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">7</button>
+      <button onclick="appendNum('8')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">8</button>
+      <button onclick="appendNum('9')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">9</button>
+      <button onclick="appendOp('*')" class="p-4 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition">×</button>
+      <button onclick="appendNum('4')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">4</button>
+      <button onclick="appendNum('5')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">5</button>
+      <button onclick="appendNum('6')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">6</button>
+      <button onclick="appendOp('-')" class="p-4 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition">-</button>
+      <button onclick="appendNum('1')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">1</button>
+      <button onclick="appendNum('2')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">2</button>
+      <button onclick="appendNum('3')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">3</button>
+      <button onclick="appendOp('+')" class="p-4 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition">+</button>
+      <button onclick="appendNum('0')" class="col-span-2 p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">0</button>
+      <button onclick="appendNum('.')" class="p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition">.</button>
+      <button onclick="calculate()" class="p-4 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition">=</button>
     </div>
   </div>
 </div>
