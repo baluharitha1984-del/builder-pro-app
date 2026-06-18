@@ -15,83 +15,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Configure Unique Android Naming and Identifiers
-        run: |-
-          cat << 'EOF' > setup_app.js
-          const fs = require('fs');
-
-          let appName = 'Applet';
-          if (fs.existsSync('capacitor.config.json')) {
-            try {
-              appName = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8')).appName || appName;
-            } catch(e) {}
-          } else if (fs.existsSync('package.json')) {
-            try {
-              appName = JSON.parse(fs.readFileSync('package.json', 'utf8')).name || appName;
-            } catch(e) {}
-          }
-
-          const cleanAppName = appName.trim() || 'Applet';
-          const cleanAppIdPart = cleanAppName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'app';
-          const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12);
-          const uniqueAppId = "com.builder." + cleanAppIdPart + timestamp;
-
-          console.log('=== ASSIGNING UNIQUE APP DETAILS ===');
-          console.log('App Name:', cleanAppName);
-          console.log('Dynamic App ID:', uniqueAppId);
-
-          let capData = {};
-          if (fs.existsSync('capacitor.config.json')) {
-            try {
-              capData = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
-            } catch(e) {}
-          }
-          capData.appId = uniqueAppId;
-          capData.appName = cleanAppName;
-          capData.webDir = capData.webDir || 'www';
-          capData.bundledWebRuntime = capData.bundledWebRuntime || false;
-
-          fs.writeFileSync('capacitor.config.json', JSON.stringify(capData, null, 2), 'utf8');
-          console.log('Successfully updated capacitor.config.json with Unique appId: ' + uniqueAppId);
-
-          const gradlePaths = ['android/app/build.gradle', 'app/build.gradle'];
-          for (const gradlePath of gradlePaths) {
-            if (fs.existsSync(gradlePath)) {
-              let content = fs.readFileSync(gradlePath, 'utf8');
-              const updatedContent = content.replace(/applicationId\s+['"][^'"]+['"]/g, "applicationId \"" + uniqueAppId + "\"");
-              fs.writeFileSync(gradlePath, updatedContent, 'utf8');
-              console.log('Successfully updated applicationId in ' + gradlePath + ' to ' + uniqueAppId);
-            }
-          }
-
-          const stringsPaths = ['android/app/src/main/res/values/strings.xml', 'app/src/main/res/values/strings.xml'];
-          for (const stringsPath of stringsPaths) {
-            if (fs.existsSync(stringsPath)) {
-              let content = fs.readFileSync(stringsPath, 'utf8');
-              let updatedContent = content.replace(/<string\s+name="app_name">.*?<\/string>/g, "<string name=\"app_name\">" + cleanAppName + "</string>");
-              updatedContent = updatedContent.replace(/<string\s+name="title_activity_main">.*?<\/string>/g, "<string name=\"title_activity_main\">" + cleanAppName + "</string>");
-              fs.writeFileSync(stringsPath, updatedContent, 'utf8');
-              console.log('Successfully updated app_name and title_activity_main strings in ' + stringsPath + ' to ' + cleanAppName);
-            }
-          }
-
-          const manifestPaths = [
-            'android/app/src/main/AndroidManifest.xml',
-            'app/src/main/AndroidManifest.xml',
-            'android/app/AndroidManifest.xml',
-            'app/AndroidManifest.xml'
-          ];
-          for (const manifestPath of manifestPaths) {
-            if (fs.existsSync(manifestPath)) {
-              let content = fs.readFileSync(manifestPath, 'utf8');
-              const updatedContent = content.replace(/package="[^"]+"/g, "package=\"" + uniqueAppId + "\"");
-              fs.writeFileSync(manifestPath, updatedContent, 'utf8');
-              console.log('Successfully updated package name in ' + manifestPath + ' to ' + uniqueAppId);
-            }
-          }
-          EOF
-          node setup_app.js
-          rm setup_app.js
       - name: Detect and Setup Project
         id: setup_project
         run: |-
@@ -133,52 +56,6 @@ jobs:
             # Initialize Capacitor using dynamic values
             npx cap init "$APP_NAME" "$APP_ID" --web-dir=www || true
             npx cap add android || true
-
-            # Apply dynamic configuration changes onto newly generated native Android project
-            cat << 'EOF' > setup_app.js
-            const fs = require('fs');
-            const capData = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
-            const cleanAppName = capData.appName;
-            const uniqueAppId = capData.appId;
-            
-            const gradlePaths = ['android/app/build.gradle', 'app/build.gradle'];
-            for (const gradlePath of gradlePaths) {
-              if (fs.existsSync(gradlePath)) {
-                let content = fs.readFileSync(gradlePath, 'utf8');
-                const updatedContent = content.replace(/applicationId\s+['"][^'"]+['"]/g, "applicationId \"" + uniqueAppId + "\"");
-                fs.writeFileSync(gradlePath, updatedContent, 'utf8');
-                console.log('Successfully updated applicationId in ' + gradlePath + ' to ' + uniqueAppId);
-              }
-            }
-            
-            const stringsPaths = ['android/app/src/main/res/values/strings.xml', 'app/src/main/res/values/strings.xml'];
-            for (const stringsPath of stringsPaths) {
-              if (fs.existsSync(stringsPath)) {
-                let content = fs.readFileSync(stringsPath, 'utf8');
-                let updatedContent = content.replace(/<string\s+name="app_name">.*?<\/string>/g, "<string name=\"app_name\">" + cleanAppName + "</string>");
-                updatedContent = updatedContent.replace(/<string\s+name="title_activity_main">.*?<\/string>/g, "<string name=\"title_activity_main\">" + cleanAppName + "</string>");
-                fs.writeFileSync(stringsPath, updatedContent, 'utf8');
-                console.log('Successfully updated app_name and title_activity_main strings in ' + stringsPath + ' to ' + cleanAppName);
-              }
-            }
-
-            const manifestPaths = [
-              'android/app/src/main/AndroidManifest.xml',
-              'app/src/main/AndroidManifest.xml',
-              'android/app/AndroidManifest.xml',
-              'app/AndroidManifest.xml'
-            ];
-            for (const manifestPath of manifestPaths) {
-              if (fs.existsSync(manifestPath)) {
-                let content = fs.readFileSync(manifestPath, 'utf8');
-                const updatedContent = content.replace(/package="[^"]+"/g, "package=\"" + uniqueAppId + "\"");
-                fs.writeFileSync(manifestPath, updatedContent, 'utf8');
-                console.log('Successfully updated package name in ' + manifestPath + ' to ' + uniqueAppId);
-              }
-            }
-            EOF
-            node setup_app.js
-            rm setup_app.js
 
             # Patch dynamically generated Gradle files on the fly to fix Kotlin duplicate class conflicts
             node -e "
@@ -225,71 +102,17 @@ jobs:
             echo "Unknown build environment type."
             exit 1
           fi
-      - name: Prepare Artifacts for Upload
-        run: |-
-          mkdir -p tmp-apk tmp-aab
-
-          # Determine App Name dynamically
-          if [ -f "capacitor.config.json" ]; then
-            APP_NAME=$(node -p "try { require('./capacitor.config.json').appName || require('./package.json').name || 'Applet' } catch { 'Applet' }")
-          elif [ -f "package.json" ]; then
-            APP_NAME=$(node -p "try { require('./package.json').name } catch { 'Applet' }")
-          else
-            APP_NAME="Applet"
-          fi
-
-          # Sanitize app name to be safe for filenames
-          cleanAppName=$(echo "$APP_NAME" | sed 's/[^a-zA-Z0-9_-]//g')
-          if [ -z "$cleanAppName" ]; then
-            cleanAppName="Applet"
-          fi
-
-          # Formulate final names using run number as requested for _v1, _v2, etc format
-          RUN_NUM="${{ github.run_number }}"
-          if [ -n "$RUN_NUM" ]; then
-            VERSION_SUFFIX="v${RUN_NUM}"
-          else
-            VERSION_SUFFIX=$(date +'%Y%m%d%H%M')
-          fi
-
-          APK_FILENAME="${cleanAppName}_${VERSION_SUFFIX}.apk"
-          AAB_FILENAME="${cleanAppName}_${VERSION_SUFFIX}.aab"
-
-          # Save to environment variables for subsequent steps
-          echo "APK_FILENAME=${APK_FILENAME}" >> $GITHUB_ENV
-          echo "AAB_FILENAME=${AAB_FILENAME}" >> $GITHUB_ENV
-
-          # Locate APK and copy it to tmp-apk
-          APK_FILE=$(find . -name "*.apk" -not -path "*/node_modules/*" | head -n 1)
-          if [ -n "$APK_FILE" ]; then
-            cp "$APK_FILE" "tmp-apk/${APK_FILENAME}"
-            echo "Successfully copied APK: $APK_FILE to tmp-apk/${APK_FILENAME}"
-          else
-            echo "ERROR: No compiled APK found!" >&2
-            exit 1
-          fi
-
-          # Locate AAB and copy it to tmp-aab
-          AAB_FILE=$(find . -name "*.aab" -not -path "*/node_modules/*" | head -n 1)
-          if [ -n "$AAB_FILE" ]; then
-            cp "$AAB_FILE" "tmp-aab/${AAB_FILENAME}"
-            echo "Successfully copied AAB: $AAB_FILE to tmp-aab/${AAB_FILENAME}"
-          else
-            echo "ERROR: No compiled AAB found!" >&2
-            exit 1
-          fi
-
-          echo "=== FINAL GENERATED ARTIFACTS ==="
-          echo "APK Filename: ${APK_FILENAME}"
-          echo "AAB Filename: ${AAB_FILENAME}"
-          echo "=================================="
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APK_FILENAME }}
-          path: tmp-apk/${{ env.APK_FILENAME }}
+          name: play-ready-debug-apk
+          path: |-
+            **/*.apk
+            !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.AAB_FILENAME }}
-          path: tmp-aab/${{ env.AAB_FILENAME }}
+          name: play-ready-release-aab
+          path: |-
+            **/*.aab
+            !**/node_modules/**
