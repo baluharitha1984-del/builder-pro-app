@@ -3,16 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TestApp999</title>
+  <title>Retro Neon Clock</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<div class="min-h-screen bg-slate-50 p-6 md:p-12 font-sans"><header class="mb-10 text-center"><h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Test App 999</h1><p class="text-slate-600 mt-2">System verification environment</p></header><div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100"><h2 class="text-xl font-bold mb-6">Interaction Logger</h2><div id="log-container" class="space-y-3 h-64 overflow-y-auto pr-2 mb-4 bg-slate-50 p-4 rounded-xl text-sm"></div><button id="test-trigger" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-all active:scale-95">Execute Test Signal</button></div><div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100"><h2 class="text-xl font-bold mb-6">System Stats</h2><div class="grid grid-cols-2 gap-4"><div class="p-4 bg-emerald-50 rounded-xl text-emerald-900"><p class="text-xs font-semibold uppercase">Status</p><p id="status-val" class="text-2xl font-bold">Online</p></div><div class="p-4 bg-blue-50 rounded-xl text-blue-900"><p class="text-xs font-semibold uppercase">Signals</p><p id="count-val" class="text-2xl font-bold">0</p></div></div><div class="mt-6 p-4 border rounded-xl text-slate-500 text-xs leading-relaxed">Component ID: 999-VERIFY-X1. All systems operational. Ready for user-triggered simulation events.</div></div></div></div>
+  <!-- Retro Digital Glowing Neon Clock -->
+<div class="clock-container">
+  <div class="glow-orb"></div>
+  <div class="glow-orb secondary"></div>
+  
+  <div class="glass-board">
+    <div class="app-header">
+      <span class="status-dot"></span>
+      <span class="header-title">LIVE NEON CLOCK</span>
+    </div>
+    
+    <div class="time-display">
+      <span id="hours">00</span>
+      <span class="colon">:</span>
+      <span id="minutes">00</span>
+      <span class="colon">:</span>
+      <span id="seconds">00</span>
+      <span id="ampm" class="ampm">AM</span>
+    </div>
+    
+    <div class="date-display" id="date">Loading Today's Date...</div>
+    
+    <div class="controls-row">
+      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
+      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
+    </div>
+  </div>
+</div>
   
   <script src="script.js"></script>
 </body>
