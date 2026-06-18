@@ -74,6 +74,21 @@ jobs:
               console.log('Successfully updated app_name and title_activity_main strings in ' + stringsPath + ' to ' + cleanAppName);
             }
           }
+
+          const manifestPaths = [
+            'android/app/src/main/AndroidManifest.xml',
+            'app/src/main/AndroidManifest.xml',
+            'android/app/AndroidManifest.xml',
+            'app/AndroidManifest.xml'
+          ];
+          for (const manifestPath of manifestPaths) {
+            if (fs.existsSync(manifestPath)) {
+              let content = fs.readFileSync(manifestPath, 'utf8');
+              const updatedContent = content.replace(/package="[^"]+"/g, "package=\"" + uniqueAppId + "\"");
+              fs.writeFileSync(manifestPath, updatedContent, 'utf8');
+              console.log('Successfully updated package name in ' + manifestPath + ' to ' + uniqueAppId);
+            }
+          }
           EOF
           node setup_app.js
           rm setup_app.js
@@ -146,6 +161,21 @@ jobs:
                 console.log('Successfully updated app_name and title_activity_main strings in ' + stringsPath + ' to ' + cleanAppName);
               }
             }
+
+            const manifestPaths = [
+              'android/app/src/main/AndroidManifest.xml',
+              'app/src/main/AndroidManifest.xml',
+              'android/app/AndroidManifest.xml',
+              'app/AndroidManifest.xml'
+            ];
+            for (const manifestPath of manifestPaths) {
+              if (fs.existsSync(manifestPath)) {
+                let content = fs.readFileSync(manifestPath, 'utf8');
+                const updatedContent = content.replace(/package="[^"]+"/g, "package=\"" + uniqueAppId + "\"");
+                fs.writeFileSync(manifestPath, updatedContent, 'utf8');
+                console.log('Successfully updated package name in ' + manifestPath + ' to ' + uniqueAppId);
+              }
+            }
             EOF
             node setup_app.js
             rm setup_app.js
@@ -214,12 +244,16 @@ jobs:
             cleanAppName="Applet"
           fi
 
-          # Generate build timestamp
-          BUILD_TIME=$(date +'%Y%m%d-%H%M')
+          # Formulate final names using run number as requested for _v1, _v2, etc format
+          RUN_NUM="${{ github.run_number }}"
+          if [ -n "$RUN_NUM" ]; then
+            VERSION_SUFFIX="v${RUN_NUM}"
+          else
+            VERSION_SUFFIX=$(date +'%Y%m%d%H%M')
+          fi
 
-          # Formulate final names
-          APK_FILENAME="${cleanAppName}-${BUILD_TIME}.apk"
-          AAB_FILENAME="${cleanAppName}-${BUILD_TIME}.aab"
+          APK_FILENAME="${cleanAppName}_${VERSION_SUFFIX}.apk"
+          AAB_FILENAME="${cleanAppName}_${VERSION_SUFFIX}.aab"
 
           # Save to environment variables for subsequent steps
           echo "APK_FILENAME=${APK_FILENAME}" >> $GITHUB_ENV
