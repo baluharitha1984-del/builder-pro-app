@@ -57,6 +57,28 @@ jobs:
             # Initialize and sync Capacitor platform
             npx cap init "Applet" "com.pwa.app" --web-dir=www || true
             npx cap add android || true
+
+            # Patch dynamically generated Gradle files on the fly to fix Kotlin duplicate class conflicts
+            node -e "
+            const fs = require('fs');
+            if (fs.existsSync('android/build.gradle')) {
+              let content = fs.readFileSync('android/build.gradle', 'utf8');
+              if (!content.includes('resolutionStrategy.eachDependency')) {
+                content += '\n\nsubprojects {\n    configurations.all {\n        resolutionStrategy.eachDependency { details ->\n            if (details.requested.group == \"org.jetbrains.kotlin\") {\n                details.useVersion \"1.8.22\"\n            }\n        }\n    }\n}\n';
+                fs.writeFileSync('android/build.gradle', content);
+              }
+            }
+            if (fs.existsSync('android/app/build.gradle')) {
+              let content = fs.readFileSync('android/app/build.gradle', 'utf8');
+              content = content.replace(/.*kotlin-stdlib-jdk7.*/g, '');
+              content = content.replace(/.*kotlin-stdlib-jdk8.*/g, '');
+              if (!content.includes('kotlin-stdlib-jdk7')) {
+                content += '\n\nconfigurations.all {\n    exclude group: \"org.jetbrains.kotlin\", module: \"kotlin-stdlib-jdk7\"\n    exclude group: \"org.jetbrains.kotlin\", module: \"kotlin-stdlib-jdk8\"\n}\n';
+              }
+              fs.writeFileSync('android/app/build.gradle', content);
+            }
+            "
+
             npx cap sync android
           fi
       - name: Set up JDK 21
