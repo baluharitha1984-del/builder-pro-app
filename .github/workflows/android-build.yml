@@ -15,6 +15,68 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Configure Unique Android Naming and Identifiers
+        run: |-
+          cat << 'EOF' > setup_app.js
+          const fs = require('fs');
+
+          let appName = 'Applet';
+          if (fs.existsSync('capacitor.config.json')) {
+            try {
+              appName = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8')).appName || appName;
+            } catch(e) {}
+          } else if (fs.existsSync('package.json')) {
+            try {
+              appName = JSON.parse(fs.readFileSync('package.json', 'utf8')).name || appName;
+            } catch(e) {}
+          }
+
+          const cleanAppName = appName.trim() || 'Applet';
+          const cleanAppIdPart = cleanAppName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'app';
+          const timestamp = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 12);
+          const uniqueAppId = "com.builder." + cleanAppIdPart + timestamp;
+
+          console.log('=== ASSIGNING UNIQUE APP DETAILS ===');
+          console.log('App Name:', cleanAppName);
+          console.log('Dynamic App ID:', uniqueAppId);
+
+          let capData = {};
+          if (fs.existsSync('capacitor.config.json')) {
+            try {
+              capData = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
+            } catch(e) {}
+          }
+          capData.appId = uniqueAppId;
+          capData.appName = cleanAppName;
+          capData.webDir = capData.webDir || 'www';
+          capData.bundledWebRuntime = capData.bundledWebRuntime || false;
+
+          fs.writeFileSync('capacitor.config.json', JSON.stringify(capData, null, 2), 'utf8');
+          console.log('Successfully updated capacitor.config.json with Unique appId: ' + uniqueAppId);
+
+          const gradlePaths = ['android/app/build.gradle', 'app/build.gradle'];
+          for (const gradlePath of gradlePaths) {
+            if (fs.existsSync(gradlePath)) {
+              let content = fs.readFileSync(gradlePath, 'utf8');
+              const updatedContent = content.replace(/applicationId\s+['"][^'"]+['"]/g, "applicationId \"" + uniqueAppId + "\"");
+              fs.writeFileSync(gradlePath, updatedContent, 'utf8');
+              console.log('Successfully updated applicationId in ' + gradlePath + ' to ' + uniqueAppId);
+            }
+          }
+
+          const stringsPaths = ['android/app/src/main/res/values/strings.xml', 'app/src/main/res/values/strings.xml'];
+          for (const stringsPath of stringsPaths) {
+            if (fs.existsSync(stringsPath)) {
+              let content = fs.readFileSync(stringsPath, 'utf8');
+              let updatedContent = content.replace(/<string\s+name="app_name">.*?<\/string>/g, "<string name=\"app_name\">" + cleanAppName + "</string>");
+              updatedContent = updatedContent.replace(/<string\s+name="title_activity_main">.*?<\/string>/g, "<string name=\"title_activity_main\">" + cleanAppName + "</string>");
+              fs.writeFileSync(stringsPath, updatedContent, 'utf8');
+              console.log('Successfully updated app_name and title_activity_main strings in ' + stringsPath + ' to ' + cleanAppName);
+            }
+          }
+          EOF
+          node setup_app.js
+          rm setup_app.js
       - name: Detect and Setup Project
         id: setup_project
         run: |-
@@ -49,14 +111,44 @@ jobs:
               fi
             done
             
-            # Create default capacitor.config.json if not exists
-            if [ ! -f "capacitor.config.json" ]; then
-              echo '{"appId": "com.pwa.app", "appName": "Applet", "webDir": "www", "bundledWebRuntime": false}' > capacitor.config.json
-            fi
+            # Retrieve dynamic config appId and appName
+            APP_NAME=$(node -p "try { require('./capacitor.config.json').appName || 'Applet' } catch { 'Applet' }")
+            APP_ID=$(node -p "try { require('./capacitor.config.json').appId || 'com.pwa.app' } catch { 'com.pwa.app' }")
             
-            # Initialize and sync Capacitor platform
-            npx cap init "Applet" "com.pwa.app" --web-dir=www || true
+            # Initialize Capacitor using dynamic values
+            npx cap init "$APP_NAME" "$APP_ID" --web-dir=www || true
             npx cap add android || true
+
+            # Apply dynamic configuration changes onto newly generated native Android project
+            cat << 'EOF' > setup_app.js
+            const fs = require('fs');
+            const capData = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
+            const cleanAppName = capData.appName;
+            const uniqueAppId = capData.appId;
+            
+            const gradlePaths = ['android/app/build.gradle', 'app/build.gradle'];
+            for (const gradlePath of gradlePaths) {
+              if (fs.existsSync(gradlePath)) {
+                let content = fs.readFileSync(gradlePath, 'utf8');
+                const updatedContent = content.replace(/applicationId\s+['"][^'"]+['"]/g, "applicationId \"" + uniqueAppId + "\"");
+                fs.writeFileSync(gradlePath, updatedContent, 'utf8');
+                console.log('Successfully updated applicationId in ' + gradlePath + ' to ' + uniqueAppId);
+              }
+            }
+            
+            const stringsPaths = ['android/app/src/main/res/values/strings.xml', 'app/src/main/res/values/strings.xml'];
+            for (const stringsPath of stringsPaths) {
+              if (fs.existsSync(stringsPath)) {
+                let content = fs.readFileSync(stringsPath, 'utf8');
+                let updatedContent = content.replace(/<string\s+name="app_name">.*?<\/string>/g, "<string name=\"app_name\">" + cleanAppName + "</string>");
+                updatedContent = updatedContent.replace(/<string\s+name="title_activity_main">.*?<\/string>/g, "<string name=\"title_activity_main\">" + cleanAppName + "</string>");
+                fs.writeFileSync(stringsPath, updatedContent, 'utf8');
+                console.log('Successfully updated app_name and title_activity_main strings in ' + stringsPath + ' to ' + cleanAppName);
+              }
+            }
+            EOF
+            node setup_app.js
+            rm setup_app.js
 
             # Patch dynamically generated Gradle files on the fly to fix Kotlin duplicate class conflicts
             node -e "
@@ -64,7 +156,7 @@ jobs:
             if (fs.existsSync('android/build.gradle')) {
               let content = fs.readFileSync('android/build.gradle', 'utf8');
               if (!content.includes('resolutionStrategy.eachDependency')) {
-                content += '\n\nsubprojects {\n    configurations.all {\n        resolutionStrategy.eachDependency { details ->\n            if (details.requested.group == \"org.jetbrains.kotlin\") {\n                details.useVersion \"1.8.22\"\n            }\n        }\n    }\n}\n';
+                content += '\n\nsubprojects {\n    configurations.all {\n        resolutionStrategy.eachDependency { details ->\n            if (details.requested.group == \"org.jetbrains.kotlin\") {\n                details.useVersion \"1.8.22\"\n            }\n         }\n    }\n}\n';
                 fs.writeFileSync('android/build.gradle', content);
               }
             }
