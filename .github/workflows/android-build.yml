@@ -107,11 +107,37 @@ jobs:
         run: |-
           mkdir -p tmp-apk tmp-aab
 
+          # Determine App Name dynamically
+          if [ -f "capacitor.config.json" ]; then
+            APP_NAME=$(node -p "try { require('./capacitor.config.json').appName || require('./package.json').name || 'Applet' } catch { 'Applet' }")
+          elif [ -f "package.json" ]; then
+            APP_NAME=$(node -p "try { require('./package.json').name } catch { 'Applet' }")
+          else
+            APP_NAME="Applet"
+          fi
+
+          # Sanitize app name to be safe for filenames
+          cleanAppName=$(echo "$APP_NAME" | sed 's/[^a-zA-Z0-9_-]//g')
+          if [ -z "$cleanAppName" ]; then
+            cleanAppName="Applet"
+          fi
+
+          # Generate build timestamp
+          BUILD_TIME=$(date +'%Y%m%d-%H%M')
+
+          # Formulate final names
+          APK_FILENAME="${cleanAppName}-${BUILD_TIME}.apk"
+          AAB_FILENAME="${cleanAppName}-${BUILD_TIME}.aab"
+
+          # Save to environment variables for subsequent steps
+          echo "APK_FILENAME=${APK_FILENAME}" >> $GITHUB_ENV
+          echo "AAB_FILENAME=${AAB_FILENAME}" >> $GITHUB_ENV
+
           # Locate APK and copy it to tmp-apk
           APK_FILE=$(find . -name "*.apk" -not -path "*/node_modules/*" | head -n 1)
           if [ -n "$APK_FILE" ]; then
-            cp "$APK_FILE" tmp-apk/app-debug.apk
-            echo "Successfully copied APK: $APK_FILE"
+            cp "$APK_FILE" "tmp-apk/${APK_FILENAME}"
+            echo "Successfully copied APK: $APK_FILE to tmp-apk/${APK_FILENAME}"
           else
             echo "ERROR: No compiled APK found!" >&2
             exit 1
@@ -120,19 +146,24 @@ jobs:
           # Locate AAB and copy it to tmp-aab
           AAB_FILE=$(find . -name "*.aab" -not -path "*/node_modules/*" | head -n 1)
           if [ -n "$AAB_FILE" ]; then
-            cp "$AAB_FILE" tmp-aab/app-release.aab
-            echo "Successfully copied AAB: $AAB_FILE"
+            cp "$AAB_FILE" "tmp-aab/${AAB_FILENAME}"
+            echo "Successfully copied AAB: $AAB_FILE to tmp-aab/${AAB_FILENAME}"
           else
             echo "ERROR: No compiled AAB found!" >&2
             exit 1
           fi
+
+          echo "=== FINAL GENERATED ARTIFACTS ==="
+          echo "APK Filename: ${APK_FILENAME}"
+          echo "AAB Filename: ${AAB_FILENAME}"
+          echo "=================================="
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: play-ready-debug-apk
-          path: tmp-apk/app-debug.apk
+          name: ${{ env.APK_FILENAME }}
+          path: tmp-apk/${{ env.APK_FILENAME }}
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: play-ready-release-aab
-          path: tmp-aab/app-release.aab
+          name: ${{ env.AAB_FILENAME }}
+          path: tmp-aab/${{ env.AAB_FILENAME }}
