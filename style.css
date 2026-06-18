@@ -1,1 +1,1 @@
-.calculator-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(4, 1fr); } button:active { transform: scale(0.96); }
+.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } button { font-weight: 500; font-size: 1.25rem; }
