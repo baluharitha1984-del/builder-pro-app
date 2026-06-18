@@ -102,8 +102,15 @@ for (const p of stringsPaths) {
   if (fs.existsSync(p)) {
     try {
       let content = fs.readFileSync(p, 'utf8');
-      content = content.replace(/<string\\s+name="app_name">.*?<\\/string>/g, '<string name="app_name">' + uniqueAppLabel + '</string>');
-      content = content.replace(/<string\\s+name="title_activity_main">.*?<\\/string>/g, '<string name="title_activity_main">' + uniqueAppLabel + '</string>');
+      content = content.replace(
+  /<string\s+name="app_name">.*?<\/string>/g,
+  '<string name="app_name">' + uniqueAppLabel + '</string>'
+);
+
+content = content.replace(
+  /<string\s+name="title_activity_main">.*?<\/string>/g,
+  '<string name="title_activity_main">' + uniqueAppLabel + '</string>'
+);
       fs.writeFileSync(p, content, 'utf8');
       console.log("Updated strings.xml: " + p);
     } catch (e) {
@@ -120,9 +127,9 @@ for (const p of gradlePaths) {
   if (fs.existsSync(p)) {
     try {
       let content = fs.readFileSync(p, 'utf8');
-      content = content.replace(/namespace\\s+['"][^'"]+['"]/g, 'namespace "' + uniqueAppId + '"');
-      content = content.replace(/applicationId\\s+['"][^'"]+['"]/g, 'applicationId "' + uniqueAppId + '"');
-      content = content.replace(/versionCode\\s+\\d+/g, 'versionCode ' + versionCode);
+      content = content.replace(/namespace\s+['"][^'"]+['"]/g, 'namespace "' + uniqueAppId + '"');
+content = content.replace(/applicationId\s+['"][^'"]+['"]/g, 'applicationId "' + uniqueAppId + '"');
+content = content.replace(/versionCode\s+\d+/g, 'versionCode ' + versionCode);
       fs.writeFileSync(p, content, 'utf8');
       console.log("Updated build.gradle: " + p);
     } catch (e) {
