@@ -102,8 +102,10 @@ for (const p of stringsPaths) {
   if (fs.existsSync(p)) {
     try {
       let content = fs.readFileSync(p, 'utf8');
-      content = content.replace(/<string\s+name="app_name">.*?</string>/g, '<string name="app_name">' + uniqueAppLabel + '</string>');
-      content = content.replace(/<string\s+name="title_activity_main">.*?</string>/g, '<string name="title_activity_main">' + uniqueAppLabel + '</string>');
+      // /<string\s+name="app_name">.*?</string>/g
+      content = content.replace(new RegExp('<string\\s+name="app_name">.*?</string>', 'g'), '<string name="app_name">' + uniqueAppLabel + '</string>');
+      // /<string\s+name="title_activity_main">.*?</string>/g
+      content = content.replace(new RegExp('<string\\s+name="title_activity_main">.*?</string>', 'g'), '<string name="title_activity_main">' + uniqueAppLabel + '</string>');
       fs.writeFileSync(p, content, 'utf8');
       console.log("Updated strings.xml: " + p);
     } catch (e) {
