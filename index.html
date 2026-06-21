@@ -3,373 +3,367 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SciLab Simulator</title>
+  <title>Elementium Periodic Table</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased pb-12">
+  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
   <!-- Header Navigation -->
-  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800 px-6 py-4">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+        <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl shadow-lg shadow-indigo-500/20">
           <svg class="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
           </svg>
         </div>
         <div>
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">SciLab Simulator</h1>
-          <p class="text-xs text-slate-400">Interactive Virtual Experiments & Lab Notebook</p>
+          <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Elementium</h1>
+          <p class="text-xs text-slate-400 font-medium tracking-wider uppercase">The Ultimate Interactive Periodic Table</p>
         </div>
       </div>
-      <nav class="flex flex-wrap gap-2" id="main-nav">
-        <button id="tab-btn-labs" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-600 text-white shadow-md shadow-indigo-600/20" onclick="switchTab('labs')">🧪 Virtual Labs</button>
-        <button id="tab-btn-periodic" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-slate-800 text-slate-300 hover:bg-slate-700" onclick="switchTab('periodic')">🔋 Periodic Table</button>
-        <button id="tab-btn-notebook" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-slate-800 text-slate-300 hover:bg-slate-700" onclick="switchTab('notebook')">📓 Lab Notebook</button>
-        <button id="tab-btn-trivia" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-slate-800 text-slate-300 hover:bg-slate-700" onclick="switchTab('trivia')">⚡ Quick Quiz</button>
-      </nav>
+
+      <!-- Global Search & Quick Stats -->
+      <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div class="relative flex-1 md:w-80">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </span>
+          <input id="table-search" type="search" class="w-full pl-9 pr-4 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-100 placeholder-slate-400 transition-all" placeholder="Search by symbol, name, number...">
+        </div>
+        <button id="btn-quiz-mode" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm rounded-xl shadow-md shadow-indigo-600/10 transition-all flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 01-2 2h0a2 2 0 01-2-2v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          Element Quiz
+        </button>
+        <button id="btn-compare-mode" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-sm rounded-xl transition-all flex items-center gap-2">
+          Compare
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-    <!-- TAB 1: VIRTUAL LABS -->
-    <section id="tab-content-labs" class="space-y-8 block">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        <!-- SUB-LAB A: CHEMISTRY MIXER -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
-          <div class="flex justify-between items-center mb-6">
-            <div>
-              <span class="text-xs font-semibold uppercase tracking-wider text-cyan-400 px-2.5 py-1 rounded-full bg-cyan-500/10">Chemistry Lab</span>
-              <h2 class="text-xl font-bold mt-2">pH Indicator & Reaction Simulator</h2>
-            </div>
-            <button id="reset-chem-btn" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors" title="Reset Flask">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H15.657"/></svg>
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <!-- Interactive Beaker Visual -->
-            <div class="md:col-span-5 flex flex-col items-center justify-center bg-slate-950/50 rounded-xl p-4 border border-slate-800/80">
-              <div class="relative w-40 h-56 flex items-end justify-center pb-4">
-                <!-- Flask Outer Contour -->
-                <div class="absolute inset-0 border-4 border-slate-600 rounded-b-3xl rounded-t-lg flex items-end justify-center overflow-hidden" style="clip-path: polygon(30% 0%, 70% 0%, 70% 30%, 100% 70%, 100% 100%, 0% 100%, 0% 70%, 30% 30%);">
-                  <!-- Fluid level -->
-                  <div id="beaker-fluid" class="w-full transition-all duration-500 ease-out relative" style="height: 50%; background-color: rgb(16, 185, 129);">
-                    <!-- Bubbles inside fluid -->
-                    <div class="bubble bubble-1"></div>
-                    <div class="bubble bubble-2"></div>
-                    <div class="bubble bubble-3"></div>
-                  </div>
-                </div>
-                <div class="absolute -top-3 w-16 h-3 border-2 border-slate-500 bg-slate-800 rounded-full"></div>
-                
-                <!-- Readout overlay -->
-                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900/90 px-3 py-1 rounded-full border border-slate-700 shadow-md">
-                  <span id="ph-display-val" class="text-sm font-extrabold text-emerald-400">pH 7.0</span>
-                </div>
-              </div>
-              
-              <div class="w-full mt-4 space-y-2">
-                <div class="flex justify-between text-xs text-slate-400">
-                  <span>Acidic (pH < 7)</span>
-                  <span>Neutral</span>
-                  <span>Basic (pH > 7)</span>
-                </div>
-                <div class="h-2 w-full rounded-full bg-gradient-to-r from-red-500 via-green-500 to-purple-600 relative">
-                  <div id="ph-indicator-pin" class="w-4 h-4 rounded-full bg-white border-2 border-slate-900 absolute -top-1 transition-all duration-300" style="left: 50%; transform: translateX(-50%);"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Lab Controls -->
-            <div class="md:col-span-7 flex flex-col justify-between space-y-4">
-              <div>
-                <h3 class="text-sm font-medium text-slate-300 mb-2">Add Chemical Compounds:</h3>
-                <div class="grid grid-cols-2 gap-2">
-                  <button id="add-hcl-btn" class="px-3 py-2 bg-red-950/40 hover:bg-red-900/50 border border-red-800/50 rounded-lg text-left text-xs flex flex-col justify-between transition-colors">
-                    <span class="font-bold text-red-400">HCl (Acid)</span>
-                    <span class="text-[10px] text-slate-400">+10ml Hydrochloric Acid</span>
-                  </button>
-                  <button id="add-naoh-btn" class="px-3 py-2 bg-violet-950/40 hover:bg-violet-900/50 border border-violet-800/50 rounded-lg text-left text-xs flex flex-col justify-between transition-colors">
-                    <span class="font-bold text-violet-400">NaOH (Base)</span>
-                    <span class="text-[10px] text-slate-400">+10ml Sodium Hydroxide</span>
-                  </button>
-                  <button id="add-water-btn" class="px-3 py-2 bg-sky-950/40 hover:bg-sky-900/50 border border-sky-800/50 rounded-lg text-left text-xs flex flex-col justify-between transition-colors">
-                    <span class="font-bold text-sky-400">H₂O (Water)</span>
-                    <span class="text-[10px] text-slate-400">+30ml Neutral Water</span>
-                  </button>
-                  <button id="add-indicator-btn" class="px-3 py-2 bg-amber-950/40 hover:bg-amber-900/50 border border-amber-800/50 rounded-lg text-left text-xs flex flex-col justify-between transition-colors">
-                    <span class="font-bold text-amber-400">Indicator Dye</span>
-                    <span class="text-[10px] text-slate-400">Enable Phenolphthalein</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="bg-slate-950/60 p-3 rounded-lg border border-slate-800">
-                <h4 class="text-xs font-semibold text-slate-400 mb-1.5 uppercase tracking-wide">Reaction Notebook Feed:</h4>
-                <div id="chem-logger" class="space-y-1 h-28 overflow-y-auto text-xs font-mono text-slate-300 scrollbar-thin scrollbar-thumb-slate-800">
-                  <p class="text-emerald-400">[SYSTEM] Lab beaker prepped with 100ml Pure H₂O.</p>
-                  <p class="text-slate-500">[INFO] Try mixing acids & bases to see indicator color changes!</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- SUB-LAB B: PHYSICS PENDULUM -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-          <div class="flex justify-between items-center mb-6">
-            <div>
-              <span class="text-xs font-semibold uppercase tracking-wider text-indigo-400 px-2.5 py-1 rounded-full bg-indigo-500/10">Physics Lab</span>
-              <h2 class="text-xl font-bold mt-2">Pendulum Motion Simulator</h2>
-            </div>
-            <div class="flex gap-2">
-              <button id="pendulum-play-btn" class="p-2 text-emerald-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </button>
-              <button id="pendulum-reset-btn" class="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H15.657"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <!-- Canvas Container -->
-            <div class="md:col-span-6 flex flex-col items-center bg-slate-950/50 rounded-xl p-3 border border-slate-800/80 relative">
-              <canvas id="pendulum-canvas" class="w-full h-48 bg-slate-950 rounded-lg border border-slate-900"></canvas>
-              <div class="mt-3 grid grid-cols-2 gap-2 w-full text-center text-xs">
-                <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800">
-                  <div class="text-slate-400">Period (T)</div>
-                  <div id="pendulum-period-val" class="font-mono font-bold text-indigo-400">1.8s</div>
-                </div>
-                <div class="bg-slate-900/80 p-1.5 rounded border border-slate-800">
-                  <div class="text-slate-400">Max Angle</div>
-                  <div id="pendulum-angle-val" class="font-mono font-bold text-amber-400">45°</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Simulator Controls -->
-            <div class="md:col-span-6 flex flex-col justify-between space-y-4">
-              <div class="space-y-4">
-                <!-- Length Slider -->
-                <div>
-                  <div class="flex justify-between items-center mb-1">
-                    <label class="text-xs text-slate-300 font-medium">String Length (L)</label>
-                    <span id="slider-length-val" class="text-xs font-mono font-bold text-cyan-400">120 cm</span>
-                  </div>
-                  <input id="slider-length" type="range" min="50" max="200" value="120" class="w-full accent-cyan-400 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
-                </div>
-
-                <!-- Gravity Selector -->
-                <div>
-                  <label class="text-xs text-slate-300 font-medium block mb-1.5">Environment Gravity (g)</label>
-                  <div class="grid grid-cols-3 gap-1">
-                    <button id="g-earth-btn" class="px-2 py-1.5 text-xs rounded bg-indigo-600 text-white font-medium hover:bg-indigo-500 transition-colors">Earth (9.8)</button>
-                    <button id="g-moon-btn" class="px-2 py-1.5 text-xs rounded bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition-colors">Moon (1.6)</button>
-                    <button id="g-jupiter-btn" class="px-2 py-1.5 text-xs rounded bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition-colors">Jupiter (24.8)</button>
-                  </div>
-                </div>
-
-                <!-- Bob Mass Slider -->
-                <div>
-                  <div class="flex justify-between items-center mb-1">
-                    <label class="text-xs text-slate-300 font-medium">Bob Mass (m)</label>
-                    <span id="slider-mass-val" class="text-xs font-mono font-bold text-cyan-400">1.0 kg</span>
-                  </div>
-                  <input id="slider-mass" type="range" min="0.2" max="3.0" step="0.1" value="1.0" class="w-full accent-indigo-400 bg-slate-800 rounded-lg h-1.5 cursor-pointer">
-                </div>
-              </div>
-
-              <p class="text-[11px] text-slate-500 leading-relaxed">
-                💡 <span class="text-slate-400 font-semibold">Did you know?</span> A pendulum's period depends strictly on length and gravity, not the mass of the bob! Drag parameters to experiment.
-              </p>
-            </div>
-          </div>
-        </div>
-        
+  <!-- Sub-Toolbar (Filters & Temp Slider) -->
+  <div class="bg-slate-900 border-b border-slate-800 py-3 px-6">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <!-- Categories Quick Filter -->
+      <div class="flex flex-wrap gap-1.5 items-center" id="category-filters-container">
+        <span class="text-xs font-semibold uppercase text-slate-400 mr-2">Filter Group:</span>
+        <button class="filter-chip active" data-category="all">All</button>
+        <button class="filter-chip" data-category="nonmetal">Nonmetals</button>
+        <button class="filter-chip" data-category="noble">Noble Gases</button>
+        <button class="filter-chip" data-category="alkali">Alkali Metals</button>
+        <button class="filter-chip" data-category="alkaline">Alkaline Earth</button>
+        <button class="filter-chip" data-category="metalloid">Metalloids</button>
+        <button class="filter-chip" data-category="halogen">Halogens</button>
+        <button class="filter-chip" data-category="transition">Transition</button>
+        <button class="filter-chip" data-category="lanthanide">Lanthanides</button>
+        <button class="filter-chip" data-category="actinide">Actinides</button>
       </div>
-    </section>
 
-    <!-- TAB 2: PERIODIC TABLE -->
-    <section id="tab-content-periodic" class="space-y-8 hidden">
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative">
-        <div class="mb-6">
-          <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 px-2.5 py-1 rounded-full bg-emerald-500/10">Chemistry Sandbox</span>
-          <h2 class="text-2xl font-bold mt-2">Interactive Periodic Table</h2>
-          <p class="text-slate-400 text-sm mt-1">Select an element to study atomic mass, group classifications, and educational fast facts.</p>
+      <!-- Temp Slider -->
+      <div class="flex items-center gap-3 bg-slate-950/50 px-4 py-1.5 rounded-xl border border-slate-800/80 w-full lg:w-auto">
+        <div class="text-xs font-semibold uppercase text-slate-400 whitespace-nowrap">State at Temperature:</div>
+        <div class="flex items-center gap-2 w-full">
+          <span class="text-xs text-slate-400 font-mono" id="temp-val">298 K (25°C)</span>
+          <input id="temp-slider" type="range" min="0" max="6000" value="298" class="accent-indigo-500 h-1.5 bg-slate-800 rounded-lg cursor-pointer w-32 md:w-48">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Dashboard -->
+  <main class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- Left side: Periodic Table Grid and controls (9 cols on large screen) -->
+    <div class="lg:col-span-9 space-y-8 overflow-x-auto">
+
+      <!-- Periodic Table Element Grid Container -->
+      <div class="relative min-w-[980px] select-none p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60 shadow-inner">
+        
+        <!-- Period numbers (Left Column) -->
+        <div class="absolute left-0 top-12 bottom-16 flex flex-col justify-between py-1 text-xs font-bold font-mono text-slate-600">
+          <div class="h-12 flex items-center justify-center w-4">1</div>
+          <div class="h-12 flex items-center justify-center w-4">2</div>
+          <div class="h-12 flex items-center justify-center w-4">3</div>
+          <div class="h-12 flex items-center justify-center w-4">4</div>
+          <div class="h-12 flex items-center justify-center w-4">5</div>
+          <div class="h-12 flex items-center justify-center w-4">6</div>
+          <div class="h-12 flex items-center justify-center w-4">7</div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <!-- Mini Grid Container -->
-          <div class="lg:col-span-8 overflow-x-auto">
-            <div class="min-w-[500px] grid grid-cols-8 gap-2 p-1 bg-slate-950/60 rounded-xl border border-slate-800/80" id="elements-container">
-              <!-- Element cards dynamically loaded by JS -->
-            </div>
+        <!-- Periodic Table Wrapper Grid -->
+        <div class="pl-6">
+          <!-- 18 Group Numbers -->
+          <div class="grid grid-cols-18 gap-1.5 text-center text-[10px] font-mono text-slate-500 font-semibold mb-2">
+            <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div>
           </div>
 
-          <!-- Detail Sidebar Panel -->
-          <div class="lg:col-span-4 bg-slate-950/80 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
-            <div id="element-detail-card">
-              <div class="flex items-start justify-between border-b border-slate-800 pb-4 mb-4">
-                <div>
-                  <span id="elem-number" class="text-xs font-mono font-bold text-emerald-400">#1</span>
-                  <h3 id="elem-name" class="text-xl font-extrabold text-white mt-0.5">Hydrogen</h3>
-                  <p id="elem-category" class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">Reactive Nonmetal</p>
-                </div>
-                <div id="elem-symbol-box" class="w-14 h-14 bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 rounded-lg border border-slate-700/60 flex items-center justify-center font-extrabold text-2xl text-cyan-400">
-                  H
-                </div>
-              </div>
+          <!-- The core 18-column grid -->
+          <div id="periodic-table-grid" class="grid grid-cols-18 gap-1.5">
+            <!-- Elements are rendered dynamically here -->
+          </div>
 
-              <div class="space-y-3 text-sm">
-                <div class="flex justify-between border-b border-slate-900 pb-2">
-                  <span class="text-slate-400">Atomic Weight:</span>
-                  <span id="elem-weight" class="font-mono text-slate-200">1.008 u</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-900 pb-2">
-                  <span class="text-slate-400">Standard State:</span>
-                  <span id="elem-state" class="text-slate-200">Gas</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-900 pb-2">
-                  <span class="text-slate-400">Discoverer:</span>
-                  <span id="elem-discoverer" class="text-slate-200">Henry Cavendish</span>
-                </div>
-                <div>
-                  <span class="text-xs text-emerald-400 font-semibold uppercase tracking-wider block mb-1">Educational Trivia:</span>
-                  <p id="elem-trivia" class="text-xs text-slate-300 leading-relaxed bg-slate-900/50 p-3 rounded border border-slate-800/50">
-                    Hydrogen is the most abundant chemical substance in the Universe, constituting roughly 75% of all baryonic mass.
-                  </p>
-                </div>
-              </div>
-            </div>
+          <!-- Spacer / Separator for Lanthanides and Actinides -->
+          <div class="h-8"></div>
 
-            <div class="mt-6 text-center">
-              <p class="text-[11px] text-slate-500 italic">
-                Tap any colored block in the table grid to update this info panel instantly.
-              </p>
-            </div>
+          <!-- Lanthanides & Actinides Grid -->
+          <div id="periodic-table-f-block" class="grid grid-cols-18 gap-1.5">
+            <!-- F-block (lanthanides/actinides) elements are dynamically rendered here -->
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- TAB 3: LAB NOTEBOOK -->
-    <section id="tab-content-notebook" class="space-y-8 hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- Left: Planner Input Column -->
-        <div class="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col">
-          <h2 class="text-xl font-bold mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-            Plan New Experiment
-          </h2>
-          
-          <form id="experiment-form" class="space-y-4 flex-1">
-            <div>
-              <label class="text-xs text-slate-300 font-medium block mb-1">Experiment Title</label>
-              <input id="exp-title" type="text" placeholder="e.g., Potato Battery" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500" required>
-            </div>
-
-            <div>
-              <label class="text-xs text-slate-300 font-medium block mb-1">Hypothesis</label>
-              <textarea id="exp-hypothesis" rows="2" placeholder="What do you predict will happen?" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500" required></textarea>
-            </div>
-
-            <div>
-              <label class="text-xs text-slate-300 font-medium block mb-1">Materials Needed (Comma-separated)</label>
-              <input id="exp-materials" type="text" placeholder="e.g., Potato, copper coin, zinc nail" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500" required>
-            </div>
-
-            <div>
-              <label class="text-xs text-slate-300 font-medium block mb-1">Steps</label>
-              <textarea id="exp-steps" rows="3" placeholder="1. Insert metal into potato...
-2. Hook up voltmeter...
-3. Measure current." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500" required></textarea>
-            </div>
-
-            <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold text-sm hover:from-purple-500 hover:to-indigo-500 transition-all shadow-md shadow-purple-600/10">
-              Save to Lab Book
-            </button>
-          </form>
-        </div>
-
-        <!-- Right: Current Experiments List -->
-        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col">
-          <div class="flex justify-between items-center mb-6">
-            <div>
-              <h2 class="text-xl font-bold">Active Lab Entries</h2>
-              <p class="text-xs text-slate-400 mt-1">Browse, log outcomes, or remove scientific templates below.</p>
-            </div>
-            <button id="clear-all-notebook" class="text-xs text-red-400 hover:text-red-300 bg-red-950/20 px-3 py-1.5 rounded-lg border border-red-900/50 hover:bg-red-950/40 transition-colors">
-              Clear All
-            </button>
+      <!-- Map/Color Legend & Information Bar -->
+      <div class="bg-slate-900/50 rounded-xl p-4 border border-slate-800/80 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex flex-wrap gap-4 text-xs">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 inline-block"></span>
+            <span class="text-slate-300">Reactive Nonmetals</span>
           </div>
-
-          <!-- Active Experiments Stack -->
-          <div id="notebook-list" class="space-y-4 flex-1 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin">
-            <!-- Template/Default Notebook cards load dynamically via JS -->
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-purple-500/20 border border-purple-500/40 inline-block"></span>
+            <span class="text-slate-300">Noble Gases</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-rose-500/20 border border-rose-500/40 inline-block"></span>
+            <span class="text-slate-300">Alkali Metals</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-amber-500/20 border border-amber-500/40 inline-block"></span>
+            <span class="text-slate-300">Alkaline Earth</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-yellow-500/20 border border-yellow-500/40 inline-block"></span>
+            <span class="text-slate-300">Metalloids</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-cyan-500/20 border border-cyan-500/40 inline-block"></span>
+            <span class="text-slate-300">Halogens</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-sky-500/20 border border-sky-500/40 inline-block"></span>
+            <span class="text-slate-300">Post-Transition</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3.5 h-3.5 rounded-md bg-indigo-500/20 border border-indigo-500/40 inline-block"></span>
+            <span class="text-slate-300">Transition Metals</span>
           </div>
         </div>
 
+        <div class="flex gap-4 text-xs font-mono text-slate-400 bg-slate-950/60 px-3 py-1.5 rounded-lg border border-slate-800">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-slate-200 inline-block"></span>
+            <span>Solid</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-blue-400 inline-block animate-pulse"></span>
+            <span>Liquid</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-400 inline-block"></span>
+            <span>Gas</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-pink-400 inline-block"></span>
+            <span>Synthetic</span>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <!-- TAB 4: QUICK QUIZ -->
-    <section id="tab-content-trivia" class="space-y-8 hidden">
-      <div class="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-        <div class="absolute -top-12 -left-12 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="mb-6 flex justify-between items-center">
-          <div>
-            <span class="text-xs font-semibold uppercase tracking-wider text-purple-400 px-2.5 py-1 rounded-full bg-purple-500/10">Science Trivia Challenge</span>
-            <h2 class="text-2xl font-bold mt-2">SciLab Brain Teaser</h2>
+    <!-- Right side: Interactive Cards (Detail Panel, Quiz Panel, Comparison Panel) -->
+    <div class="lg:col-span-3 space-y-6">
+      
+      <!-- Interactive Card 1: Element Inspector (Always Visible/Toggled) -->
+      <div id="panel-details" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <h3 class="font-bold text-sm tracking-wider uppercase text-slate-400 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+            Element Inspector
+          </h3>
+          <span class="text-xs bg-slate-800/80 text-slate-400 px-2 py-0.5 rounded border border-slate-700 font-mono" id="detail-state">Solid</span>
+        </div>
+        
+        <div class="text-center py-6 bg-slate-950/50 rounded-xl border border-slate-800/80 mb-4 relative overflow-hidden group">
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent pointer-events-none"></div>
+          <div class="text-xs font-mono text-slate-500 font-bold absolute top-3 left-3" id="detail-number">6</div>
+          <div class="text-xs font-mono text-slate-500 font-bold absolute top-3 right-3" id="detail-mass">12.011</div>
+          <div class="text-5xl font-black text-white tracking-wide transition-all group-hover:scale-110 duration-300 mt-2" id="detail-symbol">C</div>
+          <div class="text-lg font-bold text-indigo-300 tracking-wider mt-1" id="detail-name">Carbon</div>
+          <div class="text-xs text-slate-400 font-mono tracking-wide mt-1" id="detail-category">Reactive Nonmetal</div>
+        </div>
+
+        <!-- Quick Facts Matrix -->
+        <div class="grid grid-cols-2 gap-3 text-xs mb-4">
+          <div class="p-2.5 bg-slate-950/30 border border-slate-800/60 rounded-lg">
+            <div class="text-slate-500 font-medium mb-0.5">Phase (STP)</div>
+            <div class="font-bold text-slate-300" id="detail-phase">Solid</div>
           </div>
-          <div class="text-right">
-            <span class="text-xs text-slate-400 block">Streak</span>
-            <span id="streak-counter" class="text-xl font-bold text-amber-400">0 🔥</span>
+          <div class="p-2.5 bg-slate-950/30 border border-slate-800/60 rounded-lg">
+            <div class="text-slate-500 font-medium mb-0.5">Discoverer</div>
+            <div class="font-bold text-slate-300 truncate" id="detail-discoverer" title="Ancient Egypt">Ancient Egypt</div>
+          </div>
+          <div class="p-2.5 bg-slate-950/30 border border-slate-800/60 rounded-lg">
+            <div class="text-slate-500 font-medium mb-0.5">Melting Point</div>
+            <div class="font-bold text-slate-300 font-mono" id="detail-melting">3823 K</div>
+          </div>
+          <div class="p-2.5 bg-slate-950/30 border border-slate-800/60 rounded-lg">
+            <div class="text-slate-500 font-medium mb-0.5">Boiling Point</div>
+            <div class="font-bold text-slate-300 font-mono" id="detail-boiling">4300 K</div>
           </div>
         </div>
 
-        <!-- Card for Quiz Qs -->
-        <div class="bg-slate-950/80 rounded-xl p-6 border border-slate-800/80">
-          <div class="flex justify-between items-center mb-4">
-            <span class="text-xs font-mono text-slate-400" id="quiz-difficulty">Level: Medium</span>
-            <span class="text-xs font-mono text-cyan-400" id="quiz-category">Physics</span>
-          </div>
-          
-          <p id="quiz-question" class="text-lg font-semibold text-white mb-6 leading-relaxed">
-            Which particles are responsible for electrical conduction in metallic conductors?
-          </p>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="quiz-options-container">
-            <!-- Buttons loaded dynamically -->
-          </div>
-
-          <div id="quiz-feedback" class="mt-6 p-4 rounded-lg hidden transition-all duration-300">
-            <p id="feedback-text" class="text-sm font-medium"></p>
-          </div>
+        <!-- Summary Text -->
+        <div class="bg-slate-950/30 border border-slate-800/60 p-3 rounded-lg text-xs text-slate-300 leading-relaxed">
+          <p class="font-semibold text-slate-400 mb-1">Overview & Significance:</p>
+          <p id="detail-summary" class="line-clamp-4 hover:line-clamp-none transition-all cursor-pointer">Carbon is a chemical element with symbol C and atomic number 6. It is nonmetallic and tetravalent—making four electrons available to form covalent chemical bonds.</p>
         </div>
+      </div>
 
-        <div class="mt-6 flex justify-between items-center">
-          <p class="text-xs text-slate-500">
-            Test your general science, chemistry, and physics knowledge!
-          </p>
-          <button id="next-quiz-btn" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5">
-            Next Question
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <!-- Interactive Card 2: Element Compare Panel (Hidden / Toggle-controlled) -->
+      <div id="panel-compare" class="hidden bg-slate-900 border border-indigo-500/40 rounded-2xl p-5 shadow-xl transition-all duration-300 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-3">
+          <button id="close-compare-btn" class="text-slate-400 hover:text-white transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
           </button>
         </div>
+        <div class="flex items-center border-b border-slate-800 pb-3 mb-4">
+          <h3 class="font-bold text-sm tracking-wider uppercase text-indigo-400 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path>
+            </svg>
+            Compare Elements
+          </h3>
+        </div>
+
+        <!-- Dual Picker -->
+        <div class="space-y-3 mb-4">
+          <div>
+            <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Element A</label>
+            <select id="compare-select-a" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              <!-- Hydrated dynamically -->
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Element B</label>
+            <select id="compare-select-b" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:ring-1 focus:ring-indigo-500">
+              <!-- Hydrated dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Comparison Sheet -->
+        <div class="space-y-2.5 text-xs font-mono">
+          <div class="flex justify-between pb-1 border-b border-slate-800/80 text-slate-400 font-sans font-semibold">
+            <span>Metric</span>
+            <span id="compare-label-a" class="text-indigo-400 truncate max-w-[80px]">A</span>
+            <span id="compare-label-b" class="text-pink-400 truncate max-w-[80px]">B</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-800/40">
+            <span class="text-slate-500 font-sans">Number</span>
+            <span id="comp-num-a" class="font-bold">-</span>
+            <span id="comp-num-b" class="font-bold">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-800/40">
+            <span class="text-slate-500 font-sans">Mass (u)</span>
+            <span id="comp-mass-a">-</span>
+            <span id="comp-mass-b">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-800/40">
+            <span class="text-slate-500 font-sans">Category</span>
+            <span id="comp-cat-a" class="truncate max-w-[80px]">-</span>
+            <span id="comp-cat-b" class="truncate max-w-[80px]">-</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-800/40">
+            <span class="text-slate-500 font-sans">State</span>
+            <span id="comp-state-a">-</span>
+            <span id="comp-state-b">-</span>
+          </div>
+          <div class="flex justify-between py-1">
+            <span class="text-slate-500 font-sans">Discoverer</span>
+            <span id="comp-disco-a" class="truncate max-w-[80px]" title="-">-</span>
+            <span id="comp-disco-b" class="truncate max-w-[80px]" title="-">-</span>
+          </div>
+        </div>
       </div>
-    </section>
+
+      <!-- Interactive Card 3: Element Quiz Mode (Hidden / Toggle-controlled) -->
+      <div id="panel-quiz" class="hidden bg-slate-900 border border-violet-500/40 rounded-2xl p-5 shadow-xl transition-all duration-300 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-3">
+          <button id="close-quiz-btn" class="text-slate-400 hover:text-white transition-all">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+          <h3 class="font-bold text-sm tracking-wider uppercase text-violet-400 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-violet-500 animate-ping"></span>
+            Element Challenge
+          </h3>
+          <span class="text-xs font-mono font-bold bg-violet-950 text-violet-300 border border-violet-800/60 px-2 py-0.5 rounded-full" id="quiz-score">Score: 0/0</span>
+        </div>
+
+        <!-- Quiz Setup / Active Game -->
+        <div id="quiz-box" class="space-y-4">
+          <div class="p-4 bg-slate-950/60 border border-slate-800 rounded-xl text-center relative">
+            <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider block mb-1">Identify the Element with Symbol</span>
+            <span class="text-4xl font-black text-white tracking-wide block" id="quiz-target-symbol">Au</span>
+          </div>
+
+          <!-- Options Grid -->
+          <div class="grid grid-cols-1 gap-2.5" id="quiz-options-container">
+            <!-- Interactive choice buttons go here -->
+            <button class="quiz-option-btn">Gold</button>
+            <button class="quiz-option-btn">Copper</button>
+            <button class="quiz-option-btn">Silver</button>
+            <button class="quiz-option-btn">Iron</button>
+          </div>
+
+          <!-- Status feedback bar -->
+          <div id="quiz-feedback" class="text-xs text-center font-semibold rounded-lg py-2 hidden">
+            Correct! Gold is highly valuable.
+          </div>
+
+          <div class="flex justify-between items-center pt-2">
+            <button id="btn-skip-quiz" class="text-xs text-slate-400 hover:text-slate-200 underline font-medium">Skip Element</button>
+            <button id="btn-reset-quiz" class="text-xs text-rose-400 hover:text-rose-300 font-medium">Reset Stats</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Card 4: Fun Interactive Trivia & Quick Explorer -->
+      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-5 shadow-lg">
+        <h4 class="font-bold text-xs uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+          <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          Quick Lab Tips
+        </h4>
+        <p class="text-xs text-slate-400 leading-relaxed">
+          Drag the <span class="text-slate-200 font-semibold">State Slider</span> above to witness phase transformations in real-time. Gases will turn <span class="text-red-400">red</span>, liquids will shimmer <span class="text-cyan-400">cyan</span>, and solids remain <span class="text-slate-300">stable</span>. Compare any two side-by-side using the comparison console!
+        </p>
+      </div>
+    </div>
   </main>
+
+  <!-- Beautiful Footer -->
+  <footer class="border-t border-slate-800 bg-slate-900/40 py-8 px-6 mt-12 text-center text-slate-500 text-xs">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p>© Elementium periodic table engine. Built with standard-compliant chemical database arrays.</p>
+      <div class="flex gap-4 font-medium">
+        <a href="#" id="btn-about-chem" class="hover:underline hover:text-slate-300">Chemical Database</a>
+        <a href="#" id="btn-clear-settings" class="hover:underline hover:text-slate-300">Reset View</a>
+      </div>
+    </div>
+  </footer>
 </div>
   
   <script src="script.js"></script>
