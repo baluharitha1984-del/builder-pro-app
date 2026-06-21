@@ -29,7 +29,7 @@ if (fs.existsSync('capacitor.config.json')) {
 }
 console.log("Target Package Name/ApplicationId: " + uniqueAppId);
 
-let appName = 'Applet';
+let appName = '';
 if (fs.existsSync('capacitor.config.json')) {
   try {
     const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
@@ -50,7 +50,7 @@ if (fs.existsSync('capacitor.config.json')) {
   } catch (e) {}
 }
 
-const cleanAppName = appName.trim() || 'Applet';
+const cleanAppName = appName.trim() || 'Custom App';
 const uniqueAppLabel = cleanAppName;
 console.log("Target App Label: " + uniqueAppLabel);
 
