@@ -3,379 +3,278 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Numiverse Studio</title>
+  <title>Telugu Lipi Learning Hub</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<div class="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
-  <!-- Header Banner -->
-  <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div class="min-h-screen bg-slate-900 text-slate-100 font-sans pb-12 transition-colors duration-300">
+  <!-- Top Navigation & Brand Header -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-4 py-3 sm:px-6">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center space-x-3">
-        <div class="bg-gradient-to-tr from-indigo-500 to-violet-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
+        <div class="bg-amber-500 text-slate-950 p-2.5 rounded-2xl font-bold text-2xl shadow-lg shadow-amber-500/20 transform hover:rotate-6 transition-transform">
+          తె
         </div>
         <div>
-          <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Numiverse</h1>
-          <p class="text-xs text-slate-400 font-medium tracking-wide">THE INTERACTIVE NUMBER TOOLKIT &amp; PLAYGROUND</p>
+          <h1 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+            Telugu Lipi <span class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">తెలుగు అక్షరాలు</span>
+          </h1>
+          <p class="text-xs text-slate-400">Learn, Write & Master the Telugu Alphabet</p>
         </div>
       </div>
       
-      <!-- Interactive Fun Fact Ticker -->
-      <div class="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl flex items-center space-x-2 text-sm max-w-md w-full sm:w-auto">
-        <span class="flex h-2 w-2 relative">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-        </span>
-        <span class="text-slate-400 font-semibold">Did you know?</span>
-        <span id="fact-ticker" class="text-slate-300 truncate transition-all duration-300">Loading cool number fact...</span>
+      <!-- Stats Widget -->
+      <div class="flex items-center gap-4 bg-slate-950/60 px-4 py-2 rounded-xl border border-slate-800/80">
+        <div class="text-center">
+          <span class="block text-xs text-slate-500 uppercase tracking-widest font-bold">Mastered</span>
+          <span id="stats-mastered-count" class="text-lg font-extrabold text-emerald-400">0 / 42</span>
+        </div>
+        <div class="w-px h-8 bg-slate-800"></div>
+        <div class="text-center">
+          <span class="block text-xs text-slate-500 uppercase tracking-widest font-bold">Quiz Score</span>
+          <span id="stats-quiz-score" class="text-lg font-extrabold text-amber-400">0 XP</span>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    <!-- Grid Row 1: Quick Tools (Base Converter, Fact Finder, Stats) -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- LEFT SIDE: Letter Board & Category Selection (7 Cols) -->
+    <section class="lg:col-span-7 flex flex-col gap-6">
       
-      <!-- Tool 1: Real-time Base Converter -->
-      <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-indigo-400 flex items-center gap-2">
-              <span class="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-              </span>
-              Base Radiator
-            </h2>
-            <span class="text-xs text-slate-500 font-mono">Multi-Base sync</span>
+      <!-- Tabs and Search Bar -->
+      <div class="bg-slate-950/40 p-4 rounded-2xl border border-slate-800/80 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-2" id="category-tabs" role="tablist">
+            <button id="tab-all" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-amber-500 text-slate-950 shadow-md font-medium" onclick="filterCategory('all')">
+              All Letters
+            </button>
+            <button id="tab-vowels" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-800 text-slate-300 hover:bg-slate-700" onclick="filterCategory('vowel')">
+              Achulu (Vowels)
+            </button>
+            <button id="tab-consonants" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-800 text-slate-300 hover:bg-slate-700" onclick="filterCategory('consonant')">
+              Hallulu (Consonants)
+            </button>
+            <button id="tab-numbers" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-800 text-slate-300 hover:bg-slate-700" onclick="filterCategory('number')">
+              Ankelu (Numbers)
+            </button>
           </div>
-          <p class="text-xs text-slate-400 mb-6">Enter a value in any input box to see live conversions across all standard number systems, including Roman Numerals.</p>
           
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Decimal (Base 10)</label>
-              <input type="number" id="base-dec" value="42" class="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors" placeholder="e.g. 100">
-            </div>
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Binary (Base 2)</label>
-              <input type="text" id="base-bin" value="101010" class="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors" placeholder="e.g. 1100100">
-            </div>
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Hexadecimal (Base 16)</label>
-              <input type="text" id="base-hex" value="2A" class="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors" placeholder="e.g. 64">
-            </div>
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Octal (Base 8)</label>
-              <input type="text" id="base-oct" value="52" class="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors" placeholder="e.g. 144">
-            </div>
-            <div>
-              <label class="block text-xs font-mono text-slate-400 uppercase mb-1">Roman Numerals</label>
-              <input type="text" id="base-roman" value="XLII" class="w-full bg-slate-950/80 border border-slate-800 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors" placeholder="e.g. C">
-            </div>
-          </div>
-        </div>
-        <div class="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center text-xs text-slate-500">
-          <span>Max value: 3999 (Roman limit)</span>
-          <button id="reset-converter" class="text-indigo-400 hover:text-indigo-300 transition-colors font-semibold">Reset to 42</button>
-        </div>
-      </section>
-
-      <!-- Tool 2: Statistical Analyzer -->
-      <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-violet-400 flex items-center gap-2">
-              <span class="p-1.5 bg-violet-500/10 rounded-lg text-violet-400">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-              </span>
-              Quick-Stats Deck
-            </h2>
-            <span class="text-xs text-slate-500 font-mono">Array statistics</span>
-          </div>
-          <p class="text-xs text-slate-400 mb-4">Input a list of numbers separated by commas or spaces. We'll extract, analyze, and map key properties instantly.</p>
-
-          <div class="space-y-4">
-            <div>
-              <textarea id="stats-input" rows="3" class="w-full bg-slate-950/80 border border-slate-800 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors resize-none" placeholder="Enter numbers, e.g. 15, 23, 42, 8, 4, 16, 23">15, 23, 42, 8, 4, 16, 23</textarea>
-            </div>
-
-            <!-- Calculated Stats Cards Grid -->
-            <div class="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
-                <div class="text-slate-500">SUM</div>
-                <div id="stat-sum" class="text-sm font-bold text-slate-200 mt-0.5">-</div>
-              </div>
-              <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
-                <div class="text-slate-500">AVERAGE (MEAN)</div>
-                <div id="stat-mean" class="text-sm font-bold text-slate-200 mt-0.5">-</div>
-              </div>
-              <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
-                <div class="text-slate-500">MEDIAN</div>
-                <div id="stat-median" class="text-sm font-bold text-slate-200 mt-0.5">-</div>
-              </div>
-              <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
-                <div class="text-slate-500">MODE</div>
-                <div id="stat-mode" class="text-sm font-bold text-slate-200 mt-0.5">-</div>
-              </div>
-              <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
-                <div class="text-slate-500">MIN / MAX</div>
-                <div id="stat-minmax" class="text-xs font-bold text-slate-200 mt-0.5">-</div>
-              </div>
-              <div class="bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/60">
-                <div class="text-slate-500">COUNT (N)</div>
-                <div id="stat-count" class="text-sm font-bold text-slate-200 mt-0.5">-</div>
-              </div>
-            </div>
+          <!-- Mode Switcher (Grid vs Quiz) -->
+          <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+            <button id="view-mode-learn" class="px-3 py-1.5 rounded-md text-xs font-bold transition-all bg-amber-500/20 text-amber-400 border border-amber-500/30" onclick="setViewMode('learn')">
+              Study
+            </button>
+            <button id="view-mode-quiz" class="px-3 py-1.5 rounded-md text-xs font-bold transition-all text-slate-400 hover:text-white" onclick="setViewMode('quiz')">
+              Quiz Challenge
+            </button>
           </div>
         </div>
 
-        <div class="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center">
-          <button id="stats-preset-fib" class="text-xs text-violet-400 hover:underline">Fibonacci Preset</button>
-          <button id="stats-preset-primes" class="text-xs text-violet-400 hover:underline">First 10 Primes</button>
+        <!-- Search Box -->
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input id="search-input" type="text" placeholder="Search by Telugu character or English transliteration (e.g. 'ka', 'am', 'amma')..." class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 transition-all text-sm" oninput="handleSearch(this.value)">
         </div>
-      </section>
+      </div>
 
-      <!-- Tool 3: Deep Number Fact Bio & Checker -->
-      <section class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-pink-400 flex items-center gap-2">
-              <span class="p-1.5 bg-pink-500/10 rounded-lg text-pink-400">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </span>
-              Number Profiler
-            </h2>
-            <span class="text-xs text-slate-500 font-mono">Deep intelligence</span>
-          </div>
-          <p class="text-xs text-slate-400 mb-4">Search any number from 1 to 1,000,000. Discover its instant structural factors, classification, and unique personality card.</p>
-
-          <div class="flex gap-2 mb-4">
-            <input type="number" id="profile-input" value="128" min="1" max="1000000" class="flex-1 bg-slate-950/80 border border-slate-800 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors">
-            <button id="profile-btn" class="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs tracking-wider transition-all">ANALYZE</button>
-          </div>
-
-          <div class="space-y-3 bg-slate-950/40 p-3.5 rounded-xl border border-slate-800/80 text-xs font-mono">
-            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
-              <span class="text-slate-400">Classification</span>
-              <span id="profile-class" class="font-bold text-pink-300">Composite</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
-              <span class="text-slate-400">Parity</span>
-              <span id="profile-parity" class="font-bold text-pink-300">Even</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
-              <span class="text-slate-400">Square Number?</span>
-              <span id="profile-square" class="font-bold text-pink-300">No</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
-              <span class="text-slate-400">Perfect / Abundant?</span>
-              <span id="profile-perfect" class="font-bold text-pink-300">Deficient</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-400">Divisors</span>
-              <span id="profile-divisors" class="font-bold text-pink-300 truncate max-w-[150px]" title="Click to view all">1, 2, 4, 8, 16, 32, 64, 128</span>
-            </div>
-          </div>
+      <!-- LEARN PANEL: Alphabet Grid -->
+      <div id="learn-panel" class="space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 id="grid-title" class="text-lg font-bold text-amber-400 flex items-center gap-2">
+            <span>All Letters</span>
+            <span id="letter-count-badge" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md font-mono">42</span>
+          </h3>
+          <p class="text-xs text-slate-400">Click any letter to open its Pronunciation, Tracing, & Word guides.</p>
         </div>
 
-        <div class="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center">
-          <span class="text-[10px] text-slate-500">Auto-detects primes &amp; squares</span>
-          <button id="profile-random-btn" class="text-xs text-pink-400 hover:underline">Random Profiling</button>
+        <!-- The Grid -->
+        <div id="letters-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 min-h-[300px]">
+          <!-- Populated by JavaScript -->
         </div>
-      </section>
-    </div>
+      </div>
 
-    <!-- Grid Row 2: Deep Dive interactive modules -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- Interactive Visualizer: Grid Matrix Explorer (7 columns wide) -->
-      <section class="lg:col-span-7 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <!-- QUIZ PANEL (Hidden by Default) -->
+      <div id="quiz-panel" class="hidden bg-slate-950/60 p-6 rounded-2xl border border-slate-800/80 space-y-6">
+        <div class="flex justify-between items-center">
           <div>
-            <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2">
-              <span class="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-400">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-              </span>
-              Dynamic Number Matrix
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">Visualize factor density, primes, and custom multiples interactively.</p>
+            <h3 class="text-xl font-black text-white">Telugu Word & Character Quiz</h3>
+            <p class="text-xs text-slate-400">Test your skills and gain XP!</p>
           </div>
+          <button onclick="resetQuizScore()" class="text-xs text-slate-500 hover:text-red-400 underline transition-colors">
+            Reset Progress
+          </button>
+        </div>
+
+        <!-- Quiz Box -->
+        <div id="quiz-box" class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 relative overflow-hidden">
+          <div id="quiz-progress-bar" class="absolute top-0 left-0 h-1 bg-amber-500 transition-all duration-300" style="width: 0%"></div>
           
-          <!-- Controls -->
-          <div class="flex flex-wrap gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
-            <button id="sieve-filter-all" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg bg-slate-800 text-slate-100 transition-all">All</button>
-            <button id="sieve-filter-prime" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Primes</button>
-            <button id="sieve-filter-even" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Evens</button>
-            <button id="sieve-filter-odd" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Odds</button>
-            <button id="sieve-filter-square" class="px-2.5 py-1 text-[11px] font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all">Squares</button>
-          </div>
-        </div>
-
-        <!-- Sieve Interactive Multipliers Tool -->
-        <div class="mb-4 bg-slate-950/50 p-3 rounded-xl border border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="text-slate-400 font-medium">Highlight multiples of:</span>
-            <input type="number" id="sieve-multiplier-input" value="3" min="2" max="50" class="w-12 text-center bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded px-1.5 py-1 font-mono text-emerald-400">
-          </div>
-          <div class="flex items-center gap-4 text-[11px] text-slate-500">
-            <div class="flex items-center gap-1.5">
-              <span class="inline-block w-3 h-3 rounded bg-emerald-500/20 border border-emerald-500/40"></span> Selected Filter
-            </div>
-            <div class="flex items-center gap-1.5">
-              <span class="inline-block w-3 h-3 rounded bg-indigo-500/20 border border-indigo-500/40"></span> Divisor of Clicked
-            </div>
-          </div>
-        </div>
-
-        <!-- Interactive Grid Body -->
-        <div id="numbers-matrix" class="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-12 gap-1.5 max-h-[350px] overflow-y-auto custom-scrollbar p-1">
-          <!-- Generated dynamically via JS: numbers 1 to 120 -->
-        </div>
-
-        <div class="mt-4 text-xs text-slate-400 bg-slate-950/40 p-3 rounded-lg border border-slate-800/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <span id="matrix-feedback-text">Click any number above to trace its components and factors instantly.</span>
-          <button id="reset-matrix-highlights" class="text-[11px] font-semibold text-emerald-400 hover:underline shrink-0">Clear Highlights</button>
-        </div>
-      </section>
-
-      <!-- Interactive Sequencer: Collatz Conjecture & Fibonacci (5 columns wide) -->
-      <section class="lg:col-span-5 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-amber-400 flex items-center gap-2">
-              <span class="p-1.5 bg-amber-500/10 rounded-lg text-amber-400">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-              </span>
-              Collatz &amp; Series Engine
-            </h2>
-            <span class="text-xs text-slate-500 font-mono">3x + 1 Cascade</span>
-          </div>
-          <p class="text-xs text-slate-400 mb-6">Witness mathematical paths unfold. Enter a starting value to run the legendary <strong>Collatz Conjecture</strong> (Hailstone Sequence) or generate rapid Fibonacci sets.</p>
-
-          <!-- Action Selection Tabs -->
-          <div class="flex border-b border-slate-800 mb-4">
-            <button id="tab-collatz" class="border-b-2 border-amber-400 px-4 py-2 text-xs font-semibold text-amber-300">Collatz Conjecture</button>
-            <button id="tab-fib" class="border-b-2 border-transparent px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200">Fibonacci Steps</button>
-          </div>
-
-          <!-- Main Dynamic Interface Area -->
-          <div id="sequence-interface" class="space-y-4">
-            <div class="flex gap-2">
-              <div class="flex-1">
-                <label id="seq-input-label" class="block text-[10px] font-mono text-slate-500 uppercase mb-1">Starting integer (N)</label>
-                <input type="number" id="seq-start-val" value="27" min="1" class="w-full bg-slate-950/80 border border-slate-800 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 rounded-lg py-2 px-3 text-sm font-mono text-slate-100 transition-colors">
-              </div>
-              <button id="run-sequence-btn" class="self-end bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs tracking-wider transition-all h-[38px]">CALCULATE</button>
-            </div>
-
-            <!-- Sequence stats display -->
-            <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
-              <div class="bg-slate-950/60 p-2 rounded border border-slate-800/80">
-                <span id="seq-stat-1-lbl" class="text-slate-500 block">Steps to Reach 1:</span>
-                <span id="seq-stat-1-val" class="font-bold text-amber-300 text-sm">111 steps</span>
-              </div>
-              <div class="bg-slate-950/60 p-2 rounded border border-slate-800/80">
-                <span id="seq-stat-2-lbl" class="text-slate-500 block">Peak Value reached:</span>
-                <span id="seq-stat-2-val" class="font-bold text-amber-300 text-sm">9,232</span>
-              </div>
-            </div>
-
-            <!-- Interactive Output visual box -->
-            <div class="relative">
-              <span class="absolute top-2 right-2 text-[10px] font-mono text-slate-500">SEQUENCE PATH</span>
-              <div id="sequence-visual-output" class="w-full h-32 bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 text-xs font-mono overflow-y-auto space-y-1.5 custom-scrollbar leading-relaxed text-slate-300">
-                <!-- Render steps dynamically -->
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-500">
-          <span>The Collatz Conjecture remains one of math's most famous unsolved problems!</span>
-        </div>
-      </section>
-
-    </div>
-
-    <!-- Interactive Prime Sandbox Game Section -->
-    <section class="bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-900/40 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-      <div class="absolute right-0 top-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute left-1/3 bottom-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div class="relative z-10 max-w-3xl">
-        <div class="inline-block bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full mb-3">
-          Brain Training &amp; Speed Sandbox
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">The Prime Numbers Speedrun</h2>
-        <p class="text-sm text-slate-400 mb-6 leading-relaxed">Test your quick mental profiling. Determine whether each random number generated below is a <strong>Prime Number</strong> or a <strong>Composite Number</strong> before the timer clicks down! Build your streak!</p>
-
-        <!-- Game Area Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center bg-slate-950/80 p-6 rounded-2xl border border-slate-800">
-          
-          <!-- Big Interactive Target Value (Left Side) -->
-          <div class="md:col-span-5 flex flex-col items-center justify-center py-6 bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl border border-slate-800/80 relative">
-            <span class="text-[10px] text-slate-500 uppercase font-mono tracking-wider absolute top-3">Is this Prime?</span>
-            <div id="game-number-display" class="text-5xl font-extrabold text-white my-3 select-none drop-shadow-lg tracking-tight">17</div>
+          <div class="space-y-4 text-center">
+            <span class="inline-block px-3 py-1 bg-amber-500/15 text-amber-400 rounded-full text-xs font-bold uppercase tracking-wider">
+              Question <span id="quiz-q-num">1</span>/5
+            </span>
             
-            <!-- Timer progress bar -->
-            <div class="w-3/4 bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
-              <div id="game-timer-fill" class="bg-indigo-500 h-full w-full transition-all duration-100 ease-linear"></div>
-            </div>
-          </div>
-
-          <!-- Action Triggers (Right Side) -->
-          <div class="md:col-span-7 flex flex-col justify-between h-full space-y-4">
-            <div class="flex justify-between items-center text-xs font-mono text-slate-400 pb-2 border-b border-slate-900">
-              <div>STREAK: <span id="game-streak-counter" class="text-indigo-400 font-bold text-lg">0</span></div>
-              <div>BEST: <span id="game-high-score" class="text-emerald-400 font-bold">0</span></div>
-              <div>REMAINING: <span id="game-timer-num" class="text-amber-400 font-bold">10s</span></div>
+            <div id="quiz-question-container" class="py-4">
+              <p class="text-sm text-slate-400 mb-2" id="quiz-prompt-type">What sound does this letter make?</p>
+              <h2 class="text-6xl font-black text-white mb-6 animate-pulse-slow" id="quiz-question-char">అ</h2>
             </div>
 
-            <!-- Double Target Click Action -->
-            <div class="grid grid-cols-2 gap-4">
-              <button id="game-btn-prime" class="group relative overflow-hidden py-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold text-sm tracking-wider transition-all transform active:scale-95 shadow-lg shadow-emerald-500/15">
-                <span class="relative z-10">PRIME</span>
-                <span class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-              </button>
-              <button id="game-btn-composite" class="group relative overflow-hidden py-4 rounded-xl bg-pink-500 hover:bg-pink-600 text-slate-950 font-bold text-sm tracking-wider transition-all transform active:scale-95 shadow-lg shadow-pink-500/15">
-                <span class="relative z-10">COMPOSITE</span>
-                <span class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></span>
-              </button>
-            </div>
-
-            <!-- In-App Game Status Notification Feed -->
-            <div id="game-feedback" class="min-h-[40px] flex items-center justify-center rounded-lg bg-slate-900 border border-slate-800/80 px-4 py-2 text-xs font-medium text-slate-400 text-center">
-              Click Start Speedrun below to begin testing your factor instinct!
-            </div>
-
-            <div class="flex justify-between items-center">
-              <button id="game-toggle-btn" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest">Start Speedrun</button>
-              <span class="text-[10px] font-mono text-slate-500">Numbers generated range: 2 - 199</span>
+            <!-- Choices Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="quiz-choices">
+              <!-- Populated dynamically -->
             </div>
           </div>
         </div>
+
+        <!-- Quiz Scoreboard / Finish Screen -->
+        <div id="quiz-result-screen" class="hidden bg-slate-900 p-6 rounded-xl border border-emerald-500/20 text-center space-y-4">
+          <div class="text-5xl">🏆</div>
+          <h3 class="text-xl font-bold text-white">Quiz Completed!</h3>
+          <p class="text-slate-300">You scored <span id="quiz-correct-count" class="text-emerald-400 font-extrabold">0</span> out of <span class="font-bold">5</span> correct answers!</p>
+          <div class="flex justify-center gap-2">
+            <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-lg text-sm font-semibold" id="xp-gained-badge">+50 XP</span>
+          </div>
+          <button onclick="startNewQuizRound()" class="mt-2 px-6 py-2 bg-amber-500 text-slate-950 hover:bg-amber-400 font-bold rounded-xl shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0">
+            Play Again
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT SIDE: Writing Tracing Pad & Active Letter Study details (5 Cols) -->
+    <section class="lg:col-span-5 flex flex-col gap-6">
+      
+      <!-- Interactive Study Desk -->
+      <div class="bg-slate-950/60 p-6 rounded-2xl border border-slate-800/80 space-y-6 sticky top-24">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl font-bold text-xs">
+              STUDY
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-white">Interactive Desk</h3>
+              <p class="text-xs text-slate-400">Pronunciation & Writing guide</p>
+            </div>
+          </div>
+          
+          <!-- Mastered Checkbox -->
+          <label class="flex items-center gap-2 cursor-pointer bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800 hover:border-slate-700 select-none">
+            <input type="checkbox" id="master-checkbox" class="w-4 h-4 rounded text-amber-500 bg-slate-950 border-slate-700 focus:ring-amber-500" onchange="toggleMasterActiveLetter()">
+            <span class="text-xs font-semibold text-slate-300">Mastered</span>
+          </label>
+        </div>
+
+        <!-- Big Pronunciation Display Card -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-950 p-5 rounded-2xl border border-slate-800 text-center relative overflow-hidden">
+          <div class="absolute top-3 left-3 bg-slate-800/80 px-2 py-0.5 rounded text-[10px] text-slate-400 font-mono tracking-widest uppercase" id="desk-category-badge">
+            VOWEL
+          </div>
+          
+          <div class="my-4">
+            <h1 id="desk-char" class="text-8xl font-black text-amber-400 drop-shadow-md select-all hover:scale-105 transition-transform duration-300 cursor-help">అ</h1>
+          </div>
+
+          <div class="space-y-1">
+            <p class="text-xs text-slate-500 uppercase tracking-widest font-bold">English Sound</p>
+            <h4 id="desk-translit" class="text-2xl font-black text-white">a</h4>
+          </div>
+
+          <!-- Action Keys -->
+          <div class="mt-5 flex items-center justify-center gap-2">
+            <button id="speak-btn" onclick="speakActiveLetter()" class="flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg hover:shadow-amber-500/15 active:scale-95 transition-all text-sm w-full">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              </svg>
+              <span>Hear Pronunciation</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Word Association card -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 grid grid-cols-3 gap-3 items-center">
+          <div class="text-center bg-slate-950 p-2 rounded-lg border border-slate-800">
+            <span class="text-xs text-slate-500 block uppercase font-bold">Example</span>
+            <span id="desk-example-word" class="font-black text-emerald-400 text-base block mt-0.5">అమ్మ</span>
+          </div>
+          <div class="text-center bg-slate-950 p-2 rounded-lg border border-slate-800">
+            <span class="text-xs text-slate-500 block uppercase font-bold">Meaning</span>
+            <span id="desk-example-meaning" class="font-black text-slate-200 text-sm block mt-0.5">Mother</span>
+          </div>
+          <div class="text-center bg-slate-950 p-2 rounded-lg border border-slate-800">
+            <span class="text-xs text-slate-500 block uppercase font-bold">Phonetic</span>
+            <span id="desk-example-phonetic" class="font-mono text-amber-500/90 text-xs block mt-1">Amma</span>
+          </div>
+        </div>
+
+        <!-- Canvas Tracing Draw Section -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              Tracing Pad (Draw Below)
+            </span>
+            <div class="flex items-center gap-1.5">
+              <button onclick="clearCanvas()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-[11px] text-slate-400 hover:text-white rounded border border-slate-800 transition-colors">
+                Clear Canvas
+              </button>
+              <button id="toggle-trace-bg" onclick="toggleTraceBackground()" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-[11px] text-emerald-400 hover:text-emerald-300 rounded border border-slate-800 transition-colors">
+                Guide: ON
+              </button>
+            </div>
+          </div>
+
+          <!-- Tracing Container -->
+          <div class="relative bg-slate-950 rounded-2xl border-2 border-slate-800 overflow-hidden select-none">
+            <!-- Background tracing letter -->
+            <div id="canvas-trace-helper" class="absolute inset-0 flex items-center justify-center text-[150px] font-bold text-slate-900/70 select-none pointer-events-none">
+              అ
+            </div>
+            <canvas id="tracing-canvas" width="400" height="220" class="relative z-10 block w-full h-[220px] cursor-crosshair"></canvas>
+          </div>
+          <div class="flex justify-between items-center text-[10px] text-slate-500">
+            <span>Drag/Touch to trace. Write from left to right following the curves.</span>
+            <span class="flex items-center gap-1">
+              Brush Size:
+              <input type="range" id="brush-slider" min="4" max="16" value="8" class="w-16 accent-amber-500 bg-slate-800 rounded-lg cursor-pointer" oninput="updateBrushSize(this.value)">
+            </span>
+          </div>
+        </div>
+
+        <!-- Notification and Toast Bar inside desk -->
+        <div id="toast-message" class="p-3 bg-slate-900 text-slate-300 text-xs rounded-xl border border-slate-800 flex items-center justify-between hidden">
+          <span id="toast-text">Tip: Turn on "Guide" to see the letter under your brush!</span>
+          <button onclick="hideToast()" class="text-slate-500 hover:text-white">&times;</button>
+        </div>
+
       </div>
     </section>
   </main>
 
-  <footer class="border-t border-slate-900 bg-slate-950 py-10 text-slate-500 text-xs font-mono">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-      <div>
-        <p>© Numiverse Sandbox Engine. Synthesized mathematically.</p>
-        <p class="text-slate-600 mt-1">All calculation, Roman numeral compilation, sieve arrays and prime loops computed client-side with 0ms latency.</p>
+  <!-- About / Culture Section -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 mt-16 pt-8 border-t border-slate-850 text-slate-500 text-xs space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="space-y-2">
+        <h4 class="text-slate-400 font-bold uppercase tracking-wider text-sm">About Telugu Language</h4>
+        <p class="leading-relaxed">
+          Telugu (తెలుగు) is a Dravidian language native to India. It stands alongside Hindi and Bengali as one of the few languages with primary official language status in more than one Indian state (Andhra Pradesh and Telangana). Famous for its melodious, vowel-ending words, it is often called the <em>"Italian of the East"</em>.
+        </p>
       </div>
-      <div class="flex gap-4">
-        <a href="#" id="btn-quick-reset-all" class="text-slate-400 hover:text-white transition-colors">⚡ Hard Reset Widgets</a>
-        <span class="text-slate-800">|</span>
-        <span class="text-slate-600">Version 1.0.4</span>
+      <div class="space-y-2">
+        <h4 class="text-slate-400 font-bold uppercase tracking-wider text-sm">Learning Tips</h4>
+        <p class="leading-relaxed">
+          Start with the <strong>Achulu (Vowels)</strong>, which represent basic vowel sounds. Then move on to <strong>Hallulu (Consonants)</strong>. Use our tracing pad to master the distinct rounded aesthetic of Telugu scripts. Once comfortable, jump into the <strong>Quiz Challenge</strong> to put your memory to the test!
+        </p>
       </div>
+    </div>
+    <div class="text-center pt-8 text-[11px] border-t border-slate-900">
+      &copy; Telugu Lipi Learning Hub. Developed with beautiful interactive guides & speech synthesis support.
     </div>
   </footer>
 </div>
