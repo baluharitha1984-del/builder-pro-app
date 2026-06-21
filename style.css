@@ -1,28 +1,61 @@
-/* Word Card Hover Effects & Pop Animations */
-.word-card {
-  perspective: 1000px;
-  cursor: pointer;
+/* Bubble animation for chemical simulator */
+.bubble {
+  position: absolute;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: bubble-up 4s infinite ease-in;
+}
+.bubble-1 {
+  width: 10px;
+  height: 10px;
+  left: 20%;
+  animation-duration: 3.5s;
+  animation-delay: 0.5s;
+}
+.bubble-2 {
+  width: 15px;
+  height: 15px;
+  left: 50%;
+  animation-duration: 4.8s;
+  animation-delay: 1s;
+}
+.bubble-3 {
+  width: 8px;
+  height: 8px;
+  left: 75%;
+  animation-duration: 2.9s;
+  animation-delay: 0.2s;
+}
+@keyframes bubble-up {
+  0% {
+    transform: translateY(10px) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-160px) scale(1.2);
+    opacity: 0;
+  }
 }
 
-.word-card:active {
-  transform: scale(0.95);
+/* Scrollbar style customization */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-.level-select-btn {
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
 }
-
-.active-level {
-  border-color: #FF4E4E !important;
-  box-shadow: 0 0 12px rgba(255, 110, 110, 0.6) !important;
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.6);
+  border-radius: 3px;
 }
-
-/* Interactive blinking star animation */
-@keyframes starPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); filter: drop-shadow(0 0 8px #FFD066); }
-}
-
-.star-active {
-  animation: starPulse 1s infinite ease-in-out;
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(71, 85, 105, 0.9);
 }
