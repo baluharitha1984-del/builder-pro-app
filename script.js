@@ -1,677 +1,586 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // Canvas Setup
-  const canvas = document.getElementById("graphCanvas");
-  const ctx = canvas.getContext("2d");
+// Educational Data Sets: Achulu (Vowels) & Hallulu (Consonants)
+const vowels = [
+  { char: "అ", roman: "a", word: "అమ్మ (Amma)", mean: "Mother", type: "Vowel" },
+  { char: "ఆ", roman: "aa", word: "ఆట (Aata)", mean: "Game", type: "Vowel" },
+  { char: "ఇ", roman: "i", word: "ఇల్లు (Illu)", mean: "House", type: "Vowel" },
+  { char: "ఈ", roman: "ee", word: "ఈల (Eela)", mean: "Whistle", type: "Vowel" },
+  { char: "ఉ", roman: "u", word: "ఉడుత (Uduta)", mean: "Squirrel", type: "Vowel" },
+  { char: "ఊ", roman: "oo", word: "ఊయల (Ooyala)", mean: "Cradle", type: "Vowel" },
+  { char: "ఋ", roman: "ru", word: "ఋషి (Rushi)", mean: "Sage", type: "Vowel" },
+  { char: "ఎ", roman: "e", word: "ఎలుక (Eluka)", mean: "Rat", type: "Vowel" },
+  { char: "ఏ", roman: "ae", word: "ఏనుగు (Aenugu)", mean: "Elephant", type: "Vowel" },
+  { char: "ఐ", roman: "ai", word: "ఐదు (Aidu)", mean: "Five", type: "Vowel" },
+  { char: "ఒ", roman: "o", word: "ఒంటె (Onte)", mean: "Camel", type: "Vowel" },
+  { char: "ఓ", roman: "oo", word: "ఓడ (Oda)", mean: "Ship", type: "Vowel" },
+  { char: "ఔ", roman: "au", word: "ఔషధం (Aushadham)", mean: "Medicine", type: "Vowel" },
+  { char: "అం", roman: "am", word: "అందము (Andhamu)", mean: "Beauty", type: "Vowel" },
+  { char: "అః", roman: "aha", word: "అంతఃపురం (Anthapuram)", mean: "Palace", type: "Vowel" }
+];
 
-  // Resize handler / pixel ratio support
-  const DPR = window.devicePixelRatio || 1;
-  const logicalSize = 520;
-  canvas.width = logicalSize * DPR;
-  canvas.height = logicalSize * DPR;
-  ctx.scale(DPR, DPR);
+const consonants = [
+  { char: "క", roman: "ka", word: "కల (Kala)", mean: "Dream", type: "Consonant" },
+  { char: "ఖ", roman: "kha", word: "ఖడ్గం (Khadgam)", mean: "Sword", type: "Consonant" },
+  { char: "గ", roman: "ga", word: "గడియారం (Gadiyaram)", mean: "Clock", type: "Consonant" },
+  { char: "ఘ", roman: "gha", word: "ఘటం (Ghatam)", mean: "Pot", type: "Consonant" },
+  { char: "చ", roman: "cha", word: "చక్రం (Chakram)", mean: "Wheel", type: "Consonant" },
+  { char: "ఛ", roman: "chha", word: "ఛత్రి (Chhatri)", mean: "Umbrella", type: "Consonant" },
+  { char: "జ", roman: "ja", word: "జడ (Jada)", mean: "Plait / Hair braid", type: "Consonant" },
+  { char: "ఝ", roman: "jha", word: "ఝషం (Jhasham)", mean: "Fish", type: "Consonant" },
+  { char: "ట", roman: "ta", word: "టమాటా (Tamata)", mean: "Tomato", type: "Consonant" },
+  { char: "డ", roman: "da", word: "డబ్బా (Dabba)", mean: "Box", type: "Consonant" },
+  { char: "త", roman: "tha", word: "తబలా (Tabala)", mean: "Tabla drum", type: "Consonant" },
+  { char: "ద", roman: "da", word: "దండ (Danda)", mean: "Garland", type: "Consonant" },
+  { char: "ధ", roman: "dha", word: "ధనస్సు (Dhanassu)", mean: "Bow", type: "Consonant" },
+  { char: "న", roman: "na", word: "నగ (Naga)", mean: "Jewel", type: "Consonant" },
+  { char: "ప", roman: "pa", word: "పడవ (Padava)", mean: "Boat", type: "Consonant" },
+  { char: "ఫ", roman: "pha", word: "ఫలం (Phalam)", mean: "Fruit", type: "Consonant" },
+  { char: "బ", roman: "ba", word: "బంతి (Banthi)", mean: "Ball", type: "Consonant" },
+  { char: "భ", roman: "bha", word: "భల్లూకం (Bhallookam)", mean: "Bear", type: "Consonant" },
+  { char: "మ", roman: "ma", word: "మంచం (Mancham)", mean: "Cot", type: "Consonant" },
+  { char: "య", roman: "ya", word: "యజ్ఞం (Yagnam)", mean: "Ritual fire", type: "Consonant" },
+  { char: "ర", roman: "ra", word: "రథం (Ratham)", mean: "Chariot", type: "Consonant" },
+  { char: "ల", roman: "la", word: "లత (Lata)", mean: "Creeper plant", type: "Consonant" },
+  { char: "వ", roman: "va", word: "వల (Vala)", mean: "Net", type: "Consonant" },
+  { char: "శ", roman: "sha", word: "శంఖం (Shankham)", mean: "Conch", type: "Consonant" },
+  { char: "స", roman: "sa", word: "సబ్బు (Sabbu)", mean: "Soap", type: "Consonant" },
+  { char: "హ", roman: "ha", word: "హంస (Hamsa)", mean: "Swan", type: "Consonant" }
+];
 
-  // Audio Synthesizer for educational feedback (success/click/error sounds)
-  const playSound = (type) => {
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      osc.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
+// Comprehensive list of questions for the dynamic Quiz challenge
+const quizQuestions = [
+  { q: "Which Telugu letter represents the vowel sound 'a' (as in Mother)?", options: ["అ", "ఆ", "ఇ", "ఈ"], answer: "అ" },
+  { q: "Identify the consonant 'ka' (క) from the options below:", options: ["క", "ఖ", "గ", "ఘ"], answer: "క" },
+  { q: "What does the word 'అమ్మ (Amma)' mean?", options: ["Mother", "Game", "House", "Swan"], answer: "Mother" },
+  { q: "Which Telugu consonant represents the sound 'la' as in Net/Creeper?", options: ["మ", "య", "ర", "ల"], answer: "ల" },
+  { q: "What is the meaning of the Telugu word 'ఈల (Eela)'?", options: ["Whistle", "Elephant", "Cradle", "Medicine"], answer: "Whistle" },
+  { q: "Identify the Telugu letter representing 'oo' as in Cradle/Ship:", options: ["ఊ", "ఋ", "ఎ", "ఓ"], answer: "ఊ" },
+  { q: "What is the meaning of the consonant-based word 'కల (Kala)'?", options: ["Dream", "Fruit", "Garland", "Jewel"], answer: "Dream" }
+];
 
-      if (type === 'success') {
-        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-        osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
-        osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
-        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.35);
-      } else if (type === 'click') {
-        osc.frequency.setValueAtTime(329.63, audioCtx.currentTime); // E4
-        gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.1);
-      } else if (type === 'error') {
-        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
-      }
-    } catch (e) {
-      // AudioContext fails gracefully if browser blocks it
+// State variables
+let selectedLetter = vowels[0];
+let activeTab = "vowels"; // 'vowels' or 'consonants'
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let guideVisible = true;
+let userScore = 0;
+
+// Quiz variables
+let activeQuizQuestions = [];
+let currentQuestionIndex = 0;
+let quizCorrectCount = 0;
+let isQuizAnswered = false;
+
+// Word Sandbox
+let constructedWord = "";
+
+// Web Audio API Synth for elegant retro sounds
+let audioCtx = null;
+function playSynthSound(freq, type, duration) {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
-  };
-
-  // State Variables
-  let currentMode = "quadratic"; // 'quadratic' | 'linear' | 'free'
-  let plottedPoints = []; // list of {x: number, y: number, color: string, label: string}
-  let showGuideCurve = true;
-  let showAxesLabels = true;
-
-  // Core Graph Configurations
-  const centerX = logicalSize / 2;
-  const centerY = logicalSize / 2;
-  const scalePx = 22; // 1 Graph unit = 22 pixels
-
-  // Equations mapped with standard 10th-grade values
-  const mathLessons = {
-    quadratic: {
-      equationText: "y = x² - 3x - 4",
-      xValues: [-3, -2, -1, 0, 1, 2, 3, 4, 5],
-      calculateY: (x) => x * x - 3 * x - 4,
-      expectedZeroes: [-1, 4],
-      note: "Standard Quadratic graph: Cuts X-axis at (-1, 0) and (4, 0). The roots/zeroes are -1 and 4."
-    },
-    linear: {
-      equationText: "y = 2x - 3",
-      xValues: [-2, -1, 0, 1, 2, 3, 4],
-      calculateY: (x) => 2 * x - 3,
-      expectedZeroes: [1.5],
-      note: "Linear graph: Forms a perfect straight line. Cuts X-axis at (1.5, 0). The zero is 1.5."
-    },
-    free: {
-      equationText: "Free Plotting Mode",
-      xValues: [-4, -2, 0, 2, 4],
-      calculateY: (x) => x,
-      expectedZeroes: [],
-      note: "Sandbox Mode. Click anywhere on the grid board to plot standard coordinate points manually."
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
     }
-  };
-
-  // Coordinates mapper helper functions
-  function toScreenX(graphX) {
-    return centerX + graphX * scalePx;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch (e) {
+    console.log("Web Audio not fully supported or blocked by browser policy.");
   }
-  function toScreenY(graphY) {
-    return centerY - graphY * scalePx; // Flip coordinate space for traditional Cartesians
-  }
-  function toGraphX(screenX) {
-    return (screenX - centerX) / scalePx;
-  }
-  function toGraphY(screenY) {
-    return (centerY - screenY) / scalePx;
-  }
+}
 
-  // Main Render Engine for graph canvas
-  function renderGraph() {
-    // Clear
-    ctx.clearRect(0, 0, logicalSize, logicalSize);
-
-    // 1. Draw Fine Graph Paper Minor Grid (Every 1/5th of a unit representing millimeter lines)
-    ctx.strokeStyle = "#0d1d33";
-    ctx.lineWidth = 0.5;
-    for (let x = -11; x <= 11; x += 0.2) {
-      ctx.beginPath();
-      ctx.moveTo(toScreenX(x), 0);
-      ctx.lineTo(toScreenX(x), logicalSize);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(0, toScreenY(x));
-      ctx.lineTo(logicalSize, toScreenY(x));
-      ctx.stroke();
-    }
-
-    // 2. Draw standard Major Grid (Every 1 unit)
-    ctx.strokeStyle = "#132e4d";
-    ctx.lineWidth = 1.0;
-    for (let x = -11; x <= 11; x += 1) {
-      if (x === 0) continue; // Skip principal axes lines to paint them thicker later
-      ctx.beginPath();
-      ctx.moveTo(toScreenX(x), 0);
-      ctx.lineTo(toScreenX(x), logicalSize);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(0, toScreenY(x));
-      ctx.lineTo(logicalSize, toScreenY(x));
-      ctx.stroke();
-    }
-
-    // 3. Draw Principal X and Y Axes
-    ctx.strokeStyle = "#38bdf8";
-    ctx.lineWidth = 2.5;
-    // Y-Axis
-    ctx.beginPath();
-    ctx.moveTo(centerX, 0);
-    ctx.lineTo(centerX, logicalSize);
-    ctx.stroke();
-    // X-Axis
-    ctx.beginPath();
-    ctx.moveTo(0, centerY);
-    ctx.lineTo(logicalSize, centerY);
-    ctx.stroke();
-
-    // 4. Grid Mark Ticks & Numbers
-    ctx.fillStyle = "#94a3b8";
-    ctx.font = "bold 10px monospace";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    for (let i = -11; i <= 11; i++) {
-      if (i === 0) continue;
-
-      // X-Axis ticks and labels
-      const sX = toScreenX(i);
-      ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(sX, centerY - 4);
-      ctx.lineTo(sX, centerY + 4);
-      ctx.stroke();
-      ctx.fillText(i, sX, centerY + 15);
-
-      // Y-Axis ticks and labels
-      const sY = toScreenY(i);
-      ctx.beginPath();
-      ctx.moveTo(centerX - 4, sY);
-      ctx.lineTo(centerX + 4, sY);
-      ctx.stroke();
-      ctx.fillText(i, centerX - 15, sY);
-    }
-
-    // Origin sign
-    ctx.fillStyle = "#2dd4bf";
-    ctx.fillText("O(0,0)", centerX + 20, centerY + 15);
-
-    // Draw Quadrant Labels if enabled
-    if (showAxesLabels) {
-      ctx.font = "900 11px sans-serif";
-      ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
-      ctx.fillText("QUADRANT I (+,+)", logicalSize - 75, 25);
-      ctx.fillText("QUADRANT II (-,+)", 75, 25);
-      ctx.fillText("QUADRANT III (-,-)", 75, logicalSize - 25);
-      ctx.fillText("QUADRANT IV (+,-)", logicalSize - 75, logicalSize - 25);
-
-      // Axes Arrow markers labels
-      ctx.fillStyle = "#38bdf8";
-      ctx.fillText("X", logicalSize - 12, centerY - 15);
-      ctx.fillText("X'", 12, centerY - 15);
-      ctx.fillText("Y", centerX + 15, 12);
-      ctx.fillText("Y'", centerX + 15, logicalSize - 12);
-    }
-
-    // 5. Draw continuous math guiding functions (Linear / Quadratic Parabolas) as requested by users
-    if (showGuideCurve) {
-      if (currentMode === "quadratic") {
-        ctx.strokeStyle = "rgba(245, 158, 11, 0.85)"; // Orange/Amber curve
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        for (let sx = 0; sx <= logicalSize; sx++) {
-          const gx = toGraphX(sx);
-          const gy = mathLessons.quadratic.calculateY(gx);
-          const sy = toScreenY(gy);
-          if (sx === 0) {
-            ctx.moveTo(sx, sy);
-          } else {
-            ctx.lineTo(sx, sy);
-          }
-        }
-        ctx.stroke();
-
-        // Draw Root Indicators
-        ctx.fillStyle = "#f59e0b";
-        mathLessons.quadratic.expectedZeroes.forEach(root => {
-          ctx.beginPath();
-          ctx.arc(toScreenX(root), toScreenY(0), 6, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = "#fff";
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          ctx.fillStyle = "#fff";
-          ctx.fillText(`Zero: ${root}`, toScreenX(root), toScreenY(0) - 15);
-        });
-
-      } else if (currentMode === "linear") {
-        ctx.strokeStyle = "rgba(236, 72, 153, 0.85)"; // Pink line
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        const xMin = toGraphX(0);
-        const xMax = toGraphX(logicalSize);
-        ctx.moveTo(0, toScreenY(mathLessons.linear.calculateY(xMin)));
-        ctx.lineTo(logicalSize, toScreenY(mathLessons.linear.calculateY(xMax)));
-        ctx.stroke();
-
-        // Root Indicator
-        ctx.fillStyle = "#ec4899";
-        mathLessons.linear.expectedZeroes.forEach(root => {
-          ctx.beginPath();
-          ctx.arc(toScreenX(root), toScreenY(0), 6, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = "#fff";
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          ctx.fillStyle = "#fff";
-          ctx.fillText(`Zero: ${root}`, toScreenX(root), toScreenY(0) - 15);
-        });
-      }
-    }
-
-    // 6. Draw all Plotted Points dynamically
-    plottedPoints.forEach(pt => {
-      const sx = toScreenX(pt.x);
-      const sy = toScreenY(pt.y);
-
-      // Animated highlight ring around plotted points
-      ctx.strokeStyle = pt.color;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(sx, sy, 8, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Solid center circle
-      ctx.fillStyle = pt.color;
-      ctx.beginPath();
-      ctx.arc(sx, sy, 4.5, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Draw Label text coordinates e.g., A(2, 3)
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 11px monospace";
-      ctx.shadowColor = "black";
-      ctx.shadowBlur = 4;
-      ctx.fillText(`${pt.label}(${pt.x}, ${pt.y})`, sx, sy - 15);
-      ctx.shadowBlur = 0; // reset shadow
-    });
-  }
-
-  // Generate and setup value table markup depending on mode
-  function rebuildValueTable() {
-    const lesson = mathLessons[currentMode];
-    const tableHeaderEquation = document.getElementById("tableHeaderEquation");
-    tableHeaderEquation.textContent = lesson.equationText;
-
-    const tbody = document.getElementById("tableBody");
-    tbody.innerHTML = "";
-
-    // Disable plot table button initially
-    document.getElementById("btnPlotAllTable").disabled = true;
-
-    lesson.xValues.forEach((x, index) => {
-      const tr = document.createElement("tr");
-      tr.className = "border-b border-slate-700/60 hover:bg-slate-800/40 transition-colors";
-
-      // Column 1: X value
-      const tdX = document.createElement("td");
-      tdX.className = "p-2 font-semibold text-slate-300";
-      tdX.textContent = x;
-      tr.appendChild(tdX);
-
-      // Column 2: Y Input calculated by student
-      const tdYInput = document.createElement("td");
-      tdYInput.className = "p-2";
-      const input = document.createElement("input");
-      input.type = "text";
-      input.className = "cell-input";
-      input.id = `val-y-input-${index}`;
-      input.placeholder = "?";
-      input.dataset.x = x;
-      input.dataset.correctY = lesson.calculateY(x);
-      tdYInput.appendChild(input);
-      tr.appendChild(tdYInput);
-
-      // Column 3: Result ordered pair text indicator
-      const tdPair = document.createElement("td");
-      tdPair.className = "p-2 font-mono text-slate-400";
-      tdPair.id = `val-pair-${index}`;
-      tdPair.textContent = `(${x}, ?)`;
-      tr.appendChild(tdPair);
-
-      // Column 4: Check icon indicator
-      const tdCheck = document.createElement("td");
-      tdCheck.className = "p-2";
-      tdCheck.id = `val-status-${index}`;
-      tdCheck.innerHTML = `
-        <span class="text-slate-600">
-          <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-        </span>
-      `;
-      tr.appendChild(tdCheck);
-
-      // Input auto pair listener
-      input.addEventListener("input", (e) => {
-        const val = e.target.value.trim();
-        if (val !== "") {
-          tdPair.textContent = `(${x}, ${val})`;
-        } else {
-          tdPair.textContent = `(${x}, ?)`;
-        }
-      });
-
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById("tableStatusText").innerHTML = `<span class="text-slate-400">Verify all outputs to enable batch graph plotting.</span>`;
-    updateVerdict();
-  }
-
-  // Check standard table user responses
-  function checkTableResponses() {
-    const inputs = document.querySelectorAll(".cell-input");
-    let allCorrect = true;
-    let countChecked = 0;
-
-    inputs.forEach((input, index) => {
-      const valStr = input.value.trim();
-      const correctVal = parseFloat(input.dataset.correctY);
-      const statusCol = document.getElementById(`val-status-${index}`);
-
-      if (valStr === "") {
-        allCorrect = false;
-        statusCol.innerHTML = `
-          <span class="text-yellow-500 font-medium text-xs">Blank</span>
-        `;
-        return;
-      }
-
-      const parsed = parseFloat(valStr);
-      if (!isNaN(parsed) && parsed === correctVal) {
-        countChecked++;
-        statusCol.innerHTML = `
-          <span class="text-emerald-400">
-            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4"></path></svg>
-          </span>
-        `;
-        input.classList.remove("border-rose-500", "text-rose-400");
-        input.classList.add("border-emerald-500", "text-emerald-400");
-      } else {
-        allCorrect = false;
-        statusCol.innerHTML = `
-          <span class="text-rose-500">
-            <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </span>
-        `;
-        input.classList.remove("border-emerald-500", "text-emerald-400");
-        input.classList.add("border-rose-500", "text-rose-400");
-      }
-    });
-
-    if (allCorrect && inputs.length > 0) {
-      playSound('success');
-      document.getElementById("tableStatusText").innerHTML = `<span class="text-emerald-400 font-bold">🎉 Correct! Ready to plot graph now!</span>`;
-      document.getElementById("btnPlotAllTable").disabled = false;
-    } else {
-      playSound('error');
-      document.getElementById("tableStatusText").innerHTML = `<span class="text-rose-400 font-semibold">⚠️ Some answers are incorrect or empty. Try again!</span>`;
-      document.getElementById("btnPlotAllTable").disabled = true;
-    }
-  }
-
-  // Auto fill helper for learning support
-  function autoFillTable() {
-    const inputs = document.querySelectorAll(".cell-input");
-    inputs.forEach((input, index) => {
-      const correctVal = input.dataset.correctY;
-      input.value = correctVal;
-      // Trigger visual update
-      const x = input.dataset.x;
-      document.getElementById(`val-pair-${index}`).textContent = `(${x}, ${correctVal})`;
-    });
-    playSound('click');
-    checkTableResponses();
-  }
-
-  // Convert and add table points to the visual graph
-  function plotAllTablePoints() {
-    const inputs = document.querySelectorAll(".cell-input");
-    plottedPoints = []; // reset current plotting point array
-    let labelCounter = 65; // 'A' ASCII key
-
-    inputs.forEach((input) => {
-      const x = parseFloat(input.dataset.x);
-      const y = parseFloat(input.value);
-      if (!isNaN(x) && !isNaN(y)) {
-        plottedPoints.push({
-          x: x,
-          y: y,
-          color: "#2dd4bf",
-          label: String.fromCharCode(labelCounter++)
-        });
-      }
-    });
-
-    playSound('success');
-    renderGraph();
-    updatePlottedBadges();
-    updateVerdict();
-  }
-
-  // Manual addition of coordinate coordinate values
-  function handleManualPlot() {
-    const xVal = parseFloat(document.getElementById("manualX").value);
-    const yVal = parseFloat(document.getElementById("manualY").value);
-
-    if (isNaN(xVal) || isNaN(yVal)) {
-      playSound('error');
-      return;
-    }
-
-    // Check limits to keep on graph standard screen space
-    if (Math.abs(xVal) > 11 || Math.abs(yVal) > 11) {
-      alert("To keep values clean for exam standard prep, please choose coordinate values between -11 and 11.");
-      return;
-    }
-
-    const nextLabel = String.fromCharCode(65 + (plottedPoints.length % 26));
-    plottedPoints.push({
-      x: xVal,
-      y: yVal,
-      color: "#f43f5e", // Bright Rose for custom marks
-      label: nextLabel
-    });
-
-    playSound('click');
-    renderGraph();
-    updatePlottedBadges();
-    updateVerdict();
-  }
-
-  // Remove single point from board array
-  window.removePoint = function(index) {
-    plottedPoints.splice(index, 1);
-    playSound('click');
-    renderGraph();
-    updatePlottedBadges();
-    updateVerdict();
-  };
-
-  // Render side panels list
-  function updatePlottedBadges() {
-    const container = document.getElementById("plottedPointsBadgeList");
-    container.innerHTML = "";
-
-    if (plottedPoints.length === 0) {
-      container.innerHTML = `<p class="text-xs text-slate-500 italic">No points plotted yet. Click the graph grid or use the table above.</p>`;
-      return;
-    }
-
-    plottedPoints.forEach((pt, index) => {
-      const badge = document.createElement("div");
-      badge.className = "inline-flex items-center gap-1.5 bg-slate-800 text-slate-200 border border-slate-700 rounded-lg px-2.5 py-1 text-xs font-mono font-bold";
-      badge.innerHTML = `
-        <span style="color: ${pt.color}">${pt.label}(${pt.x}, ${pt.y})</span>
-        <button onclick="removePoint(${index})" class="text-slate-500 hover:text-rose-400 transition-colors focus:outline-none ml-1" title="Delete coordinate">&times;</button>
-      `;
-      container.appendChild(badge);
-    });
-  }
-
-  // Verdict panel updates with Telugu and English helper hints for 10th-grade exams
-  function updateVerdict() {
-    const title = document.getElementById("resultVerdictTitle");
-    const desc = document.getElementById("resultVerdictText");
-
-    if (currentMode === "quadratic") {
-      title.innerHTML = "Zeroes of Polynomial y = x² - 3x - 4";
-      if (plottedPoints.length > 0) {
-        desc.innerHTML = `
-          <p class="mb-2">💡 <strong>Telugu standard instruction:</strong> గ్రాఫ్ x-అక్షాన్ని ఎక్కడ ఖండిస్తుందో ఆ బిందువులే శూన్యాలు. (The values where graph cuts X-axis are the zeroes).</p>
-          <p class="text-teal-300 font-semibold">Observed intersecting points on X-axis: <strong>(-1, 0) and (4, 0)</strong>. Therefore, Zeroes are x = -1, 4.</p>
-        `;
-      } else {
-        desc.textContent = "Plot the value table to visually determine where the curve touches and intersects the X-axis.";
-      }
-    } else if (currentMode === "linear") {
-      title.innerHTML = "Solutions of Linear equation y = 2x - 3";
-      if (plottedPoints.length > 0) {
-        desc.innerHTML = `
-          <p class="mb-2">💡 <strong>Exam Rule:</strong> A linear equation represents a straight line. The point of intersection on x-axis shows the zero root.</p>
-          <p class="text-pink-400 font-semibold">Line intersects X-axis at x = 1.5. Coordinates: <strong>(1.5, 0)</strong></p>
-        `;
-      } else {
-        desc.textContent = "Plot points to view the straight linear path intersecting the axes.";
-      }
-    } else {
-      title.textContent = "Sandbox Mode Active";
-      desc.textContent = "No preset solutions. Add customized coordinates or connect dots via drawing tools to explore.";
-    }
-  }
-
-  // Canvas interactions (Plotting points via mouse click coordinate recognition)
-  canvas.addEventListener("click", (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = logicalSize / rect.width;
-    const scaleY = logicalSize / rect.height;
+// Toast feedback trigger
+function triggerToast(message) {
+  const toast = document.getElementById("toast-notification");
+  const toastMsg = document.getElementById("toast-message");
+  if (toast && toastMsg) {
+    toastMsg.innerText = message;
+    toast.classList.remove("translate-y-20", "opacity-0");
+    toast.classList.add("translate-y-0", "opacity-100");
     
-    const screenMouseX = (event.clientX - rect.left) * scaleX;
-    const screenMouseY = (event.clientY - rect.top) * scaleY;
-
-    const rawGX = toGraphX(screenMouseX);
-    const rawGY = toGraphY(screenMouseY);
-
-    // Snap coordinates to nearest half or integer value for perfect graph plotting experience
-    const snapVal = (val) => {
-      const rounded = Math.round(val);
-      if (Math.abs(val - rounded) < 0.25) {
-        return rounded;
-      }
-      const half = Math.floor(val) + 0.5;
-      if (Math.abs(val - half) < 0.25) {
-        return half;
-      }
-      return Math.round(val);
-    };
-
-    const graphSnappedX = snapVal(rawGX);
-    const graphSnappedY = snapVal(rawGY);
-
-    // Maximum boundaries verification
-    if (Math.abs(graphSnappedX) <= 11 && Math.abs(graphSnappedY) <= 11) {
-      const nextLabel = String.fromCharCode(65 + (plottedPoints.length % 26));
-      
-      // Avoid plotting duplicates at exact same location
-      const exists = plottedPoints.some(pt => pt.x === graphSnappedX && pt.y === graphSnappedY);
-      if (!exists) {
-        plottedPoints.push({
-          x: graphSnappedX,
-          y: graphSnappedY,
-          color: "#14b8a6", // Teal color marker
-          label: nextLabel
-        });
-        playSound('click');
-        renderGraph();
-        updatePlottedBadges();
-        updateVerdict();
-      }
-    }
-  });
-
-  // Real-time hover display on header
-  canvas.addEventListener("mousemove", (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = logicalSize / rect.width;
-    const scaleY = logicalSize / rect.height;
-
-    const screenMouseX = (event.clientX - rect.left) * scaleX;
-    const screenMouseY = (event.clientY - rect.top) * scaleY;
-
-    const gx = toGraphX(screenMouseX).toFixed(1);
-    const gy = toGraphY(screenMouseY).toFixed(1);
-
-    document.getElementById("hoverCoordinateText").textContent = `X: ${gx}, Y: ${gy}`;
-  });
-
-  // Menu Option Selection updates
-  function setLessonMode(mode) {
-    currentMode = mode;
-    
-    // Switch active style classes on button nodes
-    const btns = {
-      quadratic: document.getElementById("optQuad"),
-      linear: document.getElementById("optLinear"),
-      free: document.getElementById("optFree")
-    };
-
-    Object.keys(btns).forEach(key => {
-      if (key === mode) {
-        btns[key].className = "topic-opt flex items-center justify-between p-3.5 rounded-xl border border-teal-500 bg-teal-950/20 text-left transition hover:bg-teal-950/30 group";
-      } else {
-        btns[key].className = "topic-opt flex items-center justify-between p-3.5 rounded-xl border border-slate-700 bg-slate-850 text-left transition hover:bg-slate-750 group";
-      }
-    });
-
-    // Setup standard defaults
-    plottedPoints = [];
-    rebuildValueTable();
-    renderGraph();
-    updatePlottedBadges();
-    playSound('click');
+    setTimeout(() => {
+      toast.classList.remove("translate-y-0", "opacity-100");
+      toast.classList.add("translate-y-20", "opacity-0");
+    }, 2800);
   }
+}
 
-  // Button Event Bindings
-  document.getElementById("optQuad").addEventListener("click", () => setLessonMode("quadratic"));
-  document.getElementById("optLinear").addEventListener("click", () => setLessonMode("linear"));
-  document.getElementById("optFree").addEventListener("click", () => setLessonMode("free"));
+// Update XP Global Score Visuals
+function changeScore(points) {
+  userScore += points;
+  if (userScore < 0) userScore = 0;
+  const scoreBadge = document.getElementById("global-score-badge");
+  if (scoreBadge) {
+    scoreBadge.innerText = userScore;
+  }
+  localStorage.setItem("telugu_app_score", userScore);
+}
 
-  document.getElementById("btnCheckTable").addEventListener("click", checkTableResponses);
-  document.getElementById("btnAutoFill").addEventListener("click", autoFillTable);
-  document.getElementById("btnPlotAllTable").addEventListener("click", plotAllTablePoints);
-  document.getElementById("btnManualPlot").addEventListener("click", handleManualPlot);
+// Initialize Sandbox & Canvas drawing logic
+const canvas = document.getElementById("drawing-canvas");
+let ctx = null;
+if (canvas) {
+  ctx = canvas.getContext("2d");
+}
+
+function setupDrawingCanvas() {
+  if (!canvas || !ctx) return;
   
-  document.getElementById("btnClearPoints").addEventListener("click", () => {
-    plottedPoints = [];
-    playSound('click');
-    renderGraph();
-    updatePlottedBadges();
-    updateVerdict();
+  // Handle resizing/responsive canvas alignment
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  ctx.strokeStyle = "#fbbf24"; // Amber color
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  
+  // Drawing events
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mousemove", draw);
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("mouseleave", stopDrawing);
+  
+  // Touch events for tablets/mobiles
+  canvas.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+  
+  canvas.addEventListener("touchmove", (e) => {
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+    e.preventDefault();
+  }, { passive: false });
+  
+  canvas.addEventListener("touchend", (e) => {
+    const mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+  });
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  const rect = canvas.getBoundingClientRect();
+  lastX = e.clientX - rect.left;
+  lastY = e.clientY - rect.top;
+  
+  document.getElementById("canvas-status").innerText = "Writing...";
+  document.getElementById("canvas-status").classList.add("text-amber-400");
+  playSynthSound(420, "sine", 0.05);
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const rect = canvas.getBoundingClientRect();
+  const currX = e.clientX - rect.left;
+  const currY = e.clientY - rect.top;
+
+  // Get dynamic brush size
+  const brushVal = document.getElementById("canvas-brush-size").value || 6;
+  
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(currX, currY);
+  ctx.lineWidth = brushVal;
+  ctx.stroke();
+  
+  lastX = currX;
+  lastY = currY;
+}
+
+function stopDrawing() {
+  if (isDrawing) {
+    isDrawing = false;
+    document.getElementById("canvas-status").innerText = "Drawn successfully";
+    document.getElementById("canvas-status").classList.remove("text-amber-400");
+  }
+}
+
+// Load letters into UI grid selector
+function populateLettersGrid() {
+  const grid = document.getElementById("letters-grid");
+  if (!grid) return;
+  
+  grid.innerHTML = "";
+  const list = activeTab === "vowels" ? vowels : consonants;
+  
+  list.forEach((item, index) => {
+    const btn = document.createElement("button");
+    btn.className = `letter-card flex flex-col items-center justify-center p-3 rounded-xl border transition-all duration-200 shadow-md ${selectedLetter.char === item.char ? 'bg-amber-500 border-amber-400 text-slate-950 font-extrabold' : 'bg-slate-900 hover:bg-slate-800 border-slate-700/80 text-slate-100 hover:border-amber-500/40'}`;
+    btn.id = `letter-card-${activeTab}-${index}`;
+    btn.innerHTML = `
+      <span class="text-2xl mb-1">${item.char}</span>
+      <span class="text-[10px] uppercase tracking-wider ${selectedLetter.char === item.char ? 'text-slate-900' : 'text-slate-400'}">${item.roman}</span>
+    `;
+    
+    btn.addEventListener("click", () => {
+      selectLetter(item);
+      // Sound effect
+      playSynthSound(550, "triangle", 0.1);
+    });
+    grid.appendChild(btn);
+  });
+}
+
+// Update Pronunciation card and dynamic Canvas bg guide
+function selectLetter(letter) {
+  selectedLetter = letter;
+  
+  // Re-render grid to update active card states
+  populateLettersGrid();
+
+  // Update UI guide card elements
+  document.getElementById("card-big-char").innerText = letter.char;
+  document.getElementById("card-roman-sound").innerText = letter.roman;
+  document.getElementById("card-example-word").innerHTML = `${letter.word}`;
+  document.getElementById("card-example-meaning").innerText = `Meaning: ${letter.mean}`;
+  
+  const badge = document.getElementById("selected-letter-type");
+  badge.innerText = letter.type;
+  if (letter.type === "Vowel") {
+    badge.className = "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30";
+  } else {
+    badge.className = "text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+  }
+
+  // Update Canvas background Trace guide text
+  const traceBg = document.getElementById("canvas-trace-background");
+  if (traceBg) {
+    traceBg.innerHTML = `<span class="text-slate-800/60 text-9xl font-bold select-none">${letter.char}</span>`;
+  }
+  
+  triggerToast(`Loaded '${letter.char}' into the writing pad guide.`);
+}
+
+// Simulated Web Audio synth Voice pronunciation guide!
+function generateSimulatedSpeech(char, roman) {
+  // Attempt real browser Speech Synthesis, default fallback to nice customized modular synth chime
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(char);
+    // Try setting voice to Indian accent if possible
+    const voices = window.speechSynthesis.getVoices();
+    const inVoice = voices.find(v => v.lang.includes("TE") || v.lang.includes("IN"));
+    if (inVoice) utterance.voice = inVoice;
+    utterance.rate = 0.85;
+    window.speechSynthesis.speak(utterance);
+    triggerToast(`Audio: Pronouncing '${char}' (${roman})`);
+  }
+  
+  // Sound effect feedback
+  playSynthSound(600, "sine", 0.15);
+  setTimeout(() => {
+    playSynthSound(780, "sine", 0.12);
+  }, 80);
+}
+
+// Quiz System Logic
+function setupQuiz() {
+  // Randomize a pool of 5 questions
+  activeQuizQuestions = [...quizQuestions]
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 5);
+    
+  currentQuestionIndex = 0;
+  quizCorrectCount = 0;
+  isQuizAnswered = false;
+  
+  document.getElementById("quiz-content-wrapper").classList.remove("hidden");
+  document.getElementById("quiz-result-view").classList.add("hidden");
+  
+  loadQuizQuestion();
+}
+
+function loadQuizQuestion() {
+  isQuizAnswered = false;
+  const feedbackBox = document.getElementById("quiz-feedback-box");
+  feedbackBox.classList.add("hidden");
+  
+  const qData = activeQuizQuestions[currentQuestionIndex];
+  document.getElementById("quiz-curr-index").innerText = currentQuestionIndex + 1;
+  document.getElementById("quiz-question-text").innerText = qData.q;
+  
+  // Update Progress Bar
+  const progressPct = ((currentQuestionIndex) / 5) * 100;
+  document.getElementById("quiz-progress-bar").style.width = `${progressPct}%`;
+  document.getElementById("quiz-score-fraction").innerText = `${quizCorrectCount} / 5 Correct`;
+  
+  // Render Options
+  const optionsGrid = document.getElementById("quiz-options-grid");
+  optionsGrid.innerHTML = "";
+  
+  qData.options.forEach((opt, idx) => {
+    const btn = document.createElement("button");
+    btn.id = `quiz-option-btn-${idx}`;
+    btn.className = "option-btn w-full p-3 bg-slate-900 hover:bg-slate-700 border border-slate-700 rounded-xl text-sm font-semibold text-slate-200 hover:text-white transition duration-200 active:scale-98";
+    btn.innerText = opt;
+    
+    btn.addEventListener("click", () => {
+      handleQuizAnswer(opt, btn, qData.answer);
+    });
+    
+    optionsGrid.appendChild(btn);
+  });
+}
+
+function handleQuizAnswer(selectedOption, clickedButton, correctAnswer) {
+  if (isQuizAnswered) return;
+  isQuizAnswered = true;
+  
+  const feedbackBox = document.getElementById("quiz-feedback-box");
+  feedbackBox.classList.remove("hidden");
+  
+  // Highlight options
+  const optionsGrid = document.getElementById("quiz-options-grid");
+  const buttons = optionsGrid.querySelectorAll("button");
+  
+  if (selectedOption === correctAnswer) {
+    clickedButton.classList.add("option-btn-correct");
+    quizCorrectCount++;
+    changeScore(20);
+    
+    feedbackBox.className = "p-3 rounded-xl border text-xs text-center font-semibold bg-emerald-950/80 text-emerald-300 border-emerald-500/40 animate-bounce";
+    feedbackBox.innerText = "✨ Correct! Excellent memory! (+20 XP)";
+    playSynthSound(880, "sine", 0.15);
+  } else {
+    clickedButton.classList.add("option-btn-incorrect");
+    changeScore(-5);
+    
+    // Highlight correct option
+    buttons.forEach(btn => {
+      if (btn.innerText === correctAnswer) {
+        btn.classList.add("option-btn-correct");
+      }
+    });
+    
+    feedbackBox.className = "p-3 rounded-xl border text-xs text-center font-semibold bg-rose-950/80 text-rose-300 border-rose-500/40";
+    feedbackBox.innerText = `Incorrect. The correct answer was "${correctAnswer}"`;
+    playSynthSound(220, "sawtooth", 0.3);
+  }
+  
+  // Update Progress fraction real-time
+  document.getElementById("quiz-score-fraction").innerText = `${quizCorrectCount} / 5 Correct`;
+  
+  // Transition to next or results after a delay
+  setTimeout(() => {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < 5) {
+      loadQuizQuestion();
+    } else {
+      showQuizResults();
+    }
+  }, 2200);
+}
+
+function showQuizResults() {
+  document.getElementById("quiz-progress-bar").style.width = `100%`;
+  document.getElementById("quiz-content-wrapper").classList.add("hidden");
+  document.getElementById("quiz-result-view").classList.remove("hidden");
+  
+  document.getElementById("quiz-final-score-text").innerText = `${quizCorrectCount} / 5`;
+  
+  let achievementMsg = "Keep practicing to master Telugu!";
+  if (quizCorrectCount === 5) {
+    achievementMsg = "👑 PERFECT SCORE! You are a Telugu genius! (+100 XP)";
+    changeScore(100);
+  } else if (quizCorrectCount >= 3) {
+    achievementMsg = "👍 Good job! Keep practicing to get a perfect score!";
+    changeScore(30);
+  }
+  
+  triggerToast(achievementMsg);
+}
+
+// Word Constructor Logic
+function setupWordBuilder() {
+  const display = document.getElementById("constructed-word-display");
+  const translationDisplay = document.getElementById("constructed-word-translation");
+  const emptyMsg = document.getElementById("constructor-empty-text");
+  
+  // Render helpers
+  function updateWordDisplay() {
+    if (constructedWord.length > 0) {
+      emptyMsg.classList.add("hidden");
+      display.innerText = constructedWord;
+    } else {
+      emptyMsg.classList.remove("hidden");
+      display.innerText = "";
+      translationDisplay.innerText = "";
+    }
+  }
+
+  // Click custom helper letters
+  const paletteButtons = document.querySelectorAll(".btn-palette-char");
+  paletteButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const letterChar = btn.getAttribute("data-char");
+      constructedWord += letterChar;
+      updateWordDisplay();
+      playSynthSound(480, "triangle", 0.1);
+    });
   });
 
-  // Toggle options
-  document.getElementById("btnToggleGuide").addEventListener("click", () => {
-    showGuideCurve = !showGuideCurve;
-    const txt = document.getElementById("guideBtnText");
-    txt.textContent = showGuideCurve ? "Hide Math Curve" : "Show Math Curve";
-    playSound('click');
-    renderGraph();
+  // Clear word sandbox
+  document.getElementById("btn-clear-constructed").addEventListener("click", () => {
+    constructedWord = "";
+    updateWordDisplay();
+    playSynthSound(300, "sine", 0.1);
+    triggerToast("Cleared spelled word");
   });
 
-  document.getElementById("btnToggleAxesLabels").addEventListener("click", () => {
-    showAxesLabels = !showAxesLabels;
-    playSound('click');
-    renderGraph();
+  // Spell Checker Action
+  document.getElementById("btn-check-constructed").addEventListener("click", () => {
+    if (constructedWord === "") {
+      triggerToast("Add some character blocks first!");
+      return;
+    }
+    
+    // Check curated Telugu simple words
+    const parsedWord = constructedWord.replace(/\s+/g, '');
+    let matched = null;
+    
+    if (parsedWord === "అమ్మ") {
+      matched = { translation: "Mother", roman: "Amma", bonus: 40 };
+    } else if (parsedWord === "ఆట") {
+      matched = { translation: "Game / Play", roman: "Aata", bonus: 40 };
+    } else if (parsedWord === "ఈల") {
+      matched = { translation: "Whistle", roman: "Eela", bonus: 40 };
+    } else if (parsedWord === "కల") {
+      matched = { translation: "Dream", roman: "Kala", bonus: 40 };
+    } else if (parsedWord === "వల") {
+      matched = { translation: "Net", roman: "Vala", bonus: 30 };
+    } else if (parsedWord === "పడవ") {
+      matched = { translation: "Boat", roman: "Padava", bonus: 30 };
+    }
+    
+    if (matched) {
+      translationDisplay.innerHTML = `<span class="text-emerald-400 font-bold">🎉 Spelled Correctly!</span> - "${matched.translation}" (${matched.roman})`;
+      changeScore(matched.bonus);
+      triggerToast(`Magnificent! Spelled "${matched.roman}" (+${matched.bonus} XP)`);
+      playSynthSound(950, "sine", 0.2);
+    } else {
+      translationDisplay.innerHTML = `<span class="text-rose-400 font-semibold">Unrecognized Word</span> - Try tracing clues below.`;
+      playSynthSound(280, "sawtooth", 0.25);
+      triggerToast("That sequence doesn't match our sandbox target words! Keep trying.");
+    }
+  });
+}
+
+// Reset application progress
+function resetProgress() {
+  userScore = 0;
+  localStorage.removeItem("telugu_app_score");
+  const scoreBadge = document.getElementById("global-score-badge");
+  if (scoreBadge) scoreBadge.innerText = "0";
+  
+  setupQuiz();
+  constructedWord = "";
+  const display = document.getElementById("constructed-word-display");
+  const translationDisplay = document.getElementById("constructed-word-translation");
+  const emptyMsg = document.getElementById("constructor-empty-text");
+  if (display) display.innerText = "";
+  if (translationDisplay) translationDisplay.innerText = "";
+  if (emptyMsg) emptyMsg.classList.remove("hidden");
+  
+  triggerToast("All educational points and progress have been reset.");
+  playSynthSound(350, "sawtooth", 0.3);
+}
+
+// Main Setup entry on load
+document.addEventListener("DOMContentLoaded", () => {
+  // Load saved score from Storage
+  const savedScore = localStorage.getItem("telugu_app_score");
+  if (savedScore) {
+    userScore = parseInt(savedScore, 10) || 0;
+    const scoreBadge = document.getElementById("global-score-badge");
+    if (scoreBadge) scoreBadge.innerText = userScore;
+  }
+  
+  // Initialize sub-modules
+  setupDrawingCanvas();
+  populateLettersGrid();
+  setupQuiz();
+  setupWordBuilder();
+
+  // Tab listeners
+  const tabVowels = document.getElementById("tab-vowels");
+  const tabConsonants = document.getElementById("tab-consonants");
+  
+  tabVowels.addEventListener("click", () => {
+    activeTab = "vowels";
+    tabVowels.className = "px-4 py-1.5 text-xs font-semibold rounded-lg bg-amber-500 text-slate-950 shadow-md transition-all duration-200";
+    tabConsonants.className = "px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200";
+    populateLettersGrid();
+    selectLetter(vowels[0]);
   });
 
-  // Board Exam Helper Modal actions
-  const modal = document.getElementById("modalHelp");
-  const openModal = () => modal.classList.remove("hidden");
-  const closeModal = () => modal.classList.add("hidden");
-
-  document.getElementById("btnHelpModal").addEventListener("click", openModal);
-  document.getElementById("btnCloseModal").addEventListener("click", closeModal);
-  document.getElementById("btnCloseModalBtn").addEventListener("click", closeModal);
-
-  // Quick Setup Demo button script
-  document.getElementById("btnDemoSetup").addEventListener("click", () => {
-    // Setup automatic values for current selected mode
-    autoFillTable();
-    plotAllTablePoints();
-    playSound('success');
+  tabConsonants.addEventListener("click", () => {
+    activeTab = "consonants";
+    tabConsonants.className = "px-4 py-1.5 text-xs font-semibold rounded-lg bg-amber-500 text-slate-950 shadow-md transition-all duration-200";
+    tabVowels.className = "px-4 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-slate-200 transition-all duration-200";
+    populateLettersGrid();
+    selectLetter(consonants[0]);
   });
 
-  // Init setup first time
-  rebuildValueTable();
-  renderGraph();
+  // Canvas control actions
+  document.getElementById("btn-canvas-clear").addEventListener("click", () => {
+    if (canvas && ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.getElementById("canvas-status").innerText = "Canvas cleared";
+      playSynthSound(300, "sine", 0.15);
+    }
+  });
+
+  // Toggle Canvas trace guide
+  document.getElementById("btn-toggle-guide").addEventListener("click", () => {
+    const traceBg = document.getElementById("canvas-trace-background");
+    const toggleBtn = document.getElementById("btn-toggle-guide");
+    
+    guideVisible = !guideVisible;
+    if (guideVisible) {
+      traceBg.style.opacity = "1";
+      toggleBtn.innerText = "Hide Guide";
+      toggleBtn.className = "px-3 py-1.5 bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-200 text-xs font-medium rounded-lg transition";
+    } else {
+      traceBg.style.opacity = "0";
+      toggleBtn.innerText = "Show Guide";
+      toggleBtn.className = "px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-medium rounded-lg transition";
+    }
+    playSynthSound(620, "sine", 0.05);
+  });
+
+  // Voice pronunciation clicker
+  document.getElementById("btn-speak-letter").addEventListener("click", () => {
+    generateSimulatedSpeech(selectedLetter.char, selectedLetter.roman);
+  });
+
+  // Quiz controls
+  document.getElementById("btn-restart-quiz").addEventListener("click", () => {
+    setupQuiz();
+    triggerToast("New quiz challenge started!");
+    playSynthSound(700, "sine", 0.1);
+  });
+  
+  // General App Reset progression trigger
+  document.getElementById("btn-reset-app").addEventListener("click", resetProgress);
 });
