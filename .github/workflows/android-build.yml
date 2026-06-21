@@ -113,14 +113,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: Applet-debug-apk
+          name: ElementiumPeriodicTable-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: Applet-release-aab
+          name: ElementiumPeriodicTable-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
