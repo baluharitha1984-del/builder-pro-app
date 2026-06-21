@@ -1,6 +1,6 @@
 {
-  "appId": "com.builder.mathgraph10interactivegraphinglab202606210400",
-  "appName": "MathGraph 10 - Interactive Graphing Lab",
+  "appId": "com.builderpro.app",
+  "appName": "TeluguTestApp",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
