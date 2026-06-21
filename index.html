@@ -3,16 +3,278 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zenith Calculator</title>
+  <title>MathGraph 10 - Interactive Graphing Lab</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<div class="min-h-screen bg-slate-900 flex items-center justify-center p-6"><div class="bg-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-sm border border-slate-700"><div class="mb-6"><input type="text" id="display" readonly class="w-full bg-slate-950 text-white text-right text-4xl p-6 rounded-2xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500" value="0"></div><div class="grid grid-cols-4 gap-4"><button onclick="clearDisplay()" class="col-span-2 bg-red-900/50 text-red-200 p-4 rounded-xl hover:bg-red-800 transition">AC</button><button onclick="appendToDisplay('/')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">/</button><button onclick="appendToDisplay('*')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">*</button><button onclick="appendToDisplay('7')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">7</button><button onclick="appendToDisplay('8')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">8</button><button onclick="appendToDisplay('9')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">9</button><button onclick="appendToDisplay('-')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">-</button><button onclick="appendToDisplay('4')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">4</button><button onclick="appendToDisplay('5')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">5</button><button onclick="appendToDisplay('6')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">6</button><button onclick="appendToDisplay('+')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">+</button><button onclick="appendToDisplay('1')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">1</button><button onclick="appendToDisplay('2')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">2</button><button onclick="appendToDisplay('3')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">3</button><button onclick="calculateResult()" class="row-span-2 bg-blue-600 text-white p-4 rounded-xl hover:bg-blue-500 transition">=</button><button onclick="appendToDisplay('0')" class="col-span-2 bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">0</button><button onclick="appendToDisplay('.')" class="bg-slate-700 text-white p-4 rounded-xl hover:bg-slate-600 transition">.</button></div></div></div>
+  <div class="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-slate-900">
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-800/80 backdrop-blur-md border-b border-slate-700/60 sticky top-0 z-30 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-gradient-to-tr from-teal-500 to-cyan-500 rounded-xl shadow-lg shadow-teal-500/20">
+        <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">MathGraph 10</h1>
+        <p class="text-xs text-slate-400 font-medium">Interactive Digital Graph Board for Class X Students</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="px-3 py-1 bg-teal-500/10 border border-teal-500/30 text-teal-400 rounded-full text-xs font-semibold uppercase tracking-wider">English Medium Companion</span>
+      <button id="btnHelpModal" class="bg-slate-700 hover:bg-slate-650 transition text-slate-200 px-3.5 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5 border border-slate-600">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        How to score 8/8 marks
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- LEFT SIDEBAR: Instructions, Controls & Live Equation solver -->
+    <section class="lg:col-span-5 flex flex-col gap-5">
+      
+      <!-- Task Selector -->
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-teal-500 to-cyan-500"></div>
+        <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
+          <span class="text-teal-400">Step 1:</span> Choose Graph Topic
+        </h2>
+        <div class="grid grid-cols-1 gap-2.5">
+          <button id="optQuad" class="topic-opt flex items-center justify-between p-3.5 rounded-xl border border-teal-500/40 bg-teal-950/20 text-left transition hover:bg-teal-950/30 group">
+            <div>
+              <p class="font-semibold text-teal-300 text-sm">Quadratic Polynomial</p>
+              <p class="text-xs text-slate-400 mt-0.5">y = x² - 3x - 4 (Find the Zeroes)</p>
+            </div>
+            <span class="px-2 py-1 bg-teal-500/20 text-teal-300 rounded text-[10px] font-mono group-hover:scale-105 transition">Standard Exam Qs</span>
+          </button>
+          
+          <button id="optLinear" class="topic-opt flex items-center justify-between p-3.5 rounded-xl border border-slate-700 bg-slate-850 text-left transition hover:bg-slate-750 group">
+            <div>
+              <p class="font-semibold text-slate-200 text-sm">Linear Equation in 2 Variables</p>
+              <p class="text-xs text-slate-400 mt-0.5">y = 2x - 3 (Draw Straight Line)</p>
+            </div>
+            <span class="px-2 py-1 bg-slate-700 text-slate-400 rounded text-[10px] font-mono">Easy Plot</span>
+          </button>
+
+          <button id="optFree" class="topic-opt flex items-center justify-between p-3.5 rounded-xl border border-slate-700 bg-slate-850 text-left transition hover:bg-slate-750 group">
+            <div>
+              <p class="font-semibold text-slate-200 text-sm">Free Plotting / Sandbox</p>
+              <p class="text-xs text-slate-400 mt-0.5">Plot points, measure slopes, & form custom shapes</p>
+            </div>
+            <span class="px-2 py-1 bg-purple-500/10 text-purple-400 rounded text-[10px] font-mono">Interactive</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Value Table Builder (Essential for 10th standard mark sheet) -->
+      <div id="tableContainer" class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl transition-all">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+            <span class="text-teal-400">Step 2:</span> Complete the Value Table
+          </h2>
+          <button id="btnAutoFill" class="text-xs text-teal-400 hover:text-teal-300 flex items-center gap-1 font-medium bg-teal-500/10 hover:bg-teal-500/20 px-2 py-1 rounded transition">
+            Auto-calculate values
+          </button>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">Before drawing the graph, compute values of <strong class="text-slate-200">y</strong> for coordinates. Verify with standard answers.</p>
+        
+        <div class="overflow-x-auto rounded-xl border border-slate-700/70 bg-slate-900/50">
+          <table class="w-full text-center text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-850 text-slate-300 font-semibold border-b border-slate-700">
+                <th class="p-2.5">x value</th>
+                <th class="p-2.5 font-mono" id="tableHeaderEquation">y = x² - 3x - 4</th>
+                <th class="p-2.5">Point (x, y)</th>
+                <th class="p-2.5">Check</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Generated dynamically via Javascript depending on selected model -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-4 flex flex-wrap gap-2 justify-between items-center">
+          <span id="tableStatusText" class="text-xs text-slate-400 font-medium">Fill in inputs and verify them.</span>
+          <div class="flex gap-2">
+            <button id="btnCheckTable" class="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 transition text-slate-200 font-semibold rounded-lg text-xs">Verify Answers</button>
+            <button id="btnPlotAllTable" class="px-3.5 py-1.5 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-slate-950 font-bold rounded-lg text-xs shadow-lg shadow-teal-500/20 transition disabled:opacity-40 disabled:cursor-not-allowed" disabled>Plot Table on Graph</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Point Addition & Tools -->
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl">
+        <h2 class="text-base font-bold text-slate-100 mb-3 flex items-center gap-2">
+          <span class="text-teal-400">Alternative:</span> Manually Plot Coordinates
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 items-end">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">X - Coordinate</label>
+            <input type="number" id="manualX" step="0.5" value="2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none text-teal-400 font-bold font-mono text-center">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Y - Coordinate</label>
+            <input type="number" id="manualY" step="0.5" value="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none text-teal-400 font-bold font-mono text-center">
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <button id="btnManualPlot" class="w-full bg-slate-700 hover:bg-teal-500 hover:text-slate-950 text-slate-200 font-bold py-1.5 rounded-lg text-sm border border-slate-600 hover:border-teal-400 transition flex items-center justify-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+              Plot Point
+            </button>
+          </div>
+        </div>
+
+        <!-- Plotted points list with action triggers -->
+        <div class="mt-4 pt-4 border-t border-slate-700/60">
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Points On Board</p>
+            <button id="btnClearPoints" class="text-xs text-rose-400 hover:text-rose-300 transition-colors font-medium">Clear All</button>
+          </div>
+          <div id="plottedPointsBadgeList" class="flex flex-wrap gap-2 max-h-[110px] overflow-y-auto pr-1">
+            <!-- dynamic badges -->
+            <p class="text-xs text-slate-500 italic">No points plotted yet. Click the graph grid or use the table above.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT CONTENT: Interactive Graph & Results Panel -->
+    <section class="lg:col-span-7 flex flex-col gap-5">
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 shadow-xl flex flex-col">
+        
+        <!-- Graph Information bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-700/60">
+          <div>
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Interactive Graph Sheet</div>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="hoverCoordinateText" class="text-sm font-mono font-bold text-slate-200">Move cursor over grid</span>
+            </div>
+          </div>
+          
+          <!-- Visual Scale config -->
+          <div class="bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-700/80 flex items-center gap-4 text-xs">
+            <div>
+              <span class="text-slate-400 block font-medium">Scale on X-axis:</span>
+              <span class="font-semibold font-mono text-teal-300">1 cm = 1 Unit</span>
+            </div>
+            <div class="border-l border-slate-700 h-6"></div>
+            <div>
+              <span class="text-slate-400 block font-medium">Scale on Y-axis:</span>
+              <span class="font-semibold font-mono text-teal-300">1 cm = 1 Unit</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN CANVAS CONTAINER -->
+        <div class="relative flex justify-center items-center bg-slate-950 rounded-xl border border-teal-950 overflow-hidden shadow-inner group">
+          
+          <!-- Canvas elements -->
+          <canvas id="graphCanvas" class="w-full aspect-square max-w-[550px] cursor-crosshair block"></canvas>
+          
+          <!-- Floating visual guide overlay helper -->
+          <div class="absolute bottom-3 left-3 bg-slate-900/95 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700/80 text-[11px] text-slate-300 pointer-events-none transition-opacity duration-300 opacity-90 group-hover:opacity-100 max-w-[280px]">
+            <p class="font-bold text-teal-400 flex items-center gap-1 mb-0.5">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+              Graph Interaction Board Tip
+            </p>
+            Click directly on any grid intersection point to plot it manually! Enable the <span class="text-amber-400 font-semibold">Line Guide</span> to draw curves.
+          </div>
+
+          <!-- Canvas Control buttons top-right corner -->
+          <div class="absolute top-3 right-3 flex flex-col gap-2">
+            <button id="btnToggleGuide" class="p-2 bg-slate-900/90 text-slate-300 hover:text-amber-400 hover:bg-slate-800 rounded-lg border border-slate-700 transition shadow-md flex items-center gap-1.5 text-xs font-semibold" title="Connect points with curve/line">
+              <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5l1.5-1.5m3.036-3.036l1.5-1.5a4 4 0 10-5.656-5l-4 4a4 4 0 003.036 6.832"></path></svg>
+              <span id="guideBtnText">Show Math Curve</span>
+            </button>
+            
+            <button id="btnToggleAxesLabels" class="p-2 bg-slate-900/90 text-slate-300 hover:text-teal-400 hover:bg-slate-800 rounded-lg border border-slate-700 transition shadow-md flex items-center gap-1.5 text-xs font-semibold" title="Highlight quadrants and standard axes">
+              <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h10.5M4 7c0-2 1.5-3 3.5-3H18M4 7h16"></path></svg>
+              <span>Toggle Labels</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Educational Result Output Screen -->
+        <div class="mt-4 p-4 rounded-xl bg-slate-900/80 border border-slate-700 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Real-Time Board Exam Evaluation</span>
+            <h3 id="resultVerdictTitle" class="text-sm font-bold text-slate-200 mt-1">Plotted Zeroes / Intersection points</h3>
+            <p id="resultVerdictText" class="text-xs text-slate-400 mt-0.5">Table not completed yet. Verify the points to see full analytical results on the board screen.</p>
+          </div>
+          <div class="flex flex-wrap gap-2 shrink-0">
+            <button id="btnDemoSetup" class="px-3.5 py-2 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 hover:from-teal-500/30 hover:to-cyan-500/30 text-teal-300 font-bold rounded-lg border border-teal-500/30 text-xs transition">
+              Run Demo Guide
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 10th Class Board Examination Help Modal (Pop-up/Toggle display) -->
+  <div id="modalHelp" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-scaleUp">
+      <button id="btnCloseModal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-100 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      <h3 class="text-lg font-bold text-slate-100 mb-2 flex items-center gap-2">
+        <span class="p-1 bg-amber-500 rounded-lg text-slate-950">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+        </span>
+        Securing 8/8 Marks in Class X Graph Question
+      </h3>
+      <p class="text-xs text-slate-300 mb-4">Follow this standard marking scheme utilized in AP, Telangana & CBSE Board Examinations:</p>
+      <ul class="space-y-3 text-xs text-slate-300">
+        <li class="flex gap-2.5 items-start">
+          <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-[10px] shrink-0">1</span>
+          <div>
+            <strong class="text-slate-200">Table of Values (2 Marks):</strong>
+            <p class="text-slate-400">You must choose at least 5-7 values of x and compute the corresponding y coordinates accurately.</p>
+          </div>
+        </li>
+        <li class="flex gap-2.5 items-start">
+          <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-[10px] shrink-0">2</span>
+          <div>
+            <strong class="text-slate-200">Scale & Axis representation (2 Marks):</strong>
+            <p class="text-slate-400">Specify the scale on the top-right corner. Draw both X-axis and Y-axis with proper positive/negative markings and origin (0,0).</p>
+          </div>
+        </li>
+        <li class="flex gap-2.5 items-start">
+          <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-[10px] shrink-0">3</span>
+          <div>
+            <strong class="text-slate-200">Plotting points & Connecting them (2 Marks):</strong>
+            <p class="text-slate-400">Plot each ordered pair. Connect them with a smooth freehand curve for a parabola or a scale-ruled line for linear equations.</p>
+          </div>
+        </li>
+        <li class="flex gap-2.5 items-start">
+          <span class="w-5 h-5 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center font-bold text-[10px] shrink-0">4</span>
+          <div>
+            <strong class="text-slate-200">Zeroes / Solutions declaration (2 Marks):</strong>
+            <p class="text-slate-400">State clearly where the plotted graph cuts/crosses the X-axis. These x-coordinates are the zeroes of the polynomial!</p>
+          </div>
+        </li>
+      </ul>
+      <div class="mt-5 pt-4 border-t border-slate-700 flex justify-end">
+        <button id="btnCloseModalBtn" class="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-xl text-xs transition">
+          I Understand, Let's Practice!
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Info Bar -->
+  <footer class="bg-slate-900 border-t border-slate-800 text-slate-500 text-xs py-4 px-6 text-center flex flex-col sm:flex-row items-center justify-between gap-2">
+    <p>© MathGraph 10 - Educational Interactive Board. Highly optimized for digital classroom explanation.</p>
+    <p class="text-teal-400/80 font-mono">Scale Factor: 1 unit = 22 pixels | Graph Range: -10 to +10</p>
+  </footer>
+</div>
   
   <script src="script.js"></script>
 </body>
