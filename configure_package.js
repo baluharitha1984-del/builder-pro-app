@@ -68,7 +68,7 @@ console.log("Verified Project Description: " + appDescription);
 const slugProjectName = uniqueAppLabel.toLowerCase().replace(/[^a-z0-9]/g, '') || 'app';
 const safeProjectPart = /^[a-z]/.test(slugProjectName) ? slugProjectName : 'app' + slugProjectName;
 const timestampSeconds = Math.floor(Date.now() / 1000);
-const uniqueAppId = `com.${safeProjectPart}.${timestampSeconds}`;
+const uniqueAppId = `com.${safeProjectPart}.app${timestampSeconds}`;
 
 console.log("Newly Generated Unique ApplicationID: " + uniqueAppId);
 
