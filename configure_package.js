@@ -14,7 +14,13 @@ if (runNumStr) {
            String(now.getSeconds()).padStart(2, '0');
 }
 
-const uniqueAppId = "com.builderpro.app" + suffix;
+let uniqueAppId = "com.builderpro.app" + suffix;
+if (fs.existsSync('capacitor.config.json')) {
+  try {
+    const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
+    if (config.appId) uniqueAppId = config.appId;
+  } catch (e) {}
+}
 console.log("Target Package Name/ApplicationId: " + uniqueAppId);
 
 let appName = 'Applet';
@@ -33,7 +39,7 @@ if (fs.existsSync('capacitor.config.json')) {
 }
 
 const cleanAppName = appName.trim() || 'Applet';
-const uniqueAppLabel = cleanAppName + ' ' + suffix;
+const uniqueAppLabel = cleanAppName;
 console.log("Target App Label: " + uniqueAppLabel);
 
 const versionCode = runNumStr ? parseInt(runNumStr, 10) : Math.floor(Date.now() / 1000) % 2000000000;
