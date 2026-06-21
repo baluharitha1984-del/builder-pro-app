@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "MathLeap",
+  "appName": "Zenith Calculator",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
