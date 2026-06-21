@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "Zenith Calculator",
+  "appName": "బాల పజిల్స్ & టాయ్ బోర్డ్",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
