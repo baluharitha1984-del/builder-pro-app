@@ -1,106 +1,23 @@
-/* Tailored CSS for Grid Columns, Custom Interactive animations, and element tags */
-
-.grid-cols-18 {
-  grid-template-columns: repeat(18, minmax(0, 1fr));
+/* Custom Scrollbar for matrix lists */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
 }
 
-/* Element blocks styling */
-.element-cell {
-  aspect-ratio: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 0.35rem;
-  border-radius: 0.5rem;
+/* Interactive scale animation for matrix cells */
+.matrix-cell {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
 }
-
-.element-cell:hover {
-  transform: scale(1.08) translateY(-2px);
-  z-index: 20;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-/* Interactive filter state transitions */
-.filter-chip {
-  padding: 0.35rem 0.8rem;
-  border-radius: 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  background-color: rgb(30, 41, 59);
-  border: 1px solid rgb(51, 65, 85);
-  color: rgb(203, 213, 225);
-  transition: all 0.15s ease-in-out;
-}
-
-.filter-chip:hover {
-  background-color: rgb(51, 65, 85);
-  color: white;
-}
-
-.filter-chip.active {
-  background-color: rgb(79, 70, 229);
-  border-color: rgb(99, 102, 241);
-  color: white;
-}
-
-/* Dynamic state colorizations on text names or icons */
-.state-indicator-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0b1329;
-}
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-
-/* Quiz Option buttons styling */
-.quiz-option-btn {
-  width: 100%;
-  text-align: left;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 500;
-  background-color: rgb(15, 23, 42);
-  border: 1px solid rgb(30, 41, 59);
-  color: rgb(226, 232, 240);
-  transition: all 0.2s;
-}
-
-.quiz-option-btn:hover {
-  background-color: rgb(30, 41, 59);
-  border-color: rgb(71, 85, 105);
-  transform: translateX(4px);
-}
-
-.quiz-option-btn.correct {
-  background-color: rgba(16, 185, 129, 0.2) !important;
-  border-color: rgb(16, 185, 129) !important;
-  color: rgb(52, 211, 153) !important;
-}
-
-.quiz-option-btn.incorrect {
-  background-color: rgba(239, 68, 68, 0.2) !important;
-  border-color: rgb(239, 68, 68) !important;
-  color: rgb(248, 113, 113) !important;
+.matrix-cell:hover {
+  transform: translateY(-2px);
 }
