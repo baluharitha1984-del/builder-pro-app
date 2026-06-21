@@ -1,652 +1,517 @@
-// Virtual Lab State & Management
+document.addEventListener('DOMContentLoaded', () => {
+  // Periodic table data array with full set of elements up to key interactive range, structured precisely.
+  const elements = [
+    { number: 1, symbol: 'H', name: 'Hydrogen', mass: '1.008', category: 'nonmetal', period: 1, group: 1, state: 'gas', melting: 14, boiling: 20, discoverer: 'Henry Cavendish', summary: 'Hydrogen is the chemical element with the symbol H and atomic number 1. It is the lightest element in the periodic table.' },
+    { number: 2, symbol: 'He', name: 'Helium', mass: '4.0026', category: 'noble', period: 1, group: 18, state: 'gas', melting: 1, boiling: 4, discoverer: 'Jansen & Lockyer', summary: 'Helium is a colorless, odorless, tasteless, non-toxic, inert, monatomic gas, the first in the noble gas group.' },
+    
+    { number: 3, symbol: 'Li', name: 'Lithium', mass: '6.94', category: 'alkali', period: 2, group: 1, state: 'solid', melting: 453, boiling: 1615, discoverer: 'Johan August Arfwedson', summary: 'Lithium is a soft, silvery-white alkali metal. Under standard conditions, it is the least dense solid element.' },
+    { number: 4, symbol: 'Be', name: 'Beryllium', mass: '9.0122', category: 'alkaline', period: 2, group: 2, state: 'solid', melting: 1560, boiling: 2742, discoverer: 'Louis Nicolas Vauquelin', summary: 'Beryllium is a relatively rare element in the universe, often forming as a product of the spallation of larger nuclei.' },
+    { number: 5, symbol: 'B', name: 'Boron', mass: '10.81', category: 'metalloid', period: 2, group: 13, state: 'solid', melting: 2349, boiling: 4200, discoverer: 'Joseph Louis Gay-Lussac', summary: 'Boron is a low-abundance cosmic element produced by cosmic-ray spallation and supernovae rather than stellar nucleosynthesis.' },
+    { number: 6, symbol: 'C', name: 'Carbon', mass: '12.011', category: 'nonmetal', period: 2, group: 14, state: 'solid', melting: 3823, boiling: 4300, discoverer: 'Ancient Egypt', summary: 'Carbon is a tetravalent nonmetal element, forming the essential backbone of all organic life forms.' },
+    { number: 7, symbol: 'N', name: 'Nitrogen', mass: '14.007', category: 'nonmetal', period: 2, group: 15, state: 'gas', melting: 63, boiling: 77, discoverer: 'Daniel Rutherford', summary: 'Nitrogen is a common nonmetal gas making up about 78% of Earth\'s atmosphere, critical to amino acids.' },
+    { number: 8, symbol: 'O', name: 'Oxygen', mass: '15.999', category: 'nonmetal', period: 2, group: 16, state: 'gas', melting: 54, boiling: 90, discoverer: 'Carl Wilhelm Scheele', summary: 'Oxygen is highly reactive with other elements and organic compounds, vital for human cellular respiration.' },
+    { number: 9, symbol: 'F', name: 'Fluorine', mass: '18.998', category: 'halogen', period: 2, group: 17, state: 'gas', melting: 53, boiling: 85, discoverer: 'André-Marie Ampère', summary: 'Fluorine is an extremely toxic halogen gas, highly reactive with virtually all other substances.' },
+    { number: 10, symbol: 'Ne', name: 'Neon', mass: '20.180', category: 'noble', period: 2, group: 18, state: 'gas', melting: 24, boiling: 27, discoverer: 'Morris Travers', summary: 'Neon is a colorless inert gas that glows with a distinct reddish-orange light when used in high-voltage discharge tubes.' },
 
-// --- TAB SWITCHING SYSTEM ---
-function switchTab(tabId) {
-  const tabs = ['labs', 'periodic', 'notebook', 'trivia'];
-  tabs.forEach(t => {
-    const btn = document.getElementById(`tab-btn-${t}`);
-    const content = document.getElementById(`tab-content-${t}`);
-    if (t === tabId) {
-      btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
-      btn.classList.remove('bg-slate-800', 'text-slate-300', 'hover:bg-slate-700');
-      content.classList.remove('hidden');
-      content.classList.add('block');
+    { number: 11, symbol: 'Na', name: 'Sodium', mass: '22.990', category: 'alkali', period: 3, group: 1, state: 'solid', melting: 371, boiling: 1156, discoverer: 'Humphry Davy', summary: 'Sodium is a highly reactive alkali metal that reacts violently with water. Found abundantly in ocean table salt.' },
+    { number: 12, symbol: 'Mg', name: 'Magnesium', mass: '24.305', category: 'alkaline', period: 3, group: 2, state: 'solid', melting: 923, boiling: 1363, discoverer: 'Joseph Black', summary: 'Magnesium is a shiny gray solid which bears a close physical resemblance to the other five alkaline earth metals.' },
+    { number: 13, symbol: 'Al', name: 'Aluminium', mass: '26.982', category: 'post-transition', period: 3, group: 13, state: 'solid', melting: 933, boiling: 2792, discoverer: 'Hans Christian Ørsted', summary: 'Aluminium is a lightweight, non-magnetic post-transition metal, crucial for aerospace engineering.' },
+    { number: 14, symbol: 'Si', name: 'Silicon', mass: '28.085', category: 'metalloid', period: 3, group: 14, state: 'solid', melting: 1687, boiling: 3538, discoverer: 'Jöns Jacob Berzelius', summary: 'Silicon is a hard, crystalline metalloid widely used as the basis of modern computer semiconductor chips.' },
+    { number: 15, symbol: 'P', name: 'Phosphorus', mass: '30.974', category: 'nonmetal', period: 3, group: 15, state: 'solid', melting: 317, boiling: 553, discoverer: 'Hennig Brand', summary: 'Phosphorus exists in highly reactive red and white allotropes, critical for life energy-transfer compounds like ATP.' },
+    { number: 16, symbol: 'S', name: 'Sulfur', mass: '32.06', category: 'nonmetal', period: 3, group: 16, state: 'solid', melting: 388, boiling: 717, discoverer: 'Chinese Chemists', summary: 'Sulfur is an abundant, multivalent nonmetal. Under normal conditions, sulfur atoms form cyclic octatomic molecules with a yellow chemical formula.' },
+    { number: 17, symbol: 'Cl', name: 'Chlorine', mass: '35.45', category: 'halogen', period: 3, group: 17, state: 'gas', melting: 171, boiling: 239, discoverer: 'Carl Wilhelm Scheele', summary: 'Chlorine is a yellow-green halogen gas, widely used as an oxidizing agent in water purification and bleaches.' },
+    { number: 18, symbol: 'Ar', name: 'Argon', mass: '39.948', category: 'noble', period: 3, group: 18, state: 'gas', melting: 83, boiling: 87, discoverer: 'Lord Rayleigh', summary: 'Argon is the third-most abundant gas in the Earth\'s atmosphere, at 0.934%, making it useful as an inert shielding environment.' },
+
+    { number: 19, symbol: 'K', name: 'Potassium', mass: '39.098', category: 'alkali', period: 4, group: 1, state: 'solid', melting: 336, boiling: 1032, discoverer: 'Humphry Davy', summary: 'Potassium is a silvery-white metal that is soft enough to be cut with a knife with little effort. Highly reactive with water.' },
+    { number: 20, symbol: 'Ca', name: 'Calcium', mass: '40.078', category: 'alkaline', period: 4, group: 2, state: 'solid', melting: 1115, boiling: 1757, discoverer: 'Humphry Davy', summary: 'Calcium is vital for living organisms, particularly in cell physiology, bone formation, and shell structures.' },
+    { number: 21, symbol: 'Sc', name: 'Scandium', mass: '44.956', category: 'transition', period: 4, group: 3, state: 'solid', melting: 1814, boiling: 3109, discoverer: 'Lars Fredrik Nilson', summary: 'Scandium is a silvery-white metallic d-block transition element, historically classified as a rare-earth element.' },
+    { number: 22, symbol: 'Ti', name: 'Titanium', mass: '47.867', category: 'transition', period: 4, group: 4, state: 'solid', melting: 1941, boiling: 3560, discoverer: 'William Gregor', summary: 'Titanium is a lustrous transition metal with a silver color, low density, high strength, and highly resistant to corrosion.' },
+    { number: 23, symbol: 'V', name: 'Vanadium', mass: '50.942', category: 'transition', period: 4, group: 5, state: 'solid', melting: 2183, boiling: 3680, discoverer: 'Andrés Manuel del Río', summary: 'Vanadium is a hard, silvery-grey, malleable transition metal. It is rarely found as a free element in nature.' },
+    { number: 24, symbol: 'Cr', name: 'Chromium', mass: '51.996', category: 'transition', period: 4, group: 6, state: 'solid', melting: 2180, boiling: 2944, discoverer: 'Louis Nicolas Vauquelin', summary: 'Chromium is a steely-gray, lustrous, hard and brittle transition metal, valued for its high corrosion resistance and hardness.' },
+    { number: 25, symbol: 'Mn', name: 'Manganese', mass: '54.938', category: 'transition', period: 4, group: 7, state: 'solid', melting: 1519, boiling: 2334, discoverer: 'Carl Wilhelm Scheele', summary: 'Manganese is a transition metal with important industrial alloy uses, particularly in stainless steels.' },
+    { number: 26, symbol: 'Fe', name: 'Iron', mass: '55.845', category: 'transition', period: 4, group: 8, state: 'solid', melting: 1811, boiling: 3134, discoverer: 'Ancient civilizations', summary: 'Iron is by mass the most common element on Earth, forming much of Earth\'s outer and inner core.' },
+    { number: 27, symbol: 'Co', name: 'Cobalt', mass: '58.933', category: 'transition', period: 4, group: 9, state: 'solid', melting: 1768, boiling: 3200, discoverer: 'Georg Brandt', summary: 'Cobalt is a ferromagnetic metal used extensively in superalloys, magnetic media, and rechargeable lithium batteries.' },
+    { number: 28, symbol: 'Ni', name: 'Nickel', mass: '58.693', category: 'transition', period: 4, group: 10, state: 'solid', melting: 1728, boiling: 3186, discoverer: 'Axel Fredrik Cronstedt', summary: 'Nickel is a silvery-white lustrous metal with a slight golden tinge. It belongs to the transition metals.' },
+    { number: 29, symbol: 'Cu', name: 'Copper', mass: '63.546', category: 'transition', period: 4, group: 11, state: 'solid', melting: 1358, boiling: 2835, discoverer: 'Middle East', summary: 'Copper is a soft, malleable, and ductile metal with very high thermal and electrical conductivity.' },
+    { number: 30, symbol: 'Zn', name: 'Zinc', mass: '65.38', category: 'transition', period: 4, group: 12, state: 'solid', melting: 693, boiling: 1180, discoverer: 'Indian chemists', summary: 'Zinc is a slightly brittle metal at room temperature, with a blue-silvery appearance when oxidation is removed.' },
+    { number: 31, symbol: 'Ga', name: 'Gallium', mass: '69.723', category: 'post-transition', period: 4, group: 13, state: 'solid', melting: 303, boiling: 2673, discoverer: 'Paul-Émile Lecoq de Boisbaudran', summary: 'Gallium has a melting point near room temperature (29.7°C), letting it melt in an observer\'s hand.' },
+    { number: 32, symbol: 'Ge', name: 'Germanium', mass: '72.630', category: 'metalloid', period: 4, group: 14, state: 'solid', melting: 1211, boiling: 3106, discoverer: 'Clemens Winkler', summary: 'Germanium is a lustrous, hard-brittle, grayish-white metalloid in the carbon group, chemically similar to silicon.' },
+    { number: 33, symbol: 'As', name: 'Arsenic', mass: '74.922', category: 'metalloid', period: 4, group: 15, state: 'solid', melting: 1090, boiling: 887, discoverer: 'Albertus Magnus', summary: 'Arsenic occurs in many minerals, usually in combination with sulfur and metals. Historically infamous as a potent poison.' },
+    { number: 34, symbol: 'Se', name: 'Selenium', mass: '78.971', category: 'nonmetal', period: 4, group: 16, state: 'solid', melting: 494, boiling: 958, discoverer: 'Jöns Jacob Berzelius', summary: 'Selenium is a nonmetal with properties that are intermediate between the elements sulfur and tellurium.' },
+    { number: 35, symbol: 'Br', name: 'Bromine', mass: '79.904', category: 'halogen', period: 4, group: 17, state: 'liquid', melting: 266, boiling: 332, discoverer: 'Antoine Jérôme Balard', summary: 'Bromine is a reddish-brown liquid halogen at standard temperatures. Volatile and highly irritating.' },
+    { number: 36, symbol: 'Kr', name: 'Krypton', mass: '83.798', category: 'noble', period: 4, group: 18, state: 'gas', melting: 115, boiling: 120, discoverer: 'William Ramsay', summary: 'Krypton is a colorless, odorless, tasteless noble gas that occurs in trace amounts in the atmosphere.' },
+
+    // Selected heavy elements for complete feel
+    { number: 47, symbol: 'Ag', name: 'Silver', mass: '107.87', category: 'transition', period: 5, group: 11, state: 'solid', melting: 1235, boiling: 2435, discoverer: 'Prehistoric', summary: 'Silver is a soft, white, lustrous transition metal, exhibiting the highest electrical conductivity of any element.' },
+    { number: 50, symbol: 'Sn', name: 'Tin', mass: '118.71', category: 'post-transition', period: 5, group: 14, state: 'solid', melting: 505, boiling: 2875, discoverer: '3000 BC', summary: 'Tin is a post-transition metal in group 14, obtained chiefly from the mineral cassiterite.' },
+    { number: 53, symbol: 'I', name: 'Iodine', mass: '126.90', category: 'halogen', period: 5, group: 17, state: 'solid', melting: 387, boiling: 457, discoverer: 'Bernard Courtois', summary: 'Iodine is a lustrous, purple-black non-metallic solid. Essential for synthesis of thyroid hormones.' },
+    { number: 54, symbol: 'Xe', name: 'Xenon', mass: '131.29', category: 'noble', period: 5, group: 18, state: 'gas', melting: 161, boiling: 165, discoverer: 'William Ramsay', summary: 'Xenon is an extremely dense, colorless, odorless noble gas, used in flash lamps and ion propulsion thrusters.' },
+    
+    { number: 79, symbol: 'Au', name: 'Gold', mass: '196.97', category: 'transition', period: 6, group: 11, state: 'solid', melting: 1337, boiling: 3129, discoverer: 'Before 3000 BC', summary: 'Gold is a highly sought-after dense precious transition metal, resistant to chemical attack.' },
+    { number: 80, symbol: 'Hg', name: 'Mercury', mass: '200.59', category: 'transition', period: 6, group: 12, state: 'liquid', melting: 234, boiling: 630, discoverer: 'Ancient Chinese', summary: 'Mercury is the only metallic element that is liquid at standard conditions for temperature and pressure.' },
+    { number: 82, symbol: 'Pb', name: 'Lead', mass: '207.2', category: 'post-transition', period: 6, group: 14, state: 'solid', melting: 601, boiling: 2022, discoverer: 'Middle East', summary: 'Lead is a heavy metal denser than most common materials, with a dull gray look when tarnished.' },
+    { number: 86, symbol: 'Rn', name: 'Radon', mass: '222', category: 'noble', period: 6, group: 18, state: 'gas', melting: 202, boiling: 211, discoverer: 'Ernest Rutherford', summary: 'Radon is a radioactive, colorless, odorless, tasteless noble gas, naturally formed from radium decay.' },
+    
+    { number: 92, symbol: 'U', name: 'Uranium', mass: '238.03', category: 'actinide', period: 7, group: 6, state: 'synthetic', melting: 1405, boiling: 4404, discoverer: 'Martin Heinrich Klaproth', summary: 'Uranium is a weakly radioactive metal which has a unique role in nuclear fission power generation.' },
+
+    // Lanthanides Representation F-block
+    { number: 57, symbol: 'La', name: 'Lanthanum', mass: '138.91', category: 'lanthanide', period: 6, group: 3, state: 'solid', melting: 1193, boiling: 3737, discoverer: 'Carl Gustaf Mosander', summary: 'Lanthanum is the prototype of the lanthanide series, found in rare-earth minerals.' },
+    { number: 58, symbol: 'Ce', name: 'Cerium', mass: '140.12', category: 'lanthanide', period: 6, group: 3, state: 'solid', melting: 1068, boiling: 3716, discoverer: 'Martin Heinrich Klaproth', summary: 'Cerium is a soft, ductile, and silvery-white metal that oxidizes readily in the atmosphere.' },
+    { number: 59, symbol: 'Pr', name: 'Praseodymium', mass: '140.91', category: 'lanthanide', period: 6, group: 3, state: 'solid', melting: 1208, boiling: 3793, discoverer: 'Carl Auer von Welsbach', summary: 'Praseodymium is a soft, silvery, malleable and ductile metal, valued for its magnetic, electrical and chemical properties.' },
+
+    // Actinides Representation F-block
+    { number: 89, symbol: 'Ac', name: 'Actinium', mass: '227', category: 'actinide', period: 7, group: 3, state: 'synthetic', melting: 1323, boiling: 3471, discoverer: 'Friedrich Oskar Giesel', summary: 'Actinium is a radioactive metallic chemical element, glowing with an eerie pale blue light in the dark.' },
+    { number: 90, symbol: 'Th', name: 'Thorium', mass: '232.04', category: 'actinide', period: 7, group: 3, state: 'synthetic', melting: 2023, boiling: 5061, discoverer: 'Jöns Jacob Berzelius', summary: 'Thorium is a weakly radioactive silver-white metal, explored as an alternative fuel for nuclear power generation.' }
+  ];
+
+  // Cache Dom Elements
+  const gridContainer = document.getElementById('periodic-table-grid');
+  const fBlockContainer = document.getElementById('periodic-table-f-block');
+  const searchInput = document.getElementById('table-search');
+  const tempSlider = document.getElementById('temp-slider');
+  const tempValText = document.getElementById('temp-val');
+
+  // Inspect Panel
+  const detailNumber = document.getElementById('detail-number');
+  const detailMass = document.getElementById('detail-mass');
+  const detailSymbol = document.getElementById('detail-symbol');
+  const detailName = document.getElementById('detail-name');
+  const detailCategory = document.getElementById('detail-category');
+  const detailPhase = document.getElementById('detail-phase');
+  const detailDiscoverer = document.getElementById('detail-discoverer');
+  const detailMelting = document.getElementById('detail-melting');
+  const detailBoiling = document.getElementById('detail-boiling');
+  const detailSummary = document.getElementById('detail-summary');
+  const detailStateBadge = document.getElementById('detail-state');
+
+  // Panels
+  const panelDetails = document.getElementById('panel-details');
+  const panelCompare = document.getElementById('panel-compare');
+  const panelQuiz = document.getElementById('panel-quiz');
+
+  // Mode Switchers
+  const btnQuizMode = document.getElementById('btn-quiz-mode');
+  const btnCompareMode = document.getElementById('btn-compare-mode');
+  const closeQuizBtn = document.getElementById('close-quiz-btn');
+  const closeCompareBtn = document.getElementById('close-compare-btn');
+
+  // Quiz state
+  let quizScoreCorrect = 0;
+  let quizScoreTotal = 0;
+  let quizCurrentTarget = null;
+
+  // Category Filters
+  const categoryFilterChips = document.querySelectorAll('.filter-chip');
+  let activeCategory = 'all';
+
+  // Temperature tracking state
+  let currentTempKelvin = 298;
+
+  // Helper function to get element category color classes
+  function getCategoryColorClass(category) {
+    switch (category) {
+      case 'nonmetal': return 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30';
+      case 'noble': return 'bg-purple-500/20 border-purple-500/40 text-purple-300 hover:bg-purple-500/30';
+      case 'alkali': return 'bg-rose-500/20 border-rose-500/40 text-rose-300 hover:bg-rose-500/30';
+      case 'alkaline': return 'bg-amber-500/20 border-amber-500/40 text-amber-300 hover:bg-amber-500/30';
+      case 'metalloid': return 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300 hover:bg-yellow-500/30';
+      case 'halogen': return 'bg-cyan-500/20 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/30';
+      case 'post-transition': return 'bg-sky-500/20 border-sky-500/40 text-sky-300 hover:bg-sky-500/30';
+      case 'lanthanide': return 'bg-pink-500/20 border-pink-500/40 text-pink-300 hover:bg-pink-500/30';
+      case 'actinide': return 'bg-red-500/20 border-red-500/40 text-red-300 hover:bg-red-500/30';
+      default: return 'bg-indigo-500/20 border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/30';
+    }
+  }
+
+  // Determine state of matter at specific temperature
+  function calculateStateAtTemp(elem, tempK) {
+    if (elem.state === 'synthetic') return 'synthetic';
+    if (tempK <= elem.melting) return 'solid';
+    if (tempK > elem.melting && tempK < elem.boiling) return 'liquid';
+    return 'gas';
+  }
+
+  // Return simple text color or dot style based on temperature state
+  function getStateIndicatorColor(state) {
+    switch (state) {
+      case 'liquid': return 'bg-blue-400';
+      case 'gas': return 'bg-red-400';
+      case 'synthetic': return 'bg-pink-400';
+      default: return 'bg-slate-300';
+    }
+  }
+
+  // Primary Render Function for Periodic Grid
+  function renderGrid() {
+    gridContainer.innerHTML = '';
+    fBlockContainer.innerHTML = '';
+
+    // Create coordinates mapping standard periodic table grid system
+    // rows 1-7, cols 1-18
+    const gridPositions = {};
+    elements.forEach(el => {
+      // Exclude F-block (Lanthanides and Actinides are period 6/7 but visual subgrid)
+      if (el.category !== 'lanthanide' && el.category !== 'actinide') {
+        gridPositions[`${el.period}-${el.group}`] = el;
+      }
+    });
+
+    // Render Main Grid
+    for (let r = 1; r <= 7; r++) {
+      for (let c = 1; c <= 18; c++) {
+        const key = `${r}-${c}`;
+        const elem = gridPositions[key];
+
+        if (elem) {
+          const cell = createCellElement(elem);
+          gridContainer.appendChild(cell);
+        } else {
+          // Empty cell placeholder
+          const emptyDiv = document.createElement('div');
+          emptyDiv.className = 'aspect-ratio-1-1'; // Keeps square scale
+          gridContainer.appendChild(emptyDiv);
+        }
+      }
+    }
+
+    // Render F-block (row 1 Lanthanides, row 2 Actinides)
+    // Standard 18 grid layout, empty space on left
+    const lanthanides = elements.filter(el => el.category === 'lanthanide');
+    const actinides = elements.filter(el => el.category === 'actinide');
+
+    // Row 1: Lanthanides spacer col 1-2, elements 3-17
+    createFBlockRow(lanthanides);
+    createFBlockRow(actinides);
+
+    applyFiltersAndSearches();
+  }
+
+  function createFBlockRow(subset) {
+    // Spacer columns
+    for (let i = 0; i < 2; i++) {
+      const emptyDiv = document.createElement('div');
+      fBlockContainer.appendChild(emptyDiv);
+    }
+    // Elements
+    subset.forEach(elem => {
+      const cell = createCellElement(elem);
+      fBlockContainer.appendChild(cell);
+    });
+    // Remaining empty columns
+    for (let i = 0; i < 1; i++) {
+      const emptyDiv = document.createElement('div');
+      fBlockContainer.appendChild(emptyDiv);
+    }
+  }
+
+  // Cell Creation and Action Bindings
+  function createCellElement(elem) {
+    const cell = document.createElement('div');
+    cell.className = `element-cell border ${getCategoryColorClass(elem.category)}`;
+    cell.id = `el-${elem.symbol.toLowerCase()}`;
+    cell.dataset.symbol = elem.symbol;
+    cell.dataset.name = elem.name;
+    cell.dataset.number = elem.number;
+    cell.dataset.category = elem.category;
+
+    // Determine dynamic phase state based on temp
+    const stateAtTemp = calculateStateAtTemp(elem, currentTempKelvin);
+    const dotColor = getStateIndicatorColor(stateAtTemp);
+
+    cell.innerHTML = `
+      <div class="flex justify-between items-center text-[9px] font-mono opacity-80">
+        <span>${elem.number}</span>
+        <span class="font-semibold">${elem.mass}</span>
+      </div>
+      <div class="text-center text-sm font-black tracking-wide my-1">${elem.symbol}</div>
+      <div class="text-[8px] font-semibold text-center truncate w-full opacity-90">${elem.name}</div>
+      <span class="state-indicator-dot ${dotColor}" title="State: ${stateAtTemp}"></span>
+    `;
+
+    // Trigger Detail View on click
+    cell.addEventListener('click', () => {
+      selectElement(elem);
+    });
+
+    return cell;
+  }
+
+  // Handle searching and active category filtering
+  function applyFiltersAndSearches() {
+    const query = searchInput.value.toLowerCase().trim();
+    const allCells = document.querySelectorAll('.element-cell');
+
+    allCells.forEach(cell => {
+      const symbol = cell.dataset.symbol.toLowerCase();
+      const name = cell.dataset.name.toLowerCase();
+      const number = cell.dataset.number;
+      const category = cell.dataset.category;
+
+      const matchesSearch = !query || symbol.includes(query) || name.includes(query) || number.includes(query);
+      const matchesCategory = activeCategory === 'all' || category === activeCategory;
+
+      if (matchesSearch && matchesCategory) {
+        cell.style.opacity = '1';
+        cell.style.pointerEvents = 'auto';
+        cell.classList.remove('grayscale');
+      } else {
+        cell.style.opacity = '0.15';
+        cell.classList.add('grayscale');
+      }
+    });
+  }
+
+  // Populate details on the Inspector panel
+  function selectElement(elem) {
+    detailNumber.textContent = elem.number;
+    detailMass.textContent = elem.mass;
+    detailSymbol.textContent = elem.symbol;
+    detailName.textContent = elem.name;
+    detailCategory.textContent = elem.category.toUpperCase();
+    
+    const activeState = calculateStateAtTemp(elem, currentTempKelvin);
+    detailStateBadge.textContent = activeState.toUpperCase();
+    detailPhase.textContent = elem.state.toUpperCase();
+    detailDiscoverer.textContent = elem.discoverer || 'N/A';
+    detailDiscoverer.title = elem.discoverer || 'N/A';
+    detailMelting.textContent = elem.melting === 1 ? 'Unknown' : `${elem.melting} K`;
+    detailBoiling.textContent = elem.boiling === 4 ? 'Unknown' : `${elem.boiling} K`;
+    detailSummary.textContent = elem.summary;
+
+    // Visually highlight
+    const previouslySelected = document.querySelectorAll('.element-cell.ring-2');
+    previouslySelected.forEach(el => el.classList.remove('ring-2', 'ring-indigo-400'));
+
+    const elementCard = document.getElementById(`el-${elem.symbol.toLowerCase()}`);
+    if (elementCard) {
+      elementCard.classList.add('ring-2', 'ring-indigo-400');
+    }
+  }
+
+  // Temperature Slider Activity
+  tempSlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    currentTempKelvin = val;
+    const celsius = Math.round(val - 273.15);
+    tempValText.textContent = `${val} K (${celsius}°C)`;
+    
+    // Re-render elements to display fluid phase transitions
+    renderGrid();
+  });
+
+  // Search Input Activity
+  searchInput.addEventListener('input', () => {
+    applyFiltersAndSearches();
+  });
+
+  // Category Filter chips logic
+  categoryFilterChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      categoryFilterChips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeCategory = chip.dataset.category;
+      applyFiltersAndSearches();
+    });
+  });
+
+  // View Setup - Compare elements system
+  function setupCompareSelectors() {
+    const selectA = document.getElementById('compare-select-a');
+    const selectB = document.getElementById('compare-select-b');
+
+    // Clear previous items
+    selectA.innerHTML = '';
+    selectB.innerHTML = '';
+
+    // Alphabetical elements sorting
+    const sortedElements = [...elements].sort((a, b) => a.name.localeCompare(b.name));
+
+    sortedElements.forEach(elem => {
+      const optionA = document.createElement('option');
+      optionA.value = elem.symbol;
+      optionA.textContent = `${elem.name} (${elem.symbol})`;
+      selectA.appendChild(optionA);
+
+      const optionB = document.createElement('option');
+      optionB.value = elem.symbol;
+      optionB.textContent = `${elem.name} (${elem.symbol})`;
+      selectB.appendChild(optionB);
+    });
+
+    // Pick first two as default
+    if (sortedElements.length >= 2) {
+      selectA.value = sortedElements[0].symbol;
+      selectB.value = sortedElements[1].symbol;
+    }
+
+    updateComparison();
+  }
+
+  function updateComparison() {
+    const symA = document.getElementById('compare-select-a').value;
+    const symB = document.getElementById('compare-select-b').value;
+
+    const elemA = elements.find(el => el.symbol === symA);
+    const elemB = elements.find(el => el.symbol === symB);
+
+    if (!elemA || !elemB) return;
+
+    document.getElementById('compare-label-a').textContent = elemA.name;
+    document.getElementById('compare-label-b').textContent = elemB.name;
+
+    document.getElementById('comp-num-a').textContent = elemA.number;
+    document.getElementById('comp-num-b').textContent = elemB.number;
+
+    document.getElementById('comp-mass-a').textContent = elemA.mass;
+    document.getElementById('comp-mass-b').textContent = elemB.mass;
+
+    document.getElementById('comp-cat-a').textContent = elemA.category;
+    document.getElementById('comp-cat-b').textContent = elemB.category;
+    document.getElementById('comp-cat-a').title = elemA.category;
+    document.getElementById('comp-cat-b').title = elemB.category;
+
+    document.getElementById('comp-state-a').textContent = elemA.state;
+    document.getElementById('comp-state-b').textContent = elemB.state;
+
+    document.getElementById('comp-disco-a').textContent = elemA.discoverer || 'Unknown';
+    document.getElementById('comp-disco-b').textContent = elemB.discoverer || 'Unknown';
+    document.getElementById('comp-disco-a').title = elemA.discoverer || 'Unknown';
+    document.getElementById('comp-disco-b').title = elemB.discoverer || 'Unknown';
+  }
+
+  document.getElementById('compare-select-a').addEventListener('change', updateComparison);
+  document.getElementById('compare-select-b').addEventListener('change', updateComparison);
+
+  // Quiz System mechanics
+  function startNewQuizQuestion() {
+    // Pick random element
+    const randomIndex = Math.floor(Math.random() * elements.length);
+    quizCurrentTarget = elements[randomIndex];
+
+    // Display target symbol
+    document.getElementById('quiz-target-symbol').textContent = quizCurrentTarget.symbol;
+
+    // Generate multiple choice options including correct one
+    const choices = [quizCurrentTarget];
+    while (choices.length < 4) {
+      const randElem = elements[Math.floor(Math.random() * elements.length)];
+      if (!choices.some(item => item.symbol === randElem.symbol)) {
+        choices.push(randElem);
+      }
+    }
+
+    // Shuffle choices array
+    choices.sort(() => Math.random() - 0.5);
+
+    // Render options
+    const container = document.getElementById('quiz-options-container');
+    container.innerHTML = '';
+
+    choices.forEach(option => {
+      const button = document.createElement('button');
+      button.className = 'quiz-option-btn';
+      button.textContent = option.name;
+      button.addEventListener('click', (e) => handleQuizAnswer(option, button));
+      container.appendChild(button);
+    });
+
+    // Hide previous feedback
+    const fb = document.getElementById('quiz-feedback');
+    fb.className = 'text-xs text-center font-semibold rounded-lg py-2 hidden';
+  }
+
+  function handleQuizAnswer(selectedOption, clickedButton) {
+    quizScoreTotal++;
+    const fb = document.getElementById('quiz-feedback');
+    fb.classList.remove('hidden');
+
+    // Disable all options
+    const allOptionBtns = document.querySelectorAll('.quiz-option-btn');
+    allOptionBtns.forEach(btn => btn.disabled = true);
+
+    if (selectedOption.symbol === quizCurrentTarget.symbol) {
+      quizScoreCorrect++;
+      clickedButton.classList.add('correct');
+      fb.textContent = `Correct! ${quizCurrentTarget.name} (${quizCurrentTarget.symbol}) is indeed atomic number ${quizCurrentTarget.number}.`;
+      fb.classList.add('bg-emerald-500/20', 'text-emerald-400');
     } else {
-      btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
-      btn.classList.add('bg-slate-800', 'text-slate-300', 'hover:bg-slate-700');
-      content.classList.remove('block');
-      content.classList.add('hidden');
+      clickedButton.classList.add('incorrect');
+      // Find and highlight correct answer
+      allOptionBtns.forEach(btn => {
+        if (btn.textContent === quizCurrentTarget.name) {
+          btn.classList.add('correct');
+        }
+      });
+      fb.textContent = `Incorrect! That was ${selectedOption.name}. The correct answer was ${quizCurrentTarget.name}.`;
+      fb.classList.add('bg-rose-500/20', 'text-rose-400');
     }
+
+    document.getElementById('quiz-score').textContent = `Score: ${quizScoreCorrect}/${quizScoreTotal}`;
+
+    // Auto transition to next question after 2.5s
+    setTimeout(() => {
+      startNewQuizQuestion();
+    }, 2800);
+  }
+
+  // Panel mode switch UI bindings
+  btnQuizMode.addEventListener('click', () => {
+    panelDetails.classList.add('hidden');
+    panelCompare.classList.add('hidden');
+    panelQuiz.classList.remove('hidden');
+    startNewQuizQuestion();
   });
 
-  // Refresh Pendulum Canvas dimensions or state if selected
-  if (tabId === 'labs') {
-    setupCanvas();
-  }
-}
-
-// --- SUB-LAB A: CHEMISTRY MIXER LOGIC ---
-let beakerState = {
-  waterVolume: 100, // ml
-  hclVolume: 0, // ml
-  naohVolume: 0, // ml
-  indicatorEnabled: false
-};
-
-function calculatePH() {
-  // Simple simulation algorithm for educational chemistry mixing
-  const totalAcid = beakerState.hclVolume;
-  const totalBase = beakerState.naohVolume;
-  
-  if (totalAcid === totalBase) return 7.0;
-  
-  if (totalAcid > totalBase) {
-    const excessAcid = totalAcid - totalBase;
-    const ratio = excessAcid / (beakerState.waterVolume + totalAcid + totalBase);
-    // Calculate log-like linear mapping for virtual experience
-    const ph = 7.0 - (Math.log10(1 + ratio * 100) * 4);
-    return Math.max(1.0, parseFloat(ph.toFixed(1)));
-  } else {
-    const excessBase = totalBase - totalAcid;
-    const ratio = excessBase / (beakerState.waterVolume + totalAcid + totalBase);
-    const ph = 7.0 + (Math.log10(1 + ratio * 100) * 4.5);
-    return Math.min(14.0, parseFloat(ph.toFixed(1)));
-  }
-}
-
-function getIndicatorColor(ph) {
-  // Phenolphthalein shifts from colorless to magenta around pH 8.2 - 10
-  if (beakerState.indicatorEnabled) {
-    if (ph >= 8.2) {
-      // Deep magenta color with alpha channel varying based on high base levels
-      const baseIntensity = Math.min(1.0, (ph - 8.2) / 2);
-      return `rgba(219, 39, 119, ${0.4 + (baseIntensity * 0.5)})`;
-    }
-    return 'rgba(224, 242, 254, 0.6)'; // Clear/Watery blue overlay
-  }
-  
-  // Universal Indicator mode colors
-  if (ph < 3) return 'rgba(239, 68, 68, 0.8)'; // Acid Red
-  if (ph < 5) return 'rgba(249, 115, 22, 0.8)'; // Orange
-  if (ph < 6.8) return 'rgba(234, 179, 8, 0.8)'; // Yellow
-  if (ph < 7.5) return 'rgba(16, 185, 129, 0.8)'; // Emerald Neutral Green
-  if (ph < 9) return 'rgba(14, 165, 233, 0.8)'; // Sky Blue
-  if (ph < 11) return 'rgba(67, 56, 202, 0.8)'; // Indigo
-  return 'rgba(124, 58, 237, 0.8)'; // Purple
-}
-
-function addChemLog(msg, type = 'info') {
-  const logger = document.getElementById('chem-logger');
-  const p = document.createElement('p');
-  if (type === 'acid') p.className = 'text-red-400';
-  else if (type === 'base') p.className = 'text-violet-400';
-  else if (type === 'water') p.className = 'text-sky-400';
-  else if (type === 'indicator') p.className = 'text-amber-400';
-  else if (type === 'success') p.className = 'text-emerald-400';
-  else p.className = 'text-slate-500';
-  
-  p.innerText = `[${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}] ${msg}`;
-  logger.appendChild(p);
-  logger.scrollTop = logger.scrollHeight;
-}
-
-function updateBeakerUI() {
-  const ph = calculatePH();
-  const color = getIndicatorColor(ph);
-  const fluidEl = document.getElementById('beaker-fluid');
-  const phDisplay = document.getElementById('ph-display-val');
-  const phPin = document.getElementById('ph-indicator-pin');
-  
-  // Update CSS variables for fluid levels/colors
-  const totalVolume = beakerState.waterVolume + beakerState.hclVolume + beakerState.naohVolume;
-  const visualPercentage = Math.min(95, Math.max(25, (totalVolume / 250) * 100));
-  
-  fluidEl.style.height = `${visualPercentage}%`;
-  fluidEl.style.backgroundColor = color;
-  
-  phDisplay.innerText = `pH ${ph}`;
-  
-  // Handle color classes for text readout
-  phDisplay.className = 'text-sm font-extrabold ' + (ph < 6.5 ? 'text-red-400' : ph > 7.5 ? 'text-violet-400' : 'text-emerald-400');
-  
-  // Map pH 1-14 to 0%-100% slider pin location
-  const pinPercent = ((ph - 1) / 13) * 100;
-  phPin.style.left = `${pinPercent}%`;
-}
-
-// Chemistry Events Setup
-document.getElementById('add-hcl-btn').addEventListener('click', () => {
-  beakerState.hclVolume += 10;
-  addChemLog('Added 10ml Hydrochloric Acid (HCl).', 'acid');
-  updateBeakerUI();
-});
-
-document.getElementById('add-naoh-btn').addEventListener('click', () => {
-  beakerState.naohVolume += 10;
-  addChemLog('Added 10ml Sodium Hydroxide (NaOH).', 'base');
-  updateBeakerUI();
-});
-
-document.getElementById('add-water-btn').addEventListener('click', () => {
-  beakerState.waterVolume += 30;
-  addChemLog('Poured 30ml Neutral H₂O.', 'water');
-  updateBeakerUI();
-});
-
-document.getElementById('add-indicator-btn').addEventListener('click', () => {
-  beakerState.indicatorEnabled = !beakerState.indicatorEnabled;
-  const statusText = beakerState.indicatorEnabled ? 'Phenolphthalein Dye Active (turns pink in alkaline)' : 'Universal Indicator active';
-  addChemLog(statusText, 'indicator');
-  document.getElementById('add-indicator-btn').classList.toggle('border-amber-400', beakerState.indicatorEnabled);
-  updateBeakerUI();
-});
-
-document.getElementById('reset-chem-btn').addEventListener('click', () => {
-  beakerState = {
-    waterVolume: 100,
-    hclVolume: 0,
-    naohVolume: 0,
-    indicatorEnabled: false
-  };
-  document.getElementById('add-indicator-btn').classList.remove('border-amber-400');
-  addChemLog('Beaker cleaned & refilled with fresh H₂O.', 'success');
-  updateBeakerUI();
-});
-
-
-// --- SUB-LAB B: PHYSICS PENDULUM MOTION SIMULATION ---
-const canvas = document.getElementById('pendulum-canvas');
-const ctx = canvas.getContext('2d');
-let animationFrameId;
-
-// Pendulum physical parameters
-let length = 120; // visual scale representation
-let mass = 1.0;
-let gravity = 9.8;
-let angle = Math.PI / 4; // current angle in radians
-let angularVelocity = 0.0;
-let angularAcceleration = 0.0;
-let isRunning = false;
-let originX, originY;
-
-// Configuration Sliders
-const lengthSlider = document.getElementById('slider-length');
-const massSlider = document.getElementById('slider-mass');
-const lengthVal = document.getElementById('slider-length-val');
-const massVal = document.getElementById('slider-mass-val');
-
-function setupCanvas() {
-  // Set internal resolution of physics simulator matching DOM layout sizes safely
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  originX = canvas.width / 2;
-  originY = 25;
-}
-
-function updatePendulumParameters() {
-  const lengthRaw = parseFloat(lengthSlider.value);
-  length = lengthRaw * (canvas.height / 250); // relative scaled length
-  lengthVal.innerText = `${lengthRaw} cm`;
-  
-  mass = parseFloat(massSlider.value);
-  massVal.innerText = `${mass.toFixed(1)} kg`;
-  
-  // Calculate theoretical period T = 2 * pi * sqrt(L/g)
-  const period = 2 * Math.PI * Math.sqrt((lengthRaw / 100) / gravity);
-  document.getElementById('pendulum-period-val').innerText = `${period.toFixed(2)}s`;
-}
-
-// Gravity environment selection listeners
-function setGravityPreset(gVal, buttonId) {
-  gravity = gVal;
-  const btns = ['g-earth-btn', 'g-moon-btn', 'g-jupiter-btn'];
-  btns.forEach(id => {
-    const btn = document.getElementById(id);
-    if (id === buttonId) {
-      btn.className = 'px-2 py-1.5 text-xs rounded bg-indigo-600 text-white font-medium hover:bg-indigo-500 transition-colors';
-    } else {
-      btn.className = 'px-2 py-1.5 text-xs rounded bg-slate-800 text-slate-300 font-medium hover:bg-slate-700 transition-colors';
-    }
+  btnCompareMode.addEventListener('click', () => {
+    panelDetails.classList.add('hidden');
+    panelQuiz.classList.add('hidden');
+    panelCompare.classList.remove('hidden');
+    setupCompareSelectors();
   });
-  updatePendulumParameters();
-}
 
-document.getElementById('g-earth-btn').addEventListener('click', () => setGravityPreset(9.8, 'g-earth-btn'));
-document.getElementById('g-moon-btn').addEventListener('click', () => setGravityPreset(1.6, 'g-moon-btn'));
-document.getElementById('g-jupiter-btn').addEventListener('click', () => setGravityPreset(24.8, 'g-jupiter-btn'));
-
-lengthSlider.addEventListener('input', updatePendulumParameters);
-massSlider.addEventListener('input', updatePendulumParameters);
-
-function drawPendulum() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Coordinates of the bob
-  const bobX = originX + length * Math.sin(angle);
-  const bobY = originY + length * Math.cos(angle);
-  
-  // Draw ceiling anchor
-  ctx.beginPath();
-  ctx.arc(originX, originY, 5, 0, 2 * Math.PI);
-  ctx.fillStyle = '#64748b';
-  ctx.fill();
-  
-  // Draw support beam line
-  ctx.strokeStyle = '#475569';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(originX - 40, originY - 10, 80, 5);
-  
-  // Draw String
-  ctx.beginPath();
-  ctx.moveTo(originX, originY);
-  ctx.lineTo(bobX, bobY);
-  ctx.strokeStyle = '#06b6d4';
-  ctx.lineWidth = Math.max(1, mass * 1.5); // Thickness based on visual mass
-  ctx.stroke();
-  
-  // Draw Bob sphere
-  ctx.beginPath();
-  ctx.arc(bobX, bobY, 10 + (mass * 5), 0, 2 * Math.PI);
-  ctx.fillStyle = '#4f46e5';
-  ctx.shadowColor = '#6366f1';
-  ctx.shadowBlur = 8;
-  ctx.fill();
-  ctx.shadowBlur = 0; // reset blur
-  
-  // Update peak angle label
-  const degAngle = Math.round(Math.abs(angle * (180 / Math.PI)));
-  document.getElementById('pendulum-angle-val').innerText = `${degAngle}°`;
-}
-
-function animate() {
-  if (isRunning) {
-    // Pendulum differential equation: theta'' = -(g/L) * sin(theta)
-    // Dampen angular velocity slightly for realistic lab environment drag
-    const damping = 0.995;
-    const gScaled = gravity * 0.05; // speed factor tweak
-    
-    angularAcceleration = (-gScaled / (length / 10)) * Math.sin(angle);
-    angularVelocity += angularAcceleration;
-    angularVelocity *= damping;
-    angle += angularVelocity;
-  }
-  
-  drawPendulum();
-  animationFrameId = requestAnimationFrame(animate);
-}
-
-// Pendulum Interactive Controls
-const playBtn = document.getElementById('pendulum-play-btn');
-playBtn.addEventListener('click', () => {
-  isRunning = !isRunning;
-  if (isRunning) {
-    playBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
-    playBtn.classList.remove('text-emerald-400');
-    playBtn.classList.add('text-amber-400');
-  } else {
-    playBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
-    playBtn.classList.remove('text-amber-400');
-    playBtn.classList.add('text-emerald-400');
-  }
-});
-
-document.getElementById('pendulum-reset-btn').addEventListener('click', () => {
-  isRunning = false;
-  angle = Math.PI / 4; // Reset to standard offset swing
-  angularVelocity = 0.0;
-  angularAcceleration = 0.0;
-  
-  // Update play icon button state
-  playBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
-  playBtn.classList.remove('text-amber-400');
-  playBtn.classList.add('text-emerald-400');
-  
-  drawPendulum();
-});
-
-
-// --- TAB 2: INTERACTIVE PERIODIC TABLE ---
-const mockElements = [
-  { number: 1, symbol: 'H', name: 'Hydrogen', weight: '1.008', group: 'Reactive Nonmetal', state: 'Gas', discoverer: 'Henry Cavendish', color: 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/40', trivia: 'Hydrogen is the most abundant chemical substance in the Universe, constituting roughly 75% of all baryonic mass.' },
-  { number: 2, symbol: 'He', name: 'Helium', weight: '4.0026', group: 'Noble Gas', state: 'Gas', discoverer: 'Jansen & Lockyer', color: 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border-purple-500/40', trivia: 'It has the lowest boiling & melting points of any element and is widely used in cooling superconductive MRI magnets.' },
-  { number: 3, symbol: 'Li', name: 'Lithium', weight: '6.94', group: 'Alkali Metal', state: 'Solid', discoverer: 'Johan August Arfwedson', color: 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border-orange-500/40', trivia: 'As the lightest of all metals, Lithium is essential in the production of modern rechargeable smartphone & EV batteries.' },
-  { number: 6, symbol: 'C', name: 'Carbon', weight: '12.011', group: 'Reactive Nonmetal', state: 'Solid', discoverer: 'Ancient Egypt', color: 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/40', trivia: 'Carbon compounds form the basis of all known organic life on Earth. Graphite & diamond are pure allotropes of Carbon.' },
-  { number: 7, symbol: 'N', name: 'Nitrogen', weight: '14.007', group: 'Reactive Nonmetal', state: 'Gas', discoverer: 'Daniel Rutherford', color: 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/40', trivia: 'Nitrogen gas (N₂) makes up roughly 78% of Earth\'s atmosphere, outnumbering oxygen nearly four to one.' },
-  { number: 8, symbol: 'O', name: 'Oxygen', weight: '15.999', group: 'Reactive Nonmetal', state: 'Gas', discoverer: 'Joseph Priestley', color: 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/40', trivia: 'Oxygen is highly reactive with other elements and organic matter. It fuels cellular respiration in almost all living lifeforms.' },
-  { number: 11, symbol: 'Na', name: 'Sodium', weight: '22.990', group: 'Alkali Metal', state: 'Solid', discoverer: 'Humphry Davy', color: 'bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border-orange-500/40', trivia: 'Sodium is highly explosive when exposed to liquid water, but is perfectly safe and essential in ordinary table salt (NaCl).' },
-  { number: 13, symbol: 'Al', name: 'Aluminum', weight: '26.982', group: 'Post-transition Metal', state: 'Solid', discoverer: 'Hans Christian Ørsted', color: 'bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border-blue-500/40', trivia: 'Due to its low density and immense natural resistance to corrosion, Aluminum is widely favored in aviation engineering.' },
-  { number: 14, symbol: 'Si', name: 'Silicon', weight: '28.085', group: 'Metalloid', state: 'Solid', discoverer: 'Jöns Jacob Berzelius', color: 'bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border-cyan-500/40', trivia: 'Silicon is the key structural material behind semiconductor transistors and microprocessors that power the digital age.' },
-  { number: 26, symbol: 'Fe', name: 'Iron', weight: '55.845', group: 'Transition Metal', state: 'Solid', discoverer: 'Before 5000 BC', color: 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/40', trivia: 'By mass, Iron is the most abundant element on Earth, making up much of the inner core. It conducts crucial oxygen in hemoglobin.' },
-  { number: 29, symbol: 'Cu', name: 'Copper', weight: '63.546', group: 'Transition Metal', state: 'Solid', discoverer: 'Middle East (9000 BC)', color: 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/40', trivia: 'Renowned for exceptionally high thermal & electrical conductivity. Pure copper develops a green protective layer called patina.' },
-  { number: 79, symbol: 'Au', name: 'Gold', weight: '196.97', group: 'Transition Metal', state: 'Solid', discoverer: 'Ancient Civilizations', color: 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/40', trivia: 'A highly malleable precious metal that does not tarnish or rust. It has been used as a standard of currency value for millennia.' },
-  { number: 80, symbol: 'Hg', name: 'Mercury', weight: '200.59', group: 'Transition Metal', state: 'Liquid', discoverer: 'Ancient Egyptians', color: 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/40', trivia: 'Famously nicknamed "quicksilver", Mercury is the only metallic element that remains completely liquid at standard temperature.' },
-  { number: 92, symbol: 'U', name: 'Uranium', weight: '238.03', group: 'Actinide', state: 'Solid', discoverer: 'Martin Heinrich Klaproth', color: 'bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/40', trivia: 'A highly dense, naturally radioactive metal. Its isotope U-235 is the primary fuel block driving nuclear power stations.' },
-  { number: 118, symbol: 'Og', name: 'Oganesson', weight: '294', group: 'Noble Gas (Predicted)', state: 'Gas (Predicted)', discoverer: 'Joint Institute for Nuclear Research', color: 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border-purple-500/40', trivia: 'A synthetic element that currently sits as the highest atomic number and heaviest ever synthesized on the periodic grid.' },
-  { number: 47, symbol: 'Ag', name: 'Silver', weight: '107.87', group: 'Transition Metal', state: 'Solid', discoverer: 'Prehistoric humans', color: 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/40', trivia: 'Possesses the highest electrical conductivity, thermal conductivity, and reflectivity of any known metal on Earth.' }
-];
-
-function initPeriodicTable() {
-  const container = document.getElementById('elements-container');
-  container.innerHTML = '';
-  
-  mockElements.forEach(elem => {
-    const btn = document.createElement('button');
-    btn.className = `flex flex-col items-center justify-between p-2 rounded-lg border transition-all text-center aspect-square ${elem.color}`;
-    btn.id = `element-card-${elem.symbol}`;
-    btn.innerHTML = `
-      <span class="text-[9px] font-mono text-slate-400 block w-full text-left">${elem.number}</span>
-      <span class="text-lg font-bold tracking-tight">${elem.symbol}</span>
-      <span class="text-[8px] truncate max-w-full">${elem.name}</span>
-    `;
-    btn.addEventListener('click', () => selectElement(elem));
-    container.appendChild(btn);
+  closeQuizBtn.addEventListener('click', () => {
+    panelQuiz.classList.add('hidden');
+    panelDetails.classList.remove('hidden');
   });
-}
 
-function selectElement(elem) {
-  document.getElementById('elem-number').innerText = `#${elem.number}`;
-  document.getElementById('elem-name').innerText = elem.name;
-  document.getElementById('elem-category').innerText = elem.group;
-  document.getElementById('elem-weight').innerText = `${elem.weight} u`;
-  document.getElementById('elem-state').innerText = elem.state;
-  document.getElementById('elem-discoverer').innerText = elem.discoverer;
-  document.getElementById('elem-trivia').innerText = elem.trivia;
-  
-  const symbolBox = document.getElementById('elem-symbol-box');
-  symbolBox.innerText = elem.symbol;
-}
-
-
-// --- TAB 3: LAB NOTEBOOK / PLANNER LOGIC ---
-let localExperiments = [];
-
-const defaultExperiments = [
-  {
-    id: 1,
-    title: "Baking Soda Volcano",
-    hypothesis: "Mixing sodium bicarbonate (base) and acetic acid (vinegar) releases carbon dioxide gas, producing dynamic bubbling fizz resembling an eruption.",
-    materials: "Baking soda, vinegar, red dye, plastic cup, tray",
-    steps: "1. Place cup on protective flat tray.\n2. Fill with 3 tablespoons baking soda & some red dye.\n3. Pour in half a cup of vinegar and quickly observe the bubbling foam!",
-    completed: true,
-    outcome: "Succeeded. Huge foam eruption occurred within 2 seconds. Releasing CO2 creates rapid gas expansion!"
-  },
-  {
-    id: 2,
-    title: "Invisible Lemon Ink",
-    hypothesis: "Lemon juice is acidic and weakens paper. Heat will oxidize the residual citric acid, turning the hidden text brown first.",
-    materials: "Lemon juice, cotton swab, plain paper, table lamp or candle heat",
-    steps: "1. Dip cotton swab in lemon juice.\n2. Write a secret code on normal printer paper.\n3. Allow paper to dry completely.\n4. Hold carefully near a warm lightbulb to read.",
-    completed: false,
-    outcome: ""
-  }
-];
-
-function loadNotebook() {
-  const stored = localStorage.getItem('scilab_experiments');
-  if (stored) {
-    localExperiments = JSON.parse(stored);
-  } else {
-    localExperiments = [...defaultExperiments];
-    saveToStorage();
-  }
-  renderNotebook();
-}
-
-function saveToStorage() {
-  localStorage.setItem('scilab_experiments', JSON.stringify(localExperiments));
-}
-
-function renderNotebook() {
-  const list = document.getElementById('notebook-list');
-  list.innerHTML = '';
-  
-  if (localExperiments.length === 0) {
-    list.innerHTML = `
-      <div class="flex flex-col items-center justify-center py-12 text-center text-slate-500">
-        <svg class="w-12 h-12 text-slate-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <p class="text-sm">No active experiments found in your log book.</p>
-        <p class="text-xs mt-1">Fill out the template inputs to add your first project.</p>
-      </div>
-    `;
-    return;
-  }
-  
-  localExperiments.forEach((exp, index) => {
-    const card = document.createElement('div');
-    card.className = `p-5 rounded-xl border transition-all ${exp.completed ? 'bg-slate-900/50 border-emerald-500/20' : 'bg-slate-950 border-slate-800'}`;
-    
-    // Format steps for rendering
-    const formattedSteps = exp.steps.split('\n').map(s => `<li>${s}</li>`).join('');
-    
-    card.innerHTML = `
-      <div class="flex justify-between items-start gap-4 mb-3">
-        <div>
-          <h3 class="font-bold text-white text-base flex items-center gap-2">
-            ${exp.completed ? '<span class="text-emerald-400 text-xs px-2 py-0.5 rounded bg-emerald-500/10">Completed</span>' : '<span class="text-amber-400 text-xs px-2 py-0.5 rounded bg-amber-500/10">In Progress</span>'}
-            ${exp.title}
-          </h3>
-          <p class="text-xs text-slate-400 mt-1"><strong>Hypothesis:</strong> ${exp.hypothesis}</p>
-        </div>
-        <button class="text-slate-500 hover:text-red-400 p-1 rounded transition-colors" onclick="deleteExperiment(${exp.id})">
-          <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-900/80 text-xs">
-        <div>
-          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">🔧 Materials:</p>
-          <p class="text-slate-300">${exp.materials}</p>
-          
-          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide mt-3 mb-1">📋 Directions:</p>
-          <ol class="list-decimal pl-4 space-y-1 text-slate-300">
-            ${formattedSteps}
-          </ol>
-        </div>
-        
-        <div class="flex flex-col justify-between bg-slate-900/30 p-3 rounded-lg border border-slate-900/60">
-          <div>
-            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1">📝 Log Outcome:</p>
-            ${exp.completed ? 
-              `<p class="text-emerald-300 italic">"${exp.outcome}"</p>` : 
-              `<textarea id="outcome-input-${exp.id}" placeholder="Log what happened during testing..." class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:border-indigo-500"></textarea>`
-            }
-          </div>
-          
-          ${!exp.completed ? 
-            `<button onclick="completeExperiment(${exp.id})" class="mt-3 w-full py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 rounded text-xs font-semibold transition-all">
-              Mark as Done & Save Log
-             </button>` : ''
-          }
-        </div>
-      </div>
-    `;
-    list.appendChild(card);
+  closeCompareBtn.addEventListener('click', () => {
+    panelCompare.classList.add('hidden');
+    panelDetails.classList.remove('hidden');
   });
-}
 
-window.completeExperiment = function(id) {
-  const textarea = document.getElementById(`outcome-input-${id}`);
-  const outcomeText = textarea ? textarea.value.trim() : 'Experiment completed successfully.';
-  
-  const index = localExperiments.findIndex(x => x.id === id);
-  if (index !== -1) {
-    localExperiments[index].completed = true;
-    localExperiments[index].outcome = outcomeText || 'Observation logged without extra notes.';
-    saveToStorage();
-    renderNotebook();
-  }
-};
-
-window.deleteExperiment = function(id) {
-  localExperiments = localExperiments.filter(x => x.id !== id);
-  saveToStorage();
-  renderNotebook();
-};
-
-document.getElementById('experiment-form').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const title = document.getElementById('exp-title').value.trim();
-  const hypothesis = document.getElementById('exp-hypothesis').value.trim();
-  const materials = document.getElementById('exp-materials').value.trim();
-  const steps = document.getElementById('exp-steps').value.trim();
-  
-  const newObj = {
-    id: Date.now(),
-    title,
-    hypothesis,
-    materials,
-    steps,
-    completed: false,
-    outcome: ''
-  };
-  
-  localExperiments.unshift(newObj); // Add to beginning of view list
-  saveToStorage();
-  renderNotebook();
-  
-  // Reset fields cleanly
-  document.getElementById('experiment-form').reset();
-});
-
-document.getElementById('clear-all-notebook').addEventListener('click', () => {
-  if (confirm('Are you sure you want to delete all saved notebook entries?')) {
-    localExperiments = [];
-    saveToStorage();
-    renderNotebook();
-  }
-});
-
-
-// --- TAB 4: TRIVIA / QUIZ LOGIC ---
-const quizPool = [
-  {
-    category: 'Physics',
-    difficulty: 'Easy',
-    question: 'Which subatomic particle carries a negative electrical charge?',
-    options: ['Proton', 'Electron', 'Neutron', 'Positron'],
-    correct: 1,
-    reason: 'Electrons orbit the nucleus of an atom and carry a standard charge of -1.'
-  },
-  {
-    category: 'Chemistry',
-    difficulty: 'Medium',
-    question: 'What is the chemical element with atomic number 79?',
-    options: ['Silver', 'Platinum', 'Gold', 'Mercury'],
-    correct: 2,
-    reason: 'The Latin name for Gold is Aurum, which explains its symbol Au and atomic number 79.'
-  },
-  {
-    category: 'Physics',
-    difficulty: 'Medium',
-    question: 'Under constant gravity, what governs the swing period duration of a simple pendulum?',
-    options: ['The mass of the bob', 'The visual color of the string', 'The physical length of the string', 'The air temperature'],
-    correct: 2,
-    reason: 'T = 2 * pi * sqrt(L / g). The swinging period is solely dictated by gravity acceleration and string length.'
-  },
-  {
-    category: 'Biology',
-    difficulty: 'Easy',
-    question: 'Which cellular structure is famously known as the powerhouse of the eukaryotic cell?',
-    options: ['Ribosome', 'Mitochondria', 'Golgi Apparatus', 'Nucleolus'],
-    correct: 1,
-    reason: 'The Mitochondria produce Adenosine Triphosphate (ATP) to chemical energy standards.'
-  },
-  {
-    category: 'Earth Science',
-    difficulty: 'Hard',
-    question: 'Which geologic layer of the Earth acts as a liquid convective fluid that powers our protective magnetic field?',
-    options: ['The Asthenosphere', 'The Inner Core', 'The Crust', 'The Outer Core'],
-    correct: 3,
-    reason: 'Convection of liquid iron and nickel in the planet outer core creates the dynamo effect generating our magnetic field.'
-  }
-];
-
-let currentQuizIndex = 0;
-let streak = 0;
-let answeredThisRound = false;
-
-function renderQuizQuestion() {
-  const q = quizPool[currentQuizIndex];
-  document.getElementById('quiz-difficulty').innerText = `Difficulty: ${q.difficulty}`;
-  document.getElementById('quiz-category').innerText = q.category;
-  document.getElementById('quiz-question').innerText = q.question;
-  
-  const optContainer = document.getElementById('quiz-options-container');
-  optContainer.innerHTML = '';
-  
-  answeredThisRound = false;
-  
-  const feedback = document.getElementById('quiz-feedback');
-  feedback.className = 'mt-6 p-4 rounded-lg hidden transition-all duration-300';
-  
-  q.options.forEach((opt, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'w-full py-3 px-4 text-left text-sm font-semibold rounded-lg bg-slate-950 border border-slate-800 hover:border-indigo-500 hover:bg-slate-900 transition-all text-slate-200';
-    btn.innerText = opt;
-    btn.addEventListener('click', () => submitAnswer(idx, btn));
-    optContainer.appendChild(btn);
+  document.getElementById('btn-skip-quiz').addEventListener('click', () => {
+    startNewQuizQuestion();
   });
-}
 
-function submitAnswer(chosenIdx, clickedBtn) {
-  if (answeredThisRound) return;
-  answeredThisRound = true;
-  
-  const q = quizPool[currentQuizIndex];
-  const feedback = document.getElementById('quiz-feedback');
-  const text = document.getElementById('feedback-text');
-  
-  const optContainer = document.getElementById('quiz-options-container');
-  const buttons = optContainer.getElementsByTagName('button');
-  
-  if (chosenIdx === q.correct) {
-    clickedBtn.className = 'w-full py-3 px-4 text-left text-sm font-bold rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300';
-    feedback.className = 'mt-6 p-4 rounded-lg block bg-emerald-950/40 border border-emerald-800/60 text-emerald-300';
-    text.innerHTML = `✨ <strong>Correct!</strong> ${q.reason}`;
-    streak++;
-  } else {
-    clickedBtn.className = 'w-full py-3 px-4 text-left text-sm font-bold rounded-lg bg-red-950 border border-red-500 text-red-300';
-    feedback.className = 'mt-6 p-4 rounded-lg block bg-red-950/40 border border-red-800/60 text-red-300';
-    text.innerHTML = `❌ <strong>Incorrect!</strong> The correct answer was <em>"${q.options[q.correct]}"</em>. <br><span class="text-xs mt-1 block text-slate-400">${q.reason}</span>`;
-    streak = 0; // Reset streak
-    
-    // Highlight the correct answer button as well
-    buttons[q.correct].className = 'w-full py-3 px-4 text-left text-sm font-bold rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300';
-  }
-  
-  document.getElementById('streak-counter').innerText = `${streak} 🔥`;
-}
+  document.getElementById('btn-reset-quiz').addEventListener('click', () => {
+    quizScoreCorrect = 0;
+    quizScoreTotal = 0;
+    document.getElementById('quiz-score').textContent = 'Score: 0/0';
+    startNewQuizQuestion();
+  });
 
-document.getElementById('next-quiz-btn').addEventListener('click', () => {
-  currentQuizIndex = (currentQuizIndex + 1) % quizPool.length;
-  renderQuizQuestion();
-});
+  // Footer tools
+  document.getElementById('btn-clear-settings').addEventListener('click', (e) => {
+    e.preventDefault();
+    searchInput.value = '';
+    tempSlider.value = 298;
+    currentTempKelvin = 298;
+    tempValText.textContent = '298 K (25°C)';
+    activeCategory = 'all';
+    categoryFilterChips.forEach(c => {
+      c.classList.remove('active');
+      if (c.dataset.category === 'all') c.classList.add('active');
+    });
+    renderGrid();
+    selectElement(elements[5]); // default to Carbon
+  });
 
+  document.getElementById('btn-about-chem').addEventListener('click', (e) => {
+    e.preventDefault();
+    alert(`Chemical periodic database v2.4 initialized. Contains ${elements.length} mapped core elements with exact thermodynamics variables, thermal phases, discoverer lists, and group designations.`);
+  });
 
-// --- ON LOAD INITIALIZATIONS ---
-window.addEventListener('load', () => {
-  // Init Chemistry display
-  updateBeakerUI();
-  
-  // Init Physics Pendulum
-  setupCanvas();
-  updatePendulumParameters();
-  animate();
-  
-  // Init Periodic Table
-  initPeriodicTable();
-  // Select hydrogen by default
-  selectElement(mockElements[0]);
-  
-  // Init Lab Notebook
-  loadNotebook();
-  
-  // Init Trivia
-  renderQuizQuestion();
-});
-
-// Capture resize safely to maintain pendulum positioning correctly
-window.addEventListener('resize', () => {
-  setupCanvas();
+  // Initial render lifecycle
+  renderGrid();
+  selectElement(elements[5]); // Default to Carbon
 });
