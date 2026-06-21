@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "TeluguTestApp",
+  "appName": "MathLeap",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
