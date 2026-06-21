@@ -20,6 +20,12 @@ if (fs.existsSync('capacitor.config.json')) {
     const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
     if (config.appId) uniqueAppId = config.appId;
   } catch (e) {}
+} else if (fs.existsSync('capacitor.config.ts')) {
+  try {
+    const content = fs.readFileSync('capacitor.config.ts', 'utf8');
+    const match = content.match(/appId\s*:\s*['"]([^'"]+)['"]/);
+    if (match) uniqueAppId = match[1];
+  } catch (e) {}
 }
 console.log("Target Package Name/ApplicationId: " + uniqueAppId);
 
@@ -28,6 +34,12 @@ if (fs.existsSync('capacitor.config.json')) {
   try {
     const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
     if (config.appName) appName = config.appName;
+  } catch (e) {}
+} else if (fs.existsSync('capacitor.config.ts')) {
+  try {
+    const content = fs.readFileSync('capacitor.config.ts', 'utf8');
+    const match = content.match(/appName\s*:\s*['"]([^'"]+)['"]/);
+    if (match) appName = match[1];
   } catch (e) {}
 } else if (fs.existsSync('package.json')) {
   try {
@@ -54,6 +66,17 @@ if (fs.existsSync('capacitor.config.json')) {
     console.log('Updated capacitor.config.json.');
   } catch(e) {
     console.error('Error modifying capacitor.config.json:', e);
+  }
+}
+if (fs.existsSync('capacitor.config.ts')) {
+  try {
+    let content = fs.readFileSync('capacitor.config.ts', 'utf8');
+    content = content.replace(/appId\s*:\s*['"][^'"]+['"]/g, "appId: '" + uniqueAppId + "'");
+    content = content.replace(/appName\s*:\s*['"][^'"]+['"]/g, "appName: '" + uniqueAppLabel + "'");
+    fs.writeFileSync('capacitor.config.ts', content, 'utf8');
+    console.log('Updated capacitor.config.ts.');
+  } catch(e) {
+    console.error('Error modifying capacitor.config.ts:', e);
   }
 }
 
