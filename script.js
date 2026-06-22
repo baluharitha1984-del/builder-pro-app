@@ -1,444 +1,669 @@
-// Complete database of Telugu letters (Vowels/Achulu and Consonants/Hallulu) with phonetic names, matching pictures, and translations
-const TELUGU_DATA = {
-  achulu: [
-    { letter: "అ", english: "A", type: "Vowel", word: "అమ్మ", translit: "Amma", meaning: "Mother", emoji: "👩" },
-    { letter: "ఆ", english: "Aa", type: "Vowel", word: "ఆవు", translit: "Aavu", meaning: "Cow", emoji: "🐄" },
-    { letter: "ఇ", english: "I", type: "Vowel", word: "ఇల్లు", translit: "Illu", meaning: "House", emoji: "🏠" },
-    { letter: "ఈ", english: "Ee", type: "Vowel", word: "ఈగ", translit: "Eega", meaning: "Housefly", emoji: "🪰" },
-    { letter: "ఉ", english: "U", type: "Vowel", word: "ఉడుత", translit: "Uduta", meaning: "Squirrel", emoji: "🐿️" },
-    { letter: "ఊ", english: "Oo", type: "Vowel", word: "ఊయల", translit: "Ooyala", meaning: "Cradle", emoji: "🎡" },
-    { letter: "ఋ", english: "Ru", type: "Vowel", word: "ఋషి", translit: "Rushi", meaning: "Sage", emoji: "🧘" },
-    { letter: "ఎ", english: "E", type: "Vowel", word: "ఎలుక", translit: "Eluka", meaning: "Rat", emoji: "🐀" },
-    { letter: "ఏ", english: "Ae", type: "Vowel", word: "ఏనుగు", translit: "Aenugu", meaning: "Elephant", emoji: "🐘" },
-    { letter: "ఐ", english: "Ai", type: "Vowel", word: "ఐదు", translit: "Aidu", meaning: "Five", emoji: "5️⃣" },
-    { letter: "ఒ", english: "O", type: "Vowel", word: "ఒంటె", translit: "Onte", meaning: "Camel", emoji: "🐪" },
-    { letter: "ఓ", english: "Oe", type: "Vowel", word: "ఓడ", translit: "Oda", meaning: "Ship", emoji: "🚢" },
-    { letter: "ఔ", english: "Au", type: "Vowel", word: "ఔషధం", translit: "Oushadham", meaning: "Medicine", emoji: "💊" },
-    { letter: "అం", english: "Am", type: "Vowel", word: "అంబరం", translit: "Ambaram", meaning: "Sky", emoji: "🌌" },
-    { letter: "అః", english: "Aha", type: "Vowel", word: "అంతఃపురం", translit: "Anthahpuram", meaning: "Palace", emoji: "🏰" }
-  ],
-  hallulu: [
-    { letter: "క", english: "Ka", type: "Consonant", word: "కన్ను", translit: "Kannu", meaning: "Eye", emoji: "👁️" },
-    { letter: "ఖ", english: "Kha", type: "Consonant", word: "ఖడ్గం", translit: "Khadgam", meaning: "Sword", emoji: "⚔️" },
-    { letter: "గ", english: "Ga", type: "Consonant", word: "గడియారం", translit: "Gadiyaaram", meaning: "Clock", emoji: "⏰" },
-    { letter: "ఘ", english: "Gha", type: "Consonant", word: "ఘటం", translit: "Ghatam", meaning: "Clay Pot", emoji: "🏺" },
-    { letter: "చ", english: "Cha", type: "Consonant", word: "చందమామ", translit: "Chandamama", meaning: "Moon", emoji: "🌙" },
-    { letter: "ఛ", english: "Chha", type: "Consonant", word: "ఛత్రి", translit: "Chhatri", meaning: "Umbrella", emoji: "⛱️" },
-    { letter: "జ", english: "Ja", type: "Consonant", word: "జడ", translit: "Jada", meaning: "Hair Braid", emoji: "💇‍♀️" },
-    { letter: "ట", english: "Ta", type: "Consonant", word: "టమోటా", translit: "Tomato", meaning: "Tomato", emoji: "🍅" },
-    { letter: "డ", english: "Da", type: "Consonant", word: "డమరుకం", translit: "Damarukam", meaning: "Drum", emoji: "🥁" },
-    { letter: "త", english: "Tha", type: "Consonant", word: "తలుపు", translit: "Talupu", meaning: "Door", emoji: "🚪" },
-    { letter: "ద", english: "Dha", type: "Consonant", word: "ద్రాక్ష", translit: "Draaksha", meaning: "Grapes", emoji: "🍇" },
-    { letter: "న", english: "Na", type: "Consonant", word: "నత్త", translit: "Natta", meaning: "Snail", emoji: "🐚" },
-    { letter: "ప", english: "Pa", type: "Consonant", word: "పలక", translit: "Palaka", meaning: "Slate", emoji: "📝" },
-    { letter: "బ", english: "Ba", type: "Consonant", word: "బంతి", translit: "Banthi", meaning: "Ball", emoji: "⚽" },
-    { letter: "మ", english: "Ma", type: "Consonant", word: "మంచం", translit: "Mancham", meaning: "Bed", emoji: "🛏️" },
-    { letter: "య", english: "Ya", type: "Consonant", word: "యంత్రం", translit: "Yanthram", meaning: "Machine", emoji: "⚙️" },
-    { letter: "ర", english: "Ra", type: "Consonant", word: "రథం", translit: "Ratham", meaning: "Chariot", emoji: "🪵" },
-    { letter: "ల", english: "La", type: "Consonant", word: "లడ్డు", translit: "Laddu", meaning: "Laddu Sweet", emoji: "🟡" },
-    { letter: "వ", english: "Va", type: "Consonant", word: "వల", translit: "Vala", meaning: "Net", emoji: "🕸️" },
-    { letter: "స", english: "Sa", type: "Consonant", word: "సబ్బు", translit: "Sabbu", meaning: "Soap", emoji: "🧼" },
-    { letter: "హ", english: "Ha", type: "Consonant", word: "హంస", translit: "Hamsa", meaning: "Swan", emoji: "🦢" }
-  ]
-};
-
-// Application State
-let currentCategory = 'achulu';
-let activeSelectedLetter = TELUGU_DATA.achulu[0];
-let ttsAudioEnabled = true;
-let ttsVoice = null;
-let searchFilter = "";
-
-// Drawing Canvas Setup Variables
-const canvas = document.getElementById('trace-canvas');
-const ctx = canvas.getContext('2d');
-let isDrawing = false;
-let lastX = 0;
-let lastY = 0;
-let brushColor = '#fbbf24';
-let brushThickness = 7;
-
-// Quiz State
-let currentQuizQuestion = null;
-let quizScore = 0;
-let quizStreak = 0;
-let quizOptions = [];
-
-// Initialize App
-window.addEventListener('DOMContentLoaded', () => {
-  initializeCanvas();
-  loadVoices();
-  renderLettersGrid();
-  updateDetailCard(activeSelectedLetter);
-  setupEventListeners();
+document.addEventListener('DOMContentLoaded', () => {
+  // --- STATE DEFINITIONS ---
+  let collatzMode = true; // true = Collatz Conjecture, false = Fibonacci Steps
+  let gameActive = false;
+  let gameCurrentNum = 17;
+  let gameStreak = 0;
+  let gameHighScore = 0;
+  let gameTimer = 10;
+  let gameInterval = null;
   
-  // Handle window resizing for Canvas
-  window.addEventListener('resize', handleCanvasResize);
-});
+  // Fun Facts Pool
+  const NUM_FACTS = [
+    "42 is the 'Answer to the Ultimate Question of Life, the Universe, and Everything'.",
+    "1729 is the Hardy-Ramanujan number, the smallest sum of two cubes in two different ways.",
+    "2520 is the smallest number divisible by all integers from 1 to 10.",
+    "Primes are the 'atoms' of mathematics; every whole number can be uniquely factored into primes.",
+    "There are infinitely many prime numbers, first proven by Euclid in 300 BC.",
+    "A 'Perfect Number' equals the sum of its proper divisors (e.g., 6, 28, 496).",
+    "The Golden Ratio is approximately 1.6180339887, deeply bound to the Fibonacci sequence.",
+    "Zero was first formally integrated into mathematics by Indian astronomer Brahmagupta.",
+    "9 is the maximum number of cubes needed to represent any positive integer.",
+    "The number 7 is universally cited as the most common 'favorite number' across civilizations."
+  ];
 
-// Find & Configure Telugu / Indian English fallback Speech Synthesis
-function loadVoices() {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      const voices = window.speechSynthesis.getVoices();
-      // Attempt to search for Telugu voice
-      const matchedVoice = voices.find(v => v.lang.includes('te-IN') || v.lang.includes('te_IN'));
-      const label = document.getElementById('active-voice-label');
-      if (matchedVoice) {
-        ttsVoice = matchedVoice;
-        label.textContent = matchedVoice.name + ' (Telugu)';
-      } else {
-        // Fallback Indian English/Standard Voice
-        const backupVoice = voices.find(v => v.lang.includes('en-IN') || v.lang.includes('en'));
-        ttsVoice = backupVoice || null;
-        label.textContent = backupVoice ? backupVoice.name + ' (Fallback)' : 'System Default';
-      }
-    };
-  } else {
-    document.getElementById('active-voice-label').textContent = 'Not supported';
-    document.getElementById('btn-toggle-tts').classList.add('opacity-50', 'pointer-events-none');
-  }
-}
-
-// Render letters to UI
-function renderLettersGrid() {
-  const gridContainer = document.getElementById('letters-grid');
-  gridContainer.innerHTML = '';
-
-  const lettersArray = TELUGU_DATA[currentCategory];
-  const filtered = lettersArray.filter(item => {
-    const matchLetter = item.letter.includes(searchFilter);
-    const matchEnglish = item.english.toLowerCase().includes(searchFilter.toLowerCase());
-    const matchWord = item.word.includes(searchFilter) || item.meaning.toLowerCase().includes(searchFilter.toLowerCase());
-    return matchLetter || matchEnglish || matchWord;
-  });
-
-  document.getElementById('letter-count-badge').textContent = `${filtered.length} Letters`;
-
-  if (filtered.length === 0) {
-    gridContainer.innerHTML = `
-      <div class="col-span-full py-12 text-center text-slate-500">
-        <p class="text-lg font-semibold">No letters found matching "${searchFilter}"</p>
-        <p class="text-xs mt-1">Try searching another letter or word translation.</p>
-      </div>
-    `;
-    return;
-  }
-
-  filtered.forEach(item => {
-    const card = document.createElement('button');
-    const isActive = activeSelectedLetter.letter === item.letter;
-    card.className = `p-4 rounded-xl border flex flex-col items-center justify-between text-center transition-all duration-300 transform hover:-translate-y-1 active:scale-95 ${
-      isActive 
-        ? 'letter-card-active border-amber-500 bg-slate-900' 
-        : 'border-slate-800 bg-slate-900/40 hover:bg-slate-900 hover:border-slate-700'
-    }`;
-    
-    card.innerHTML = `
-      <span class="text-xs text-slate-500 font-mono tracking-wider font-bold mb-1">${item.english}</span>
-      <span class="text-3xl font-bold block mb-2 text-slate-100">${item.letter}</span>
-      <div class="flex items-center gap-1.5 mt-1 bg-slate-950/80 px-2 py-1 rounded border border-slate-850 w-full justify-center">
-        <span class="text-base">${item.emoji}</span>
-        <span class="text-[10px] truncate text-slate-300 font-semibold">${item.translit}</span>
-      </div>
-    `;
-    
-    card.addEventListener('click', () => {
-      activeSelectedLetter = item;
-      renderLettersGrid();
-      updateDetailCard(item);
-    });
-    
-    gridContainer.appendChild(card);
-  });
-}
-
-// Update detailed selected card panel and change outline tracing letter
-function updateDetailCard(item) {
-  document.getElementById('detail-letter-telugu').textContent = item.letter;
-  document.getElementById('detail-letter-english').textContent = item.english;
-  document.getElementById('detail-type-badge').textContent = item.type;
-  document.getElementById('detail-word-emoji').textContent = item.emoji;
-  document.getElementById('detail-word-telugu').textContent = item.word;
-  document.getElementById('detail-word-translit').textContent = item.translit;
-  document.getElementById('detail-word-meaning').textContent = item.meaning;
+  // --- INTERACTIVITY HOOKS & ELEMENTS ---
   
-  // Update tracing assistant guide background letter
-  document.getElementById('canvas-guide-letter').textContent = item.letter;
-
-  // Play Speech Audio automatically on card switch if active
-  triggerSpeak(item);
-}
-
-// Canvas Tracing Engine
-function initializeCanvas() {
-  handleCanvasResize();
-  
-  // Pointer Listeners for Writing
-  canvas.addEventListener('mousedown', startDrawing);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stopDrawing);
-  canvas.addEventListener('mouseout', stopDrawing);
-
-  canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    isDrawing = true;
-    [lastX, lastY] = [touch.clientX - rect.left, touch.clientY - rect.top];
-  }, { passive: false });
-
-  canvas.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    if (!isDrawing) return;
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    drawStroke(touch.clientX - rect.left, touch.clientY - rect.top);
-  }, { passive: false });
-
-  canvas.addEventListener('touchend', stopDrawing);
-}
-
-function handleCanvasResize() {
-  // Match canvas physical pixels with display layout bounding dimension
-  const parent = canvas.parentElement;
-  canvas.width = parent.clientWidth;
-  canvas.height = parent.clientHeight;
-  clearCanvasDrawing();
-}
-
-function startDrawing(e) {
-  isDrawing = true;
-  [lastX, lastY] = [e.offsetX, e.offsetY];
-}
-
-function draw(e) {
-  if (!isDrawing) return;
-  drawStroke(e.offsetX, e.offsetY);
-}
-
-function drawStroke(x, y) {
-  ctx.beginPath();
-  ctx.moveTo(lastX, lastY);
-  ctx.lineTo(x, y);
-  ctx.strokeStyle = brushColor;
-  ctx.lineWidth = brushThickness;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  ctx.stroke();
-  [lastX, lastY] = [x, y];
-}
-
-function stopDrawing() {
-  isDrawing = false;
-}
-
-function clearCanvasDrawing() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-// Text to Speech Voice Synthesizer
-function triggerSpeak(item) {
-  if (!ttsAudioEnabled || !('speechSynthesis' in window)) return;
-  
-  // Cancel active sounds
-  window.speechSynthesis.cancel();
-
-  // Build speech queue: Speak Letter, then phonetics, then corresponding word
-  const utteranceText = `${item.letter}. ${item.translit}. for ${item.meaning}.`;
-  const utterance = new SpeechSynthesisUtterance(utteranceText);
-  
-  if (ttsVoice) {
-    utterance.voice = ttsVoice;
-  }
-  utterance.rate = 0.85; // slightly slower for instructional clarity
-  utterance.pitch = 1.05;
-  
-  window.speechSynthesis.speak(utterance);
-}
-
-// Setup all UI Event Handlers
-function setupEventListeners() {
-  // Vowels tab trigger
-  document.getElementById('tab-achulu').addEventListener('click', (e) => {
-    switchCategory('achulu', e.currentTarget);
-  });
-
-  // Consonants tab trigger
-  document.getElementById('tab-hallulu').addEventListener('click', (e) => {
-    switchCategory('hallulu', e.currentTarget);
-  });
-
-  // Interactive Quiz Game trigger
-  document.getElementById('tab-quiz').addEventListener('click', () => {
-    openQuizChallenge();
-  });
-
-  document.getElementById('btn-close-quiz').addEventListener('click', () => {
-    document.getElementById('quiz-modal-container').classList.add('hidden');
-  });
-
-  // Search Filter input
-  document.getElementById('search-input').addEventListener('input', (e) => {
-    searchFilter = e.target.value;
-    renderLettersGrid();
-  });
-
-  // Audio toggle trigger
-  document.getElementById('btn-toggle-tts').addEventListener('click', () => {
-    ttsAudioEnabled = !ttsAudioEnabled;
-    const indicator = document.getElementById('tts-indicator');
-    if (ttsAudioEnabled) {
-      indicator.className = "w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse";
-    } else {
-      indicator.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
-      window.speechSynthesis.cancel();
-    }
-  });
-
-  // Speak main panel sound trigger
-  document.getElementById('btn-speak-main').addEventListener('click', () => {
-    triggerSpeak(activeSelectedLetter);
-  });
-
-  // Favorite Bookmark dummy indicator interaction
-  const favBtn = document.getElementById('btn-fav');
-  favBtn.addEventListener('click', () => {
-    favBtn.classList.toggle('bg-rose-650');
-    favBtn.classList.toggle('scale-110');
-    // Create a mini notification/visual log in canvas area instead of alerts
-    const toast = document.createElement('div');
-    toast.className = "absolute bottom-3 left-3 bg-rose-500 text-slate-950 font-bold text-xs py-1.5 px-3 rounded shadow-lg transition-opacity duration-300 z-30";
-    toast.textContent = `Saved ${activeSelectedLetter.letter} to practice list!`;
-    canvas.parentElement.appendChild(toast);
+  // Fact Ticker
+  const tickerEl = document.getElementById('fact-ticker');
+  function rotateFact() {
+    const randomFact = NUM_FACTS[Math.floor(Math.random() * NUM_FACTS.length)];
+    tickerEl.style.opacity = 0;
     setTimeout(() => {
-      toast.classList.add('opacity-0');
-      setTimeout(() => toast.remove(), 300);
-    }, 2000);
+      tickerEl.textContent = randomFact;
+      tickerEl.style.opacity = 1;
+    }, 300);
+  }
+  setInterval(rotateFact, 12000);
+  rotateFact(); // Initial trigger
+
+  // --- SECTION 1: BASE RADIATOR (CONVERTER) ---
+  const decInput = document.getElementById('base-dec');
+  const binInput = document.getElementById('base-bin');
+  const hexInput = document.getElementById('base-hex');
+  const octInput = document.getElementById('base-oct');
+  const romanInput = document.getElementById('base-roman');
+  const resetConverterBtn = document.getElementById('reset-converter');
+
+  // Helper: Decimal to Roman
+  function decimalToRoman(num) {
+    if (isNaN(num) || num <= 0 || num > 3999) return 'N/A';
+    const lookup = { M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1 };
+    let roman = '';
+    for (let i in lookup) {
+      while (num >= lookup[i]) {
+        roman += i;
+        num -= lookup[i];
+      }
+    }
+    return roman;
+  }
+
+  // Helper: Roman to Decimal
+  function romanToDecimal(str) {
+    str = str.toUpperCase().trim();
+    const romanRules = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+    let num = 0;
+    for (let i = 0; i < str.length; i++) {
+      const current = romanRules[str[i]];
+      const next = romanRules[str[i + 1]];
+      if (!current) return NaN;
+      if (next && current < next) {
+        num += next - current;
+        i++;
+      } else {
+        num += current;
+      }
+    }
+    return num > 3999 ? NaN : num;
+  }
+
+  function updateAllBases(value, origin) {
+    let dec = parseInt(value, 10);
+    if (origin === 'bin') dec = parseInt(value, 2);
+    if (origin === 'hex') dec = parseInt(value, 16);
+    if (origin === 'oct') dec = parseInt(value, 8);
+    if (origin === 'roman') dec = romanToDecimal(value);
+
+    if (isNaN(dec) || dec < 0) {
+      // Clear/Invalid warning feedback state
+      if (origin !== 'dec') decInput.value = '';
+      if (origin !== 'bin') binInput.value = '';
+      if (origin !== 'hex') hexInput.value = '';
+      if (origin !== 'oct') octInput.value = '';
+      if (origin !== 'roman') romanInput.value = 'Invalid';
+      return;
+    }
+
+    // Prevent Roman overflow
+    if (dec > 3999) {
+      romanInput.value = "MAX 3999";
+    }
+
+    if (origin !== 'dec') decInput.value = dec;
+    if (origin !== 'bin') binInput.value = dec.toString(2);
+    if (origin !== 'hex') hexInput.value = dec.toString(16).toUpperCase();
+    if (origin !== 'oct') octInput.value = dec.toString(8);
+    if (origin !== 'roman' && dec <= 3999) romanInput.value = decimalToRoman(dec);
+  }
+
+  decInput.addEventListener('input', (e) => updateAllBases(e.target.value, 'dec'));
+  binInput.addEventListener('input', (e) => updateAllBases(e.target.value, 'bin'));
+  hexInput.addEventListener('input', (e) => updateAllBases(e.target.value, 'hex'));
+  octInput.addEventListener('input', (e) => updateAllBases(e.target.value, 'oct'));
+  romanInput.addEventListener('input', (e) => updateAllBases(e.target.value, 'roman'));
+  
+  resetConverterBtn.addEventListener('click', () => {
+    decInput.value = '42';
+    updateAllBases('42', 'dec');
   });
 
-  // Tracing Canvas Actions
-  document.getElementById('btn-canvas-clear').addEventListener('click', clearCanvasDrawing);
-  
-  // Tracing brush color swatches
-  const swatches = document.querySelectorAll('.color-swatch');
-  swatches.forEach(swatch => {
-    swatch.addEventListener('click', (e) => {
-      swatches.forEach(s => s.classList.remove('ring-2', 'ring-amber-400/50', 'scale-110'));
-      e.currentTarget.classList.add('ring-2', 'ring-amber-400/50', 'scale-110');
-      brushColor = e.currentTarget.getAttribute('data-color');
+
+  // --- SECTION 2: STATISTICAL ANALYZER ---
+  const statsInput = document.getElementById('stats-input');
+  const statSum = document.getElementById('stat-sum');
+  const statMean = document.getElementById('stat-mean');
+  const statMedian = document.getElementById('stat-median');
+  const statMode = document.getElementById('stat-mode');
+  const statMinMax = document.getElementById('stat-minmax');
+  const statCount = document.getElementById('stat-count');
+
+  const statsPresetFib = document.getElementById('stats-preset-fib');
+  const statsPresetPrimes = document.getElementById('stats-preset-primes');
+
+  function analyzeStats() {
+    const text = statsInput.value;
+    // Parse integers
+    const parsed = text
+      .replace(/[^0-9.-]/g, ' ') // replace punctuation/symbols with space
+      .split(/\s+/)
+      .map(v => parseFloat(v))
+      .filter(v => !isNaN(v));
+
+    if (parsed.length === 0) {
+      statSum.textContent = '-';
+      statMean.textContent = '-';
+      statMedian.textContent = '-';
+      statMode.textContent = '-';
+      statMinMax.textContent = '-';
+      statCount.textContent = '0';
+      return;
+    }
+
+    // Sum
+    const sum = parsed.reduce((a, b) => a + b, 0);
+    // Mean
+    const mean = (sum / parsed.length).toFixed(2);
+    
+    // Sorted array for Median & Range
+    const sorted = [...parsed].sort((a, b) => a - b);
+    
+    // Median
+    let median;
+    const mid = Math.floor(sorted.length / 2);
+    if (sorted.length % 2 !== 0) {
+      median = sorted[mid];
+    } else {
+      median = ((sorted[mid - 1] + sorted[mid]) / 2).toFixed(1);
+    }
+
+    // Mode
+    const frequency = {};
+    let maxFreq = 0;
+    let modes = [];
+    parsed.forEach(val => {
+      frequency[val] = (frequency[val] || 0) + 1;
+      if (frequency[val] > maxFreq) {
+        maxFreq = frequency[val];
+      }
     });
-  });
+    for (let key in frequency) {
+      if (frequency[key] === maxFreq) {
+        modes.push(key);
+      }
+    }
+    const modeStr = (maxFreq > 1) ? modes.slice(0, 3).join(', ') : 'None';
 
-  // Brush thickness slider
-  document.getElementById('brush-size').addEventListener('input', (e) => {
-    brushThickness = parseInt(e.target.value, 10);
-  });
-}
+    // Min & Max
+    const min = sorted[0];
+    const max = sorted[sorted.length - 1];
 
-// Switch Category between Vowels & Consonants
-function switchCategory(catKey, buttonElement) {
-  currentCategory = catKey;
+    // Update DOM
+    statSum.textContent = Number.isInteger(sum) ? sum : sum.toFixed(2);
+    statMean.textContent = mean;
+    statMedian.textContent = median;
+    statMode.textContent = modeStr + (modes.length > 3 ? '...' : '');
+    statMinMax.textContent = `${min} / ${max}`;
+    statCount.textContent = parsed.length;
+  }
+
+  statsInput.addEventListener('input', analyzeStats);
   
-  // Update tab navigation button styles
-  const buttons = [document.getElementById('tab-achulu'), document.getElementById('tab-hallulu')];
-  buttons.forEach(btn => {
-    btn.className = "flex-1 min-w-[100px] px-4 py-2.5 rounded-lg text-sm font-semibold transition-all bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white";
+  statsPresetFib.addEventListener('click', () => {
+    statsInput.value = "1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144";
+    analyzeStats();
   });
-  buttonElement.className = "flex-1 min-w-[100px] px-4 py-2.5 rounded-lg text-sm font-semibold transition-all bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 shadow-md transform scale-100";
-
-  // Update grid header titles
-  const titleMap = {
-    achulu: { title: "అచ్చులు (Vowels)", count: "15 Letters" },
-    hallulu: { title: "హల్లులు (Consonants)", count: "21 Letters" }
-  };
-  document.getElementById('grid-title').textContent = titleMap[catKey].title;
-  document.getElementById('letter-count-badge').textContent = titleMap[catKey].count;
-
-  // Reset selected letter to first of chosen group
-  activeSelectedLetter = TELUGU_DATA[catKey][0];
-  renderLettersGrid();
-  updateDetailCard(activeSelectedLetter);
-}
-
-// Game Engine logic
-function openQuizChallenge() {
-  const modal = document.getElementById('quiz-modal-container');
-  modal.classList.remove('hidden');
-  generateNewQuizQuestion();
-}
-
-function generateNewQuizQuestion() {
-  // Mix vowels and consonants
-  const allLetters = [...TELUGU_DATA.achulu, ...TELUGU_DATA.hallulu];
-  
-  // Select one target letter
-  const target = allLetters[Math.floor(Math.random() * allLetters.length)];
-  currentQuizQuestion = target;
-
-  // Display information
-  document.getElementById('quiz-pic-container').textContent = target.emoji;
-  document.getElementById('quiz-english-word').textContent = `${target.meaning} (${target.translit})`;
-  document.getElementById('quiz-telugu-word').textContent = target.word;
-
-  // Generate options (1 correct + 3 random distracting candidates)
-  const optionsPool = allLetters.filter(item => item.letter !== target.letter);
-  const shuffledDistractors = optionsPool.sort(() => 0.5 - Math.random()).slice(0, 3);
-  const finalOptions = [target, ...shuffledDistractors].sort(() => 0.5 - Math.random());
-
-  const optionsContainer = document.getElementById('quiz-options-container');
-  optionsContainer.innerHTML = '';
-  
-  const banner = document.getElementById('quiz-feedback-banner');
-  banner.classList.add('hidden');
-
-  finalOptions.forEach(opt => {
-    const optBtn = document.createElement('button');
-    optBtn.className = "bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-100 font-bold py-3 px-4 rounded-xl border border-slate-700 hover:border-amber-500/50 text-2xl transition-all";
-    optBtn.textContent = opt.letter;
-    optBtn.addEventListener('click', () => handleQuizAnswer(opt.letter, target.letter, optBtn));
-    optionsContainer.appendChild(optBtn);
+  statsPresetPrimes.addEventListener('click', () => {
+    statsInput.value = "2, 3, 5, 7, 11, 13, 17, 19, 23, 29";
+    analyzeStats();
   });
-}
 
-function handleQuizAnswer(selected, correct, selectedBtn) {
-  const banner = document.getElementById('quiz-feedback-banner');
-  const btns = document.getElementById('quiz-options-container').getElementsByTagName('button');
+  // Run initial calculation
+  analyzeStats();
 
-  // Disable further clicks momentarily
-  for (let b of btns) {
-    b.disabled = true;
-    if (b.textContent === correct) {
-      b.className = "bg-emerald-500/20 border-emerald-500 text-emerald-400 font-bold py-3 px-4 rounded-xl border text-2xl";
+
+  // --- SECTION 3: DEEP NUMBER PROFILE ---
+  const profileInput = document.getElementById('profile-input');
+  const profileBtn = document.getElementById('profile-btn');
+  const profileRandomBtn = document.getElementById('profile-random-btn');
+
+  const profileClass = document.getElementById('profile-class');
+  const profileParity = document.getElementById('profile-parity');
+  const profileSquare = document.getElementById('profile-square');
+  const profilePerfect = document.getElementById('profile-perfect');
+  const profileDivisors = document.getElementById('profile-divisors');
+
+  function isPrime(num) {
+    if (num <= 1) return false;
+    if (num <= 3) return true;
+    if (num % 2 === 0 || num % 3 === 0) return false;
+    for (let i = 5; i * i <= num; i += 6) {
+      if (num % i === 0 || num % (i + 2) === 0) return false;
+    }
+    return true;
+  }
+
+  function findDivisors(num) {
+    const list = [];
+    for (let i = 1; i <= Math.sqrt(num); i++) {
+      if (num % i === 0) {
+        list.push(i);
+        if (i !== num / i) {
+          list.push(num / i);
+        }
+      }
+    }
+    return list.sort((a, b) => a - b);
+  }
+
+  function runProfiling() {
+    let val = parseInt(profileInput.value, 10);
+    if (isNaN(val) || val < 1) {
+      val = 128;
+      profileInput.value = 128;
+    }
+    if (val > 1000000) {
+      val = 1000000;
+      profileInput.value = 1000000;
+    }
+
+    // 1. Classification (Prime / Composite)
+    if (val === 1) {
+      profileClass.textContent = 'Unit (Neither)';
+    } else if (isPrime(val)) {
+      profileClass.textContent = 'Prime Number';
+    } else {
+      profileClass.textContent = 'Composite';
+    }
+
+    // 2. Parity
+    profileParity.textContent = (val % 2 === 0) ? 'Even' : 'Odd';
+
+    // 3. Square
+    const root = Math.sqrt(val);
+    if (Number.isInteger(root)) {
+      profileSquare.textContent = `Yes (Square of ${root})`;
+    } else {
+      profileSquare.textContent = 'No';
+    }
+
+    // 4. Perfect / Abundant / Deficient
+    const divs = findDivisors(val);
+    const sumOfDivisors = divs.reduce((a, b) => a + b, 0) - val; // exclude self
+    if (val === 1) {
+      profilePerfect.textContent = 'Unit';
+    } else if (sumOfDivisors === val) {
+      profilePerfect.textContent = 'Perfect!';
+    } else if (sumOfDivisors > val) {
+      profilePerfect.textContent = `Abundant (+${sumOfDivisors - val})`;
+    } else {
+      profilePerfect.textContent = `Deficient (-${val - sumOfDivisors})`;
+    }
+
+    // 5. Divisors List
+    profileDivisors.textContent = divs.join(', ');
+    profileDivisors.title = divs.join(', ');
+  }
+
+  profileBtn.addEventListener('click', runProfiling);
+  profileInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') runProfiling();
+  });
+
+  profileRandomBtn.addEventListener('click', () => {
+    // Pick beautiful dynamic random integers
+    const rand = Math.floor(Math.random() * 2000) + 1;
+    profileInput.value = rand;
+    runProfiling();
+  });
+
+  // Trigger initial Profiler
+  runProfiling();
+
+
+  // --- SECTION 4: INTERACTIVE DYNAMIC MATRIX / SIEVE ---
+  const matrixContainer = document.getElementById('numbers-matrix');
+  const multipleInput = document.getElementById('sieve-multiplier-input');
+  const feedbackText = document.getElementById('matrix-feedback-text');
+  const resetMatrixBtn = document.getElementById('reset-matrix-highlights');
+  
+  const filterAll = document.getElementById('sieve-filter-all');
+  const filterPrime = document.getElementById('sieve-filter-prime');
+  const filterEven = document.getElementById('sieve-filter-even');
+  const filterOdd = document.getElementById('sieve-filter-odd');
+  const filterSquare = document.getElementById('sieve-filter-square');
+  
+  let activeFilter = 'all'; // all, prime, even, odd, square
+  
+  // Generate Matrix cells (1 to 120)
+  function buildMatrix() {
+    matrixContainer.innerHTML = '';
+    for (let i = 1; i <= 120; i++) {
+      const cell = document.createElement('button');
+      cell.id = `cell-${i}`;
+      cell.className = 'matrix-cell bg-slate-900 border border-slate-800 text-slate-300 font-mono text-xs py-2 rounded-lg font-bold flex flex-col items-center justify-center transition-all hover:bg-slate-800 hover:text-white';
+      
+      // Inner Label
+      const label = document.createElement('span');
+      label.textContent = i;
+      cell.appendChild(label);
+
+      // Simple indicator dot inside cell for primes
+      if (isPrime(i)) {
+        const dot = document.createElement('span');
+        dot.className = 'w-1 h-1 bg-emerald-400 rounded-full mt-0.5';
+        cell.appendChild(dot);
+      }
+
+      // Event: click cell to highlight divisors/multiples
+      cell.addEventListener('click', () => {
+        highlightDivisorsOf(i);
+      });
+
+      matrixContainer.appendChild(cell);
+    }
+    applyCurrentFilters();
+  }
+
+  function applyCurrentFilters() {
+    const multVal = parseInt(multipleInput.value, 10) || 0;
+    
+    for (let i = 1; i <= 120; i++) {
+      const cell = document.getElementById(`cell-${i}`);
+      if (!cell) continue;
+
+      // Reset visual effects
+      cell.className = 'matrix-cell bg-slate-900 border border-slate-800 text-slate-300 font-mono text-xs py-2 rounded-lg font-bold flex flex-col items-center justify-center';
+      
+      let matchesFilter = false;
+      if (activeFilter === 'all') matchesFilter = true;
+      else if (activeFilter === 'prime' && isPrime(i)) matchesFilter = true;
+      else if (activeFilter === 'even' && i % 2 === 0) matchesFilter = true;
+      else if (activeFilter === 'odd' && i % 2 !== 0) matchesFilter = true;
+      else if (activeFilter === 'square' && Number.isInteger(Math.sqrt(i))) matchesFilter = true;
+
+      // Apply filter highlight style
+      if (matchesFilter) {
+        cell.classList.add('border-emerald-500/30', 'bg-emerald-500/10', 'text-emerald-300');
+      } else {
+        cell.classList.add('opacity-40');
+      }
+
+      // Highlight multiplier overlap if active
+      if (multVal > 1 && i % multVal === 0) {
+        cell.classList.remove('border-slate-800', 'border-emerald-500/30');
+        cell.classList.add('border-indigo-500', 'ring-1', 'ring-indigo-500/40');
+      }
     }
   }
 
-  if (selected === correct) {
-    quizScore += 10;
-    quizStreak += 1;
-    document.getElementById('quiz-score').textContent = quizScore;
-    document.getElementById('quiz-streak').textContent = quizStreak;
+  function highlightDivisorsOf(num) {
+    applyCurrentFilters(); // Reset to standard filter view first
     
-    banner.className = "mt-4 p-3 rounded-lg text-sm text-center font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 block animate-bounce-slow";
-    banner.innerHTML = `🎉 Correct! <strong>${correct}</strong> is the starting letter!`;
-  } else {
-    quizStreak = 0;
-    document.getElementById('quiz-streak').textContent = 0;
+    const divisors = findDivisors(num);
+    feedbackText.innerHTML = `Analyzing <strong class="text-indigo-400">${num}</strong>. Divisors: <span class="text-emerald-400">${divisors.join(', ')}</span>. It has ${divisors.length} unique components.`;
+
+    divisors.forEach(div => {
+      const cell = document.getElementById(`cell-${div}`);
+      if (cell) {
+        cell.classList.remove('opacity-40');
+        cell.classList.add('bg-indigo-500/20', 'border-indigo-400', 'text-indigo-200');
+      }
+    });
     
-    selectedBtn.className = "bg-rose-500/20 border-rose-500 text-rose-400 font-bold py-3 px-4 rounded-xl border text-2xl";
-    banner.className = "mt-4 p-3 rounded-lg text-sm text-center font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 block";
-    banner.innerHTML = `❌ Incorrect. The starting letter is actually <strong>${correct}</strong>.`;
+    // Pulse clicked cell
+    const mainCell = document.getElementById(`cell-${num}`);
+    if (mainCell) {
+      mainCell.classList.add('ring-2', 'ring-pink-500');
+    }
   }
 
-  // Speak response context
-  if (ttsAudioEnabled) {
-    const utterance = new SpeechSynthesisUtterance(selected === correct ? 'Excellent, that is correct!' : 'Try again.');
-    if (ttsVoice) utterance.voice = ttsVoice;
-    window.speechSynthesis.speak(utterance);
+  // Listeners for Matrix Filters
+  const filterButtons = [filterAll, filterPrime, filterEven, filterOdd, filterSquare];
+  
+  function setFilterActive(btn, type) {
+    filterButtons.forEach(b => b.classList.remove('bg-slate-800', 'text-slate-100'));
+    filterButtons.forEach(b => b.classList.add('text-slate-400', 'hover:text-slate-200'));
+    btn.classList.add('bg-slate-800', 'text-slate-100');
+    btn.classList.remove('text-slate-400', 'hover:text-slate-200');
+    activeFilter = type;
+    applyCurrentFilters();
   }
 
-  // Next question after brief pause
-  setTimeout(() => {
-    generateNewQuizQuestion();
-  }, 2200);
-}
+  filterAll.addEventListener('click', () => setFilterActive(filterAll, 'all'));
+  filterPrime.addEventListener('click', () => setFilterActive(filterPrime, 'prime'));
+  filterEven.addEventListener('click', () => setFilterActive(filterEven, 'even'));
+  filterOdd.addEventListener('click', () => setFilterActive(filterOdd, 'odd'));
+  filterSquare.addEventListener('click', () => setFilterActive(filterSquare, 'square'));
+
+  multipleInput.addEventListener('input', applyCurrentFilters);
+  resetMatrixBtn.addEventListener('click', () => {
+    activeFilter = 'all';
+    setFilterActive(filterAll, 'all');
+    multipleInput.value = '';
+    applyCurrentFilters();
+    feedbackText.textContent = 'Click any number above to trace its components and factors instantly.';
+  });
+
+  buildMatrix();
+
+
+  // --- SECTION 5: SERIES / SEQUENCE GENERATOR (Collatz vs Fibonacci) ---
+  const tabCollatz = document.getElementById('tab-collatz');
+  const tabFib = document.getElementById('tab-fib');
+  const seqInputLabel = document.getElementById('seq-input-label');
+  const seqStartVal = document.getElementById('seq-start-val');
+  const runSeqBtn = document.getElementById('run-sequence-btn');
+  
+  const seqStat1Lbl = document.getElementById('seq-stat-1-lbl');
+  const seqStat1Val = document.getElementById('seq-stat-1-val');
+  const seqStat2Lbl = document.getElementById('seq-stat-2-lbl');
+  const seqStat2Val = document.getElementById('seq-stat-2-val');
+  const sequenceVisualOutput = document.getElementById('sequence-visual-output');
+
+  tabCollatz.addEventListener('click', () => {
+    collatzMode = true;
+    tabCollatz.className = 'border-b-2 border-amber-400 px-4 py-2 text-xs font-semibold text-amber-300';
+    tabFib.className = 'border-b-2 border-transparent px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200';
+    seqInputLabel.textContent = 'Starting integer (N)';
+    seqStartVal.value = '27';
+    runSequence();
+  });
+
+  tabFib.addEventListener('click', () => {
+    collatzMode = false;
+    tabFib.className = 'border-b-2 border-amber-400 px-4 py-2 text-xs font-semibold text-amber-300';
+    tabCollatz.className = 'border-b-2 border-transparent px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200';
+    seqInputLabel.textContent = 'Number of elements';
+    seqStartVal.value = '20';
+    runSequence();
+  });
+
+  function runSequence() {
+    const inputVal = parseInt(seqStartVal.value, 10);
+    if (isNaN(inputVal) || inputVal < 1) {
+      sequenceVisualOutput.textContent = 'Please provide a positive integer greater than 0.';
+      return;
+    }
+
+    if (collatzMode) {
+      // Collatz Logic
+      let curr = inputVal;
+      const path = [curr];
+      let peak = curr;
+      let safetyLimit = 1000;
+
+      while (curr > 1 && safetyLimit > 0) {
+        if (curr % 2 === 0) {
+          curr = curr / 2;
+        } else {
+          curr = curr * 3 + 1;
+        }
+        path.push(curr);
+        if (curr > peak) peak = curr;
+        safetyLimit--;
+      }
+
+      seqStat1Lbl.textContent = 'Steps to Reach 1:';
+      seqStat1Val.textContent = `${path.length - 1} steps`;
+      seqStat2Lbl.textContent = 'Peak Hailstone Value:';
+      seqStat2Val.textContent = peak.toLocaleString();
+
+      // Generate beautiful formatted list
+      sequenceVisualOutput.innerHTML = path.map((num, idx) => {
+        return `<span class="inline-block px-1.5 py-0.5 m-0.5 rounded ${num === 1 ? 'bg-emerald-500/20 text-emerald-300 font-bold' : 'bg-slate-900 border border-slate-800'}"><span class="text-[9px] text-slate-500 mr-1">[${idx}]</span>${num}</span>`;
+      }).join(' → ');
+    } else {
+      // Fibonacci Logic
+      const limit = Math.min(inputVal, 100); // safety cap
+      const path = [1, 1];
+      for (let i = 2; i < limit; i++) {
+        path.push(path[i - 1] + path[i - 2]);
+      }
+      
+      // If requested just 1 element
+      const finalPath = path.slice(0, limit);
+
+      seqStat1Lbl.textContent = 'Computed Terms:';
+      seqStat1Val.textContent = `${finalPath.length} numbers`;
+      seqStat2Lbl.textContent = 'Last Fibonacci Term:';
+      seqStat2Val.textContent = finalPath[finalPath.length - 1] ? finalPath[finalPath.length - 1].toLocaleString() : '0';
+
+      sequenceVisualOutput.innerHTML = finalPath.map((num, idx) => {
+        return `<span class="inline-block px-1.5 py-0.5 m-0.5 rounded bg-slate-900 border border-slate-800"><span class="text-[9px] text-slate-500 mr-1">[F<sub>${idx + 1}</sub>]</span>${num.toLocaleString()}</span>`;
+      }).join(', ');
+    }
+  }
+
+  runSeqBtn.addEventListener('click', runSequence);
+  seqStartVal.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') runSequence();
+  });
+
+  // Initial Run of default tab
+  runSequence();
+
+
+  // --- SECTION 6: BRAIN TRAINING PRIME SPEEDRUN GAME ---
+  const gameNumDisplay = document.getElementById('game-number-display');
+  const gameTimerFill = document.getElementById('game-timer-fill');
+  const gameStreakCounter = document.getElementById('game-streak-counter');
+  const gameHighScoreEl = document.getElementById('game-high-score');
+  const gameTimerNum = document.getElementById('game-timer-num');
+  const gameFeedback = document.getElementById('game-feedback');
+  const gameToggleBtn = document.getElementById('game-toggle-btn');
+
+  const gameBtnPrime = document.getElementById('game-btn-prime');
+  const gameBtnComposite = document.getElementById('game-btn-composite');
+
+  function generateNextGameNumber() {
+    // Random integer between 2 and 199
+    gameCurrentNum = Math.floor(Math.random() * 198) + 2;
+    gameNumDisplay.textContent = gameCurrentNum;
+    resetTurnTimer();
+  }
+
+  function startTurnTimer() {
+    gameTimer = 10; 
+    gameTimerNum.textContent = `${gameTimer}s`;
+    gameTimerFill.style.width = '100%';
+    
+    if (gameInterval) clearInterval(gameInterval);
+    
+    gameInterval = setInterval(() => {
+      gameTimer -= 1;
+      gameTimerNum.textContent = `${gameTimer}s`;
+      const percent = (gameTimer / 10) * 100;
+      gameTimerFill.style.width = `${percent}%`;
+
+      if (gameTimer <= 0) {
+        endGame(false, "Out of time! ⌛");
+      }
+    }, 1000);
+  }
+
+  function resetTurnTimer() {
+    startTurnTimer();
+  }
+
+  function startGame() {
+    gameActive = true;
+    gameStreak = 0;
+    gameStreakCounter.textContent = '0';
+    gameToggleBtn.textContent = 'End Speedrun';
+    gameFeedback.textContent = 'Keep your streak going! Is the number below Prime or Composite?';
+    generateNextGameNumber();
+  }
+
+  function endGame(complete, reason) {
+    gameActive = false;
+    if (gameInterval) clearInterval(gameInterval);
+    gameTimerFill.style.width = '0%';
+    gameToggleBtn.textContent = 'Start Speedrun';
+    
+    if (gameStreak > gameHighScore) {
+      gameHighScore = gameStreak;
+      gameHighScoreEl.textContent = gameHighScore;
+    }
+    
+    gameFeedback.innerHTML = `<span class="text-pink-400 font-bold">Game Over!</span> ${reason} You scored a streak of <strong class="text-indigo-400">${gameStreak}</strong>.`;
+  }
+
+  function handlePlayerChoice(isChoosingPrime) {
+    if (!gameActive) {
+      gameFeedback.textContent = 'Please click "Start Speedrun" below to begin!';
+      return;
+    }
+
+    const correctIsPrime = isPrime(gameCurrentNum);
+    const correctChoice = (isChoosingPrime && correctIsPrime) || (!isChoosingPrime && !correctIsPrime);
+
+    if (correctChoice) {
+      gameStreak++;
+      gameStreakCounter.textContent = gameStreak;
+      gameFeedback.innerHTML = `<span class="text-emerald-400 font-bold">Correct!</span> ${gameCurrentNum} is ${correctIsPrime ? 'Prime' : 'Composite'}. +1 streak point!`;
+      generateNextGameNumber();
+    } else {
+      endGame(false, `Incorrect. ${gameCurrentNum} is actually ${correctIsPrime ? 'a Prime' : 'a Composite'} number.`);
+    }
+  }
+
+  gameBtnPrime.addEventListener('click', () => handlePlayerChoice(true));
+  gameBtnComposite.addEventListener('click', () => handlePlayerChoice(false));
+
+  gameToggleBtn.addEventListener('click', () => {
+    if (gameActive) {
+      endGame(true, "Voluntarily exited early.");
+    } else {
+      startGame();
+    }
+  });
+
+
+  // --- HARD RESET GLOBAL BUTTON ---
+  document.getElementById('btn-quick-reset-all').addEventListener('click', (e) => {
+    e.preventDefault();
+    
+    // Reset Bases
+    decInput.value = '42';
+    updateAllBases('42', 'dec');
+    
+    // Reset Stats
+    statsInput.value = "15, 23, 42, 8, 4, 16, 23";
+    analyzeStats();
+
+    // Reset Profile
+    profileInput.value = '128';
+    runProfiling();
+
+    // Reset Sieve
+    activeFilter = 'all';
+    setFilterActive(filterAll, 'all');
+    multipleInput.value = '3';
+    applyCurrentFilters();
+
+    // Reset Sequences
+    collatzMode = true;
+    tabCollatz.click();
+    
+    // Reset Game
+    if (gameActive) {
+      endGame(true, "Widgets reset.");
+    }
+    gameStreak = 0;
+    gameHighScore = 0;
+    gameHighScoreEl.textContent = '0';
+    gameStreakCounter.textContent = '0';
+    gameFeedback.textContent = 'Click Start Speedrun below to begin testing your factor instinct!';
+  });
+});
