@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "Numiverse Studio",
+  "appName": "FractionMaster",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
