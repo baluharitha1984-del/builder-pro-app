@@ -106,7 +106,10 @@ if (fs.existsSync('capacitor.config.ts')) {
   }
 }
 
+// 5. Update Android Project Configuration files
 let originalPackage = '';
+const baseJavaDirLocation = 'android/app/src/main/java';
+
 const manifestPaths = [
   'android/app/src/main/AndroidManifest.xml',
   'app/src/main/AndroidManifest.xml',
@@ -128,6 +131,57 @@ for (const p of manifestPaths) {
     } catch (e) {}
     break;
   }
+}
+
+// Bulletproof Active Java Package Detection: check manifest-defined folder first
+let locatedJavaPackage = '';
+if (originalPackage) {
+  const expectedPathJava = path.join(baseJavaDirLocation, ...originalPackage.split('.'), 'MainActivity.java');
+  const expectedPathKotlin = path.join(baseJavaDirLocation, ...originalPackage.split('.'), 'MainActivity.kt');
+  const expectedPathAppJava = path.join('app/src/main/java', ...originalPackage.split('.'), 'MainActivity.java');
+  const expectedPathAppKotlin = path.join('app/src/main/java', ...originalPackage.split('.'), 'MainActivity.kt');
+  
+  if (fs.existsSync(expectedPathJava) || fs.existsSync(expectedPathKotlin) || fs.existsSync(expectedPathAppJava) || fs.existsSync(expectedPathAppKotlin)) {
+    locatedJavaPackage = originalPackage;
+    console.log(`[BULLETPROOF] Confirmed MainActivity exists inside original package folder: ${originalPackage}`);
+  }
+}
+
+// Fallback search only if not found in active package location
+if (!locatedJavaPackage) {
+  function findMainActivity(dir) {
+    if (!fs.existsSync(dir)) return null;
+    const list = fs.readdirSync(dir);
+    for (const file of list) {
+      const fullPath = path.join(dir, file);
+      if (fs.statSync(fullPath).isDirectory()) {
+        const res = findMainActivity(fullPath);
+        if (res) return res;
+      } else if (file === 'MainActivity.java' || file === 'MainActivity.kt') {
+        return fullPath;
+      }
+    }
+    return null;
+  }
+
+  try {
+    const mainActivityPath = findMainActivity(baseJavaDirLocation) || findMainActivity('app/src/main/java');
+    if (mainActivityPath) {
+      const content = fs.readFileSync(mainActivityPath, 'utf8');
+      const match = content.match(/package\\s+([^;\\s]+)/);
+      if (match) {
+        locatedJavaPackage = match[1].trim();
+        console.log(`[BULLETPROOF] Located current package directly from ${path.basename(mainActivityPath)}: ${locatedJavaPackage}`);
+      }
+    }
+  } catch (e) {
+    console.log('[BULLETPROOF] Error detecting package from source files:', e);
+  }
+}
+
+if (locatedJavaPackage) {
+  originalPackage = locatedJavaPackage;
+  console.log("[BULLETPROOF] Overriding originalPackage with the true filesystem package: " + originalPackage);
 }
 
 if (!originalPackage) {
@@ -216,10 +270,11 @@ for (const baseJavaDir of baseJavaDirs) {
       
       for (const file of javaKotlinFiles) {
         let content = fs.readFileSync(file, 'utf8');
-        if (content.includes("package " + originalPackage)) {
-          content = content.split("package " + originalPackage).join("package " + uniqueAppId);
+        const packageRegex = new RegExp('package\\s+' + originalPackage.replace(/\./g, '\\.') + '\\s*;?');
+        if (packageRegex.test(content)) {
+          content = content.replace(packageRegex, "package " + uniqueAppId + ";");
           fs.writeFileSync(file, content, 'utf8');
-          console.log("Rewrote Package Declaration inside source: " + file);
+          console.log("Rewrote Package Declaration inside source (bulletproof regex): " + file);
         }
       }
 
