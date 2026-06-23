@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "Telugu Akshara",
+  "appName": "WordDash",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
