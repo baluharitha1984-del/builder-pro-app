@@ -3,587 +3,345 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniFlow Focus & Tasks</title>
+  <title>OmniTest Sandbox Suite</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col md:flex-row">
-  <!-- Sidebar Navigation -->
-  <aside class="w-full md:w-64 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col justify-between shrink-0">
-    <div>
-      <!-- Logo Area -->
-      <div class="p-6 flex items-center gap-3 border-b border-slate-800">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-white">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+  <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20">
+          <svg class="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
           </svg>
         </div>
         <div>
-          <h1 class="text-lg font-bold tracking-tight text-white">OmniFlow</h1>
-          <span class="text-xs text-indigo-400 font-semibold uppercase tracking-wider">Focus & Tasks</span>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">OmniTest Sandbox</h1>
+          <p class="text-xs text-slate-400">The Ultimate Developer Playroom &amp; Utility Suite</p>
         </div>
       </div>
-
-      <!-- XP Level Indicator -->
-      <div class="p-6 border-b border-slate-800/60 bg-slate-900/50">
-        <div class="flex justify-between items-center mb-2">
-          <span class="text-xs font-semibold text-slate-400">Level <span id="xp-level">1</span></span>
-          <span class="text-xs font-semibold text-indigo-400"><span id="xp-current">0</span> / <span id="xp-next">100</span> XP</span>
-        </div>
-        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
-          <div id="xp-progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full w-0 transition-all duration-500 ease-out"></div>
-        </div>
-        <p class="text-[11px] text-slate-500 mt-2 text-center">Earn XP by finishing tasks and focus sessions!</p>
-      </div>
-
-      <!-- Navigation Links -->
-      <nav class="p-4 space-y-1.5">
-        <button id="nav-dashboard" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-slate-800 text-white shadow-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M7.5 21h12a1.125 1.125 0 001.125-1.125V9.75M8.25 21h8.25" /></svg>
-          Dashboard
+      <div class="flex items-center space-x-3">
+        <button id="btn-quick-toast" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition-all flex items-center space-x-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+          <span>Sandbox Active</span>
         </button>
-        <button id="nav-kanban" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/50">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 4.5v15m6-15v15m-10.5-3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
-          Kanban Board
-        </button>
-        <button id="nav-timer" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/50">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          Focus Timer & Sounds
-        </button>
-        <button id="nav-habits" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/50">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          Habits & Streaks
-        </button>
-      </nav>
-    </div>
-
-    <!-- Quick Stats Summary -->
-    <div class="p-4 border-t border-slate-800">
-      <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/80">
-        <div class="flex justify-between text-xs text-slate-400 mb-1">
-          <span>Focus Session Streak</span>
-          <span class="text-amber-500 font-semibold flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.317.766-.699 1.83-1.01 3.007a12.44 12.44 0 01-.383-2.19c-.027-.354-.053-.826-.319-1.12a1 1 0 00-1.286-.192c-.262.18-.487.445-.661.73a7.24 7.24 0 00-.731 1.648c-.297.947-.447 1.937-.447 2.924a6 6 0 1012 0c0-1.887-.918-3.475-2.21-4.574z" clip-rule="evenodd"></path></svg>
-            <span id="streak-count">3 days</span>
-          </span>
-        </div>
-        <div class="flex justify-between text-xs text-slate-400">
-          <span>XP Multiplier</span>
-          <span class="text-emerald-400 font-semibold">1.2x Active</span>
-        </div>
       </div>
     </div>
-  </aside>
+  </header>
 
   <!-- Main Workspace -->
-  <main class="flex-1 flex flex-col min-w-0 bg-slate-950">
-    
-    <!-- Header / Global Actions -->
-    <header class="bg-slate-900/60 backdrop-blur-md border-b border-slate-800 p-4 flex items-center justify-between sticky top-0 z-30">
-      <div class="flex items-center gap-3">
-        <h2 id="view-title" class="text-xl font-bold tracking-tight text-white">Overview Dashboard</h2>
-      </div>
-      <div class="flex items-center gap-3">
-        <!-- Live Notification System Toast-like feedback area -->
-        <div id="toast-pill" class="hidden items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20 animate-pulse">
-          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-          <span id="toast-message">Saved successfully!</span>
-        </div>
-
-        <!-- Quick action button -->
-        <button id="btn-quick-task" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-xs font-semibold text-white hover:from-indigo-600 hover:to-violet-700 transition shadow-md shadow-indigo-500/10 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-          New Task
-        </button>
-      </div>
-    </header>
-
-    <!-- Tab Contents Container -->
-    <div class="p-6 max-w-7xl mx-auto w-full flex-1 space-y-6">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 flex flex-col lg:flex-row gap-6 w-full">
+    <!-- Sidebar Navigation -->
+    <aside class="lg:w-64 flex flex-col gap-2 shrink-0">
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-1">Available Sandboxes</p>
+      <button id="nav-regex" class="nav-btn active flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-left text-sm font-medium w-full group">
+        <svg class="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>Regex Engine</span>
+      </button>
       
-      <!-- VIEW 1: DASHBOARD -->
-      <section id="view-content-dashboard" class="tab-content space-y-6">
-        <!-- Welcome Card -->
-        <div class="relative bg-gradient-to-r from-indigo-950 to-slate-900 border border-indigo-900/30 p-6 rounded-2xl overflow-hidden shadow-xl">
-          <div class="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 bg-indigo-500/10 rounded-full blur-3xl"></div>
-          <div class="absolute bottom-0 left-1/3 -mb-12 w-64 h-64 bg-violet-500/10 rounded-full blur-3xl"></div>
-          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-indigo-500/20 text-indigo-300">Gamified Focus Engine</span>
-              <h3 class="text-2xl font-bold text-white mt-2">Welcome back, Achiever!</h3>
-              <p class="text-slate-300 text-sm mt-1 max-w-xl">You are maintaining a 3-day streak. Complete your pending tasks to secure your weekend XP multipliers and level up!</p>
+      <button id="nav-json" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-left text-sm font-medium w-full text-slate-400 hover:text-white hover:bg-slate-900/60 group">
+        <svg class="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+        <span>JSON Formatter &amp; Validator</span>
+      </button>
+
+      <button id="nav-contrast" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-left text-sm font-medium w-full text-slate-400 hover:text-white hover:bg-slate-900/60 group">
+        <svg class="w-5 h-5 text-pink-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-3" />
+        </svg>
+        <span>Color Contrast Checker</span>
+      </button>
+
+      <button id="nav-text" class="nav-btn flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all text-left text-sm font-medium w-full text-slate-400 hover:text-white hover:bg-slate-900/60 group">
+        <svg class="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span>Text Utils &amp; Hash</span>
+      </button>
+
+      <div class="mt-auto p-4 rounded-xl bg-slate-900/50 border border-slate-800/80">
+        <h3 class="text-xs font-semibold text-slate-300 mb-1">Testing Metric</h3>
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] text-slate-500">Active Sessions</span>
+          <span class="text-xs font-mono text-emerald-400" id="session-counter">1,402</span>
+        </div>
+        <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+          <div class="bg-indigo-500 h-full w-4/5 rounded-full animate-pulse"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Tab Workspaces Content -->
+    <div class="flex-1 flex flex-col bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 min-h-[550px] overflow-hidden backdrop-blur-sm relative">
+      
+      <!-- PANE 1: REGEX ENGINE -->
+      <div id="pane-regex" class="tab-pane flex flex-col h-full space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-xl font-semibold text-white">Regular Expression Sandbox</h2>
+            <p class="text-xs text-slate-400">Test, evaluate, and extract matches dynamically from custom regex syntax.</p>
+          </div>
+          <div class="flex space-x-2">
+            <button id="btn-regex-sample" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition-all">Insert Sample Text</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="md:col-span-3 flex flex-col gap-1">
+            <label class="text-xs font-semibold text-slate-400">Expression Pattern</label>
+            <div class="relative flex items-center bg-slate-950 rounded-xl border border-slate-800 focus-within:border-indigo-500 transition-colors">
+              <span class="pl-3 text-slate-500 font-mono text-sm">/</span>
+              <input type="text" id="regex-pattern" class="w-full bg-transparent px-2 py-3 text-sm font-mono text-indigo-300 placeholder-slate-600 outline-none" placeholder="([A-Za-z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})" value="">
+              <span class="text-slate-500 font-mono text-sm">/</span>
+              <input type="text" id="regex-flags" class="w-16 bg-transparent px-2 py-3 text-sm font-mono text-purple-300 placeholder-slate-600 outline-none border-l border-slate-850" placeholder="gi" value="g">
             </div>
-            <div class="flex gap-3">
-              <button onclick="window.switchTab('timer')" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-200 text-xs font-semibold hover:bg-slate-750 transition border border-slate-700">Start Focus Session</button>
-              <button onclick="window.switchTab('kanban')" class="px-4 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/10">Manage Kanban</button>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-semibold text-slate-400">Preset Templates</label>
+            <select id="regex-presets" class="bg-slate-950 text-slate-300 border border-slate-800 rounded-xl py-3 px-3 text-sm focus:border-indigo-500 outline-none">
+              <option value="">Custom Pattern...</option>
+              <option value="email">Emails</option>
+              <option value="phone">Phone Numbers (US)</option>
+              <option value="date">YYYY-MM-DD Date</option>
+              <option value="hex">HEX Colors</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-slate-400 flex justify-between"><span>Test String</span> <span id="regex-stats" class="text-slate-500 font-mono font-normal"></span></label>
+            <textarea id="regex-input" class="flex-1 min-h-[160px] bg-slate-950 text-slate-200 p-4 rounded-xl border border-slate-800 font-mono text-sm focus:border-indigo-500 outline-none resize-none" placeholder="Insert testing string context here..."></textarea>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-semibold text-slate-400">Matched Output View</label>
+            <div id="regex-output-preview" class="flex-1 min-h-[160px] bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-sm overflow-y-auto whitespace-pre-wrap leading-relaxed select-text">
+              <span class="text-slate-500 italic">Matches will highlight here in real-time as you type pattern or string...</span>
             </div>
           </div>
         </div>
 
-        <!-- Core Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80 flex items-center gap-4 hover:border-indigo-500/30 transition">
-            <div class="p-3 rounded-xl bg-indigo-500/10 text-indigo-400">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-.621-.504-1.125-1.125-1.125H9.75M8.25 21h8.25" /></svg>
-            </div>
-            <div>
-              <span class="text-xs text-slate-400 block">Tasks Completed</span>
-              <span id="stat-tasks-completed" class="text-xl font-bold text-white">8</span>
-            </div>
+        <!-- Matches Log -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-850">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Extracted Match Groups</h4>
+          <div id="regex-groups-log" class="max-h-36 overflow-y-auto text-xs font-mono space-y-1.5 text-slate-300 divide-y divide-slate-900">
+            <p class="text-slate-500 italic">No capture matches retrieved yet.</p>
           </div>
-          
-          <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80 flex items-center gap-4 hover:border-violet-500/30 transition">
-            <div class="p-3 rounded-xl bg-violet-500/10 text-violet-400">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div>
-              <span class="text-xs text-slate-400 block">Total Focus Time</span>
-              <span id="stat-focus-time" class="text-xl font-bold text-white">145 min</span>
-            </div>
-          </div>
+        </div>
+      </div>
 
-          <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80 flex items-center gap-4 hover:border-pink-500/30 transition">
-            <div class="p-3 rounded-xl bg-pink-500/10 text-pink-400">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" /></svg>
-            </div>
-            <div>
-              <span class="text-xs text-slate-400 block">Current Streak</span>
-              <span id="stat-streak-val" class="text-xl font-bold text-white">3 Days</span>
-            </div>
+      <!-- PANE 2: JSON FORMATTER & VALIDATOR -->
+      <div id="pane-json" class="tab-pane hidden flex flex-col h-full space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-xl font-semibold text-white">JSON Formatter, Validator &amp; Beautifier</h2>
+            <p class="text-xs text-slate-400">Beautify messy JSON payloads, minify payloads, and instantly highlight schema syntax errors.</p>
           </div>
-
-          <div class="bg-slate-900 p-5 rounded-xl border border-slate-800/80 flex items-center gap-4 hover:border-emerald-500/30 transition">
-            <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div>
-              <span class="text-xs text-slate-400 block">Habit Completion</span>
-              <span id="stat-habit-rate" class="text-xl font-bold text-white">75%</span>
-            </div>
+          <div class="flex space-x-2">
+            <button id="btn-json-sample" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition-all">Insert Dirty JSON</button>
           </div>
         </div>
 
-        <!-- Main Split Screen -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Mini Kanban / Immediate Tasks -->
-          <div class="lg:col-span-2 bg-slate-900 border border-slate-800/80 rounded-2xl p-6">
-            <div class="flex justify-between items-center mb-4">
-              <div>
-                <h4 class="text-md font-bold text-white">Top Focus Tasks</h4>
-                <p class="text-xs text-slate-400">Items marked as In-Progress</p>
-              </div>
-              <button onclick="window.switchTab('kanban')" class="text-xs text-indigo-400 font-semibold hover:underline">Manage Kanban &rarr;</button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-400">Raw Input JSON</label>
+              <span id="json-validation-status" class="text-xs font-semibold text-slate-500 bg-slate-950 px-2 py-0.5 rounded-md border border-slate-800">Idle</span>
             </div>
-
-            <!-- Quick Task Injector (Compact view) -->
-            <div id="dashboard-tasks-container" class="space-y-2.5 max-h-[310px] overflow-y-auto pr-1">
-              <!-- Script-injected mini cards -->
+            <textarea id="json-input" class="flex-1 min-h-[250px] bg-slate-950 text-slate-200 p-4 rounded-xl border border-slate-800 font-mono text-sm focus:border-emerald-500 outline-none resize-none" placeholder="Paste minified or broken JSON here..."></textarea>
+            <div class="flex gap-2">
+              <button id="btn-json-beautify" class="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-lg text-xs transition-colors shadow-lg shadow-emerald-600/10">Format &amp; Beautify</button>
+              <button id="btn-json-minify" class="py-2.5 px-4 bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition-colors">Minify Payload</button>
             </div>
           </div>
-
-          <!-- Daily Habits Mini Widget -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-6 flex flex-col justify-between">
-            <div>
-              <div class="flex justify-between items-center mb-4">
-                <div>
-                  <h4 class="text-md font-bold text-white">Daily Habits</h4>
-                  <p class="text-xs text-slate-400">Maintain consistency</p>
-                </div>
-                <button onclick="window.switchTab('habits')" class="text-xs text-indigo-400 font-semibold hover:underline">View All</button>
-              </div>
-              
-              <div id="dashboard-habits-list" class="space-y-3">
-                <!-- Habits injected here -->
-              </div>
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-slate-400">Validated Formatted Output</label>
+              <button id="btn-json-copy" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded border border-slate-850 hover:border-slate-700 transition-colors">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                Copy Output
+              </button>
             </div>
-
-            <div class="mt-4 pt-4 border-t border-slate-800/80">
-              <div class="bg-slate-950 p-3 rounded-xl border border-slate-850 text-center">
-                <p class="text-[11px] text-slate-400">💡 Habits unlock massive XP bonuses once ticked off daily before 12:00 AM.</p>
-              </div>
+            <pre id="json-output" class="flex-1 min-h-[250px] bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-sm overflow-auto text-emerald-400 select-text leading-relaxed"></pre>
+            <div class="text-xs text-slate-500 flex justify-between px-1">
+              <span>Supports complex arrays, deep nests, numbers &amp; booleans</span>
+              <span id="json-output-lines">0 lines</span>
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- Performance Overview (Charts & Feed) -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Weekly Focus Distribution Chart -->
-          <div class="lg:col-span-2 bg-slate-900 border border-slate-800/80 rounded-2xl p-6">
-            <h4 class="text-md font-bold text-white mb-1">Weekly Focus Activity</h4>
-            <p class="text-xs text-slate-400 mb-6">Distribution of study sessions (minutes per day)</p>
-            
-            <div class="flex justify-between items-end h-40 gap-2 px-2 border-b border-slate-800 pb-2">
-              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div class="w-full bg-slate-800 rounded-md overflow-hidden relative group h-[30%]">
-                  <div class="bg-indigo-500/80 group-hover:bg-indigo-400 absolute bottom-0 left-0 right-0 h-full transition-all duration-300"></div>
-                  <span class="absolute inset-x-0 bottom-2 text-center text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">15m</span>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Mon</span>
-              </div>
-              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div class="w-full bg-slate-800 rounded-md overflow-hidden relative group h-[60%]">
-                  <div class="bg-indigo-500/80 group-hover:bg-indigo-400 absolute bottom-0 left-0 right-0 h-full transition-all duration-300"></div>
-                  <span class="absolute inset-x-0 bottom-2 text-center text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">30m</span>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Tue</span>
-              </div>
-              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div class="w-full bg-slate-800 rounded-md overflow-hidden relative group h-[45%]">
-                  <div class="bg-indigo-500/80 group-hover:bg-indigo-400 absolute bottom-0 left-0 right-0 h-full transition-all duration-300"></div>
-                  <span class="absolute inset-x-0 bottom-2 text-center text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">22m</span>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Wed</span>
-              </div>
-              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div class="w-full bg-slate-800 rounded-md overflow-hidden relative group h-[90%]">
-                  <div class="bg-gradient-to-t from-indigo-500 to-purple-500 absolute bottom-0 left-0 right-0 h-full transition-all duration-300"></div>
-                  <span class="absolute inset-x-0 bottom-2 text-center text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">45m</span>
-                </div>
-                <span class="text-[10px] text-indigo-400 font-bold">Thu (Today)</span>
-              </div>
-              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div class="w-full bg-slate-800 rounded-md overflow-hidden relative group h-[20%]">
-                  <div class="bg-slate-700 group-hover:bg-slate-600 absolute bottom-0 left-0 right-0 h-full transition-all duration-300"></div>
-                  <span class="absolute inset-x-0 bottom-2 text-center text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">10m</span>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Fri</span>
-              </div>
-              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div class="w-full bg-slate-800 rounded-md overflow-hidden relative group h-[10%]">
-                  <div class="bg-slate-700 group-hover:bg-slate-600 absolute bottom-0 left-0 right-0 h-full transition-all duration-300"></div>
-                  <span class="absolute inset-x-0 bottom-2 text-center text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">5m</span>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Sat</span>
-              </div>
-              <div class="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                <div class="w-full bg-slate-800 rounded-md overflow-hidden relative group h-[15%]">
-                  <div class="bg-slate-700 group-hover:bg-slate-600 absolute bottom-0 left-0 right-0 h-full transition-all duration-300"></div>
-                  <span class="absolute inset-x-0 bottom-2 text-center text-[10px] font-bold text-white opacity-0 group-hover:opacity-100 transition-opacity">8m</span>
-                </div>
-                <span class="text-[10px] text-slate-400 font-medium">Sun</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Live Event Feed / Gamified Activity Logger -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h4 class="text-md font-bold text-white">Adventure Feed</h4>
-              <button id="btn-clear-feed" class="text-[10px] text-slate-500 hover:text-red-400 transition">Clear</button>
-            </div>
-            <div id="activity-feed" class="space-y-3 max-h-40 overflow-y-auto text-xs">
-              <!-- Script-injected real live micro achievements -->
-            </div>
+      <!-- PANE 3: COLOR CONTRAST CHECKER -->
+      <div id="pane-contrast" class="tab-pane hidden flex flex-col h-full space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-xl font-semibold text-white">WCAG Contrast Ratio Validator</h2>
+            <p class="text-xs text-slate-400">Validate color combinations for real-time digital accessibility &amp; UI standards.</p>
           </div>
         </div>
-      </section>
 
-
-      <!-- VIEW 2: KANBAN BOARD -->
-      <section id="view-content-kanban" class="tab-content hidden space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-900 p-4 rounded-xl border border-slate-800">
-          <div class="flex gap-2">
-            <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5">
-              <span class="h-2 w-2 rounded-full bg-indigo-500"></span>
-              Active Tasks: <strong id="lbl-active-task-count">3</strong>
-            </span>
-            <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5">
-              <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-              Completed Today: <strong id="lbl-completed-task-count">2</strong>
-            </span>
-          </div>
-          <button id="btn-trigger-add-task" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/10 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-            Create New Task
-          </button>
-        </div>
-
-        <!-- Kanban Layout -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          <!-- TODO COLUMN -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col min-h-[450px]">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-              <div class="flex items-center gap-2">
-                <span class="h-2.5 w-2.5 rounded-full bg-indigo-500 shadow-md shadow-indigo-500/50"></span>
-                <h5 class="font-bold text-sm text-white">To Do</h5>
-              </div>
-              <span id="todo-badge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-bold">1</span>
-            </div>
-            <div id="column-todo" class="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-1">
-              <!-- Task Card Template -->
-            </div>
-          </div>
-
-          <!-- IN PROGRESS COLUMN -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col min-h-[450px]">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-              <div class="flex items-center gap-2">
-                <span class="h-2.5 w-2.5 rounded-full bg-amber-500 shadow-md shadow-amber-500/50"></span>
-                <h5 class="font-bold text-sm text-white">In Progress</h5>
-              </div>
-              <span id="inprogress-badge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-bold">1</span>
-            </div>
-            <div id="column-inprogress" class="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-1">
-              <!-- Card items generated dynamically -->
-            </div>
-          </div>
-
-          <!-- DONE COLUMN -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 flex flex-col min-h-[450px]">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
-              <div class="flex items-center gap-2">
-                <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/50"></span>
-                <h5 class="font-bold text-sm text-white">Done</h5>
-              </div>
-              <span id="done-badge" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-bold">1</span>
-            </div>
-            <div id="column-done" class="space-y-3 flex-1 overflow-y-auto max-h-[500px] pr-1">
-              <!-- Card items generated dynamically -->
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-
-      <!-- VIEW 3: FOCUS TIMER & AUDIO -->
-      <section id="view-content-timer" class="tab-content hidden space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <!-- Timer Mechanics Panel -->
-          <div class="lg:col-span-2 bg-slate-900 border border-slate-800/80 rounded-2xl p-8 flex flex-col items-center justify-center relative overflow-hidden">
-            <!-- Space Backdrop SVG in top corner -->
-            <div class="absolute top-0 right-0 text-indigo-500/5 opacity-25 p-4">
-              <svg class="w-48 h-48" viewBox="0 0 100 100" fill="currentColor"><circle cx="50" cy="50" r="40" /><circle cx="30" cy="30" r="5" fill="#fff"/><circle cx="70" cy="60" r="3" fill="#fff"/></svg>
-            </div>
-
-            <!-- Circular Progress Indicator -->
-            <div class="relative w-64 h-64 flex items-center justify-center select-none">
-              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="42" stroke-width="4" stroke="#1e293b" fill="transparent"></circle>
-                <circle id="timer-progress-ring" cx="50" cy="50" r="42" stroke-width="4" stroke="url(#indigo-grad)" fill="transparent" stroke-dasharray="263.89" stroke-dashoffset="0" class="transition-all duration-300 ease-out"></circle>
-                <defs>
-                  <linearGradient id="indigo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#6366f1" />
-                    <stop offset="100%" stop-color="#ec4899" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              
-              <!-- Inner Timer Text -->
-              <div class="absolute flex flex-col items-center">
-                <span id="timer-countdown-text" class="text-5xl font-extrabold tracking-tight text-white">25:00</span>
-                <span id="timer-state-label" class="text-xs text-indigo-400 uppercase tracking-widest font-bold mt-1">Focus Session</span>
-              </div>
-            </div>
-
-            <!-- Timer Fast Presets -->
-            <div class="flex gap-2.5 mt-6 relative z-10">
-              <button onclick="window.setTimerPreset(15, 'Sprint')" class="px-3.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold hover:bg-slate-750 border border-slate-700 transition">15m Sprint</button>
-              <button onclick="window.setTimerPreset(25, 'Standard')" class="px-3.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold hover:bg-slate-750 border border-slate-700 transition">25m Pomodoro</button>
-              <button onclick="window.setTimerPreset(50, 'Extreme')" class="px-3.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white text-xs font-semibold hover:bg-slate-750 border border-slate-700 transition">50m Deep Work</button>
-              <button onclick="window.setTimerPreset(5, 'Short Break')" class="px-3.5 py-1.5 rounded-lg bg-emerald-950/40 text-emerald-400 hover:text-emerald-300 text-xs font-semibold hover:bg-emerald-950 border border-emerald-900/40 transition">5m Break</button>
-            </div>
-
-            <!-- Timer Operational Controls -->
-            <div class="flex items-center gap-4 mt-8 relative z-10">
-              <button id="btn-timer-reset" class="p-3 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white transition border border-slate-700" title="Reset Session">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
-              </button>
-              
-              <button id="btn-timer-toggle" class="w-16 h-16 rounded-full bg-gradient-to-tr from-indigo-500 to-violet-600 text-white flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg shadow-indigo-500/25">
-                <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" /></svg>
-                <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-8 h-8 hidden"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" /></svg>
-              </button>
-              
-              <button id="btn-timer-skip" class="p-3 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-750 hover:text-white transition border border-slate-700" title="Skip Phase">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8.25V18a2.25 2.25 0 002.25 2.25h13.5A2.25 2.25 0 0021 18V8.25m-18 0V6a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 6v2.25m-18 0h18M5.25 6h.008v.008H5.25V6zM7.5 6h.008v.008H7.5V6zm2.25 0h.008v.008H9.75V6z" /></svg>
-              </button>
-            </div>
-          </div>
-
-          <!-- Synthesized Binaural Soundscape Generator -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-6 flex flex-col justify-between">
-            <div>
-              <div class="flex justify-between items-center mb-3">
-                <h4 class="text-md font-bold text-white">Focus Soundscape</h4>
-                <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/20">Synthesized Live</span>
-              </div>
-              <p class="text-xs text-slate-400 mb-6">No network required. Generated right inside your browser with the Web Audio API to boost brainwave entrainment.</p>
-
-              <div class="space-y-4">
-                <!-- Binaural Focus Drone -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                  <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
-                      <span class="h-2 w-2 rounded-full bg-indigo-500 animate-ping"></span>
-                      <label class="text-xs font-semibold text-white">Binaural Focus Tone</label>
-                    </div>
-                    <span id="lbl-vol-binaural" class="text-[10px] text-slate-400 font-bold">Off</span>
-                  </div>
-                  <input id="range-sound-binaural" type="range" min="0" max="1" step="0.05" value="0" class="w-full accent-indigo-500 cursor-pointer bg-slate-800 h-1.5 rounded-lg">
-                  <p class="text-[10px] text-slate-500 mt-1.5">Simulates 40Hz Gamma waves for cognitive sharpness.</p>
+          <!-- Control Column -->
+          <div class="md:col-span-1 space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-850">
+            <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Pick Colors</h3>
+            
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs font-semibold text-slate-400 block mb-1.5">Background Color</label>
+                <div class="flex gap-2">
+                  <input type="color" id="contrast-bg-picker" class="w-10 h-10 rounded-lg cursor-pointer bg-transparent border border-slate-800" value="#1e1b4b">
+                  <input type="text" id="contrast-bg-hex" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 text-sm font-mono text-slate-300 focus:border-indigo-500 outline-none" value="#1e1b4b">
                 </div>
+              </div>
 
-                <!-- Deep Space Ambient Noise -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                  <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
-                      <span class="h-2 w-2 rounded-full bg-violet-500"></span>
-                      <label class="text-xs font-semibold text-white">Deep Cosmic Hum</label>
-                    </div>
-                    <span id="lbl-vol-cosmic" class="text-[10px] text-slate-400 font-bold">Off</span>
-                  </div>
-                  <input id="range-sound-cosmic" type="range" min="0" max="1" step="0.05" value="0" class="w-full accent-violet-500 cursor-pointer bg-slate-800 h-1.5 rounded-lg">
-                  <p class="text-[10px] text-slate-500 mt-1.5">A smooth, rich low-frequency synthesizer sweep.</p>
-                </div>
-
-                <!-- Forest Rain Synthesizer -->
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-                  <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
-                      <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                      <label class="text-xs font-semibold text-white">Synthesized Rain</label>
-                    </div>
-                    <span id="lbl-vol-rain" class="text-[10px] text-slate-400 font-bold">Off</span>
-                  </div>
-                  <input id="range-sound-rain" type="range" min="0" max="1" step="0.05" value="0" class="w-full accent-emerald-500 cursor-pointer bg-slate-800 h-1.5 rounded-lg">
-                  <p class="text-[10px] text-slate-500 mt-1.5">Dynamic white-noise filtration mimicking fresh rainfall.</p>
+              <div>
+                <label class="text-xs font-semibold text-slate-400 block mb-1.5">Text Color</label>
+                <div class="flex gap-2">
+                  <input type="color" id="contrast-fg-picker" class="w-10 h-10 rounded-lg cursor-pointer bg-transparent border border-slate-800" value="#c7d2fe">
+                  <input type="text" id="contrast-fg-hex" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 text-sm font-mono text-slate-300 focus:border-indigo-500 outline-none" value="#c7d2fe">
                 </div>
               </div>
             </div>
 
-            <div class="mt-6">
-              <button id="btn-kill-sounds" class="w-full py-2 bg-slate-800 hover:bg-red-900/30 text-slate-400 hover:text-red-300 rounded-xl text-xs font-semibold transition border border-slate-700 hover:border-red-900/40">
-                Emergency Ambient Mute
-              </button>
+            <div class="pt-2 border-t border-slate-850 space-y-2">
+              <label class="text-xs font-semibold text-slate-400 block">Quick Swatches</label>
+              <div class="flex flex-wrap gap-1.5">
+                <button class="swatch-btn px-2 py-1 text-[11px] font-mono rounded bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300" data-bg="#0f172a" data-fg="#38bdf8">Sky Slate</button>
+                <button class="swatch-btn px-2 py-1 text-[11px] font-mono rounded bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300" data-bg="#111827" data-fg="#f3f4f6">Gray Dark</button>
+                <button class="swatch-btn px-2 py-1 text-[11px] font-mono rounded bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300" data-bg="#ec4899" data-fg="#ffffff">Pink Light</button>
+                <button class="swatch-btn px-2 py-1 text-[11px] font-mono rounded bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300" data-bg="#16a34a" data-fg="#1e1b4b">Green Deep</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Output Preview & Compliance Column -->
+          <div class="md:col-span-2 flex flex-col gap-4">
+            <!-- Live Preview Box -->
+            <div id="contrast-preview-box" class="p-6 rounded-2xl border flex flex-col justify-center min-h-[140px] transition-colors duration-150">
+              <h4 id="contrast-preview-title" class="text-lg font-bold mb-1">The quick brown fox jumps over the lazy dog.</h4>
+              <p id="contrast-preview-desc" class="text-xs leading-relaxed opacity-90">Accessibility is not a feature, it's a fundamental element of stellar design.</p>
+            </div>
+
+            <!-- Ratio Card & Statuses -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex flex-col justify-center items-center">
+                <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Contrast Ratio</span>
+                <span id="contrast-ratio-result" class="text-3xl font-extrabold font-mono text-white mt-1">0.0:1</span>
+              </div>
+
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex flex-col justify-center">
+                <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Normal Text (WCAG AA)</span>
+                <div class="flex items-center space-x-2">
+                  <span id="badge-normal-aa" class="w-3 h-3 rounded-full bg-slate-800"></span>
+                  <span id="text-normal-aa" class="text-xs font-semibold text-slate-400">Evaluating</span>
+                </div>
+                <span class="text-[9px] text-slate-600 mt-0.5">Requires contrast &ge; 4.5:1</span>
+              </div>
+
+              <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 flex flex-col justify-center">
+                <span class="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-1">Large Text (WCAG AAA)</span>
+                <div class="flex items-center space-x-2">
+                  <span id="badge-large-aaa" class="w-3 h-3 rounded-full bg-slate-800"></span>
+                  <span id="text-large-aaa" class="text-xs font-semibold text-slate-400">Evaluating</span>
+                </div>
+                <span class="text-[9px] text-slate-600 mt-0.5">Requires contrast &ge; 4.5:1</span>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-
-      <!-- VIEW 4: HABITS & STREAKS -->
-      <section id="view-content-habits" class="tab-content hidden space-y-6">
-        <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-6">
-          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div>
-              <h4 class="text-lg font-bold text-white">Continuous Habits</h4>
-              <p class="text-xs text-slate-400">Micro habits build massive lives. Tap to toggle completion status today.</p>
-            </div>
-            <button id="btn-trigger-add-habit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/10 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-              New Habit
-            </button>
-          </div>
-
-          <!-- Dynamic Habit Board Grid -->
-          <div id="habits-board-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- Dynamic habit items here -->
+      <!-- PANE 4: TEXT UTILS & HASH -->
+      <div id="pane-text" class="tab-pane hidden flex flex-col h-full space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 class="text-xl font-semibold text-white">Text Processing &amp; Encoding Utilities</h2>
+            <p class="text-xs text-slate-400">Perform bulk mutations, base64 conversions, or verify text character length parameters instantly.</p>
           </div>
         </div>
 
-        <!-- Streak Booster Explanation / Tips -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden">
-          <h4 class="text-md font-bold text-white mb-2">Streak Multipliers Mechanics</h4>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-400">
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-              <span class="text-lg font-bold text-indigo-400 block mb-1">Level Up Rewards</span>
-              <span>Unlocks unique sound synthesizer variables and custom XP frames at Levels 3, 5, and 10!</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
+          <!-- Workspace Form -->
+          <div class="md:col-span-2 flex flex-col gap-3">
+            <label class="text-xs font-semibold text-slate-400">Input String Field</label>
+            <textarea id="utils-input" class="flex-1 min-h-[160px] bg-slate-950 text-slate-200 p-4 rounded-xl border border-slate-800 font-mono text-sm focus:border-amber-500 outline-none resize-none" placeholder="Insert string for conversion...">Hello Test Sandbox!</textarea>
+            
+            <!-- Action Buttons Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button id="btn-utils-upper" class="py-2 px-3 bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition-colors">UPPERCASE</button>
+              <button id="btn-utils-lower" class="py-2 px-3 bg-slate-800 hover:bg-slate-750 text-slate-200 rounded-lg text-xs font-semibold border border-slate-700 transition-colors">lowercase</button>
+              <button id="btn-utils-base64-enc" class="py-2 px-3 bg-amber-600 hover:bg-amber-500 text-slate-950 rounded-lg text-xs font-bold transition-colors shadow-lg shadow-amber-600/10">Base64 Enc</button>
+              <button id="btn-utils-base64-dec" class="py-2 px-3 bg-purple-600 hover:bg-purple-500 text-slate-100 rounded-lg text-xs font-semibold transition-colors shadow-lg shadow-purple-600/10">Base64 Dec</button>
             </div>
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-              <span class="text-lg font-bold text-violet-400 block mb-1">3+ Day Hot Streak</span>
-              <span>Gives you a static 1.2x multiplier to all generated focus values. Currently: <strong class="text-emerald-400">Active</strong>.</span>
+          </div>
+
+          <!-- Right Side Metrics & Fast Hash -->
+          <div class="space-y-4 flex flex-col justify-between">
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+              <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Live String Metrics</h3>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
+                  <p class="text-[10px] text-slate-500">Characters</p>
+                  <p id="util-metric-chars" class="text-lg font-bold font-mono text-slate-200">19</p>
+                </div>
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
+                  <p class="text-[10px] text-slate-500">Words</p>
+                  <p id="util-metric-words" class="text-lg font-bold font-mono text-slate-200">3</p>
+                </div>
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
+                  <p class="text-[10px] text-slate-500">Lines</p>
+                  <p id="util-metric-lines" class="text-lg font-bold font-mono text-slate-200">1</p>
+                </div>
+                <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800/80">
+                  <p class="text-[10px] text-slate-500">Total Bytes</p>
+                  <p id="util-metric-bytes" class="text-lg font-bold font-mono text-slate-200">19 B</p>
+                </div>
+              </div>
             </div>
-            <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-              <span class="text-lg font-bold text-pink-400 block mb-1">Clean Slates</span>
-              <span>Habits automatically reset at midnight. Keep checking them off daily to avoid streak freeze damage.</span>
+
+            <div class="bg-slate-950 p-4 rounded-xl border border-slate-850 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">SHA-256 Signature</h3>
+                <span class="text-[9px] bg-slate-900 text-indigo-400 px-1.5 py-0.5 rounded">WebCrypto API</span>
+              </div>
+              <p id="util-hash-output" class="text-xs font-mono break-all text-indigo-300 bg-slate-900 p-2.5 rounded-lg border border-slate-800">Input text above to calculate hash signature...</p>
             </div>
           </div>
         </div>
-      </section>
+
+        <div class="mt-2">
+          <label class="text-xs font-semibold text-slate-400 block mb-1">Processed Output Preview</label>
+          <div class="relative">
+            <input type="text" id="utils-output-field" readonly class="w-full bg-slate-950 text-slate-200 px-3 py-3 rounded-xl border border-slate-800 font-mono text-sm outline-none focus:border-amber-500" placeholder="Processed result highlights here...">
+            <button id="btn-utils-copy" class="absolute right-2.5 top-2 bg-slate-800 hover:bg-slate-750 text-xs px-2.5 py-1 rounded text-slate-300 border border-slate-700 hover:text-white transition-all">Copy</button>
+          </div>
+        </div>
+      </div>
 
     </div>
   </main>
-</div>
 
-<!-- MODAL: ADD TASK -->
-<div id="modal-add-task" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-scaleUp">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-bold text-white">New Task Creation</h3>
-      <button id="btn-close-task-modal" class="text-slate-400 hover:text-white transition">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-      </button>
-    </div>
-    
-    <form id="form-add-task" class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Task Title *</label>
-        <input id="input-task-title" type="text" placeholder="e.g., Wireframe user journey" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Description</label>
-        <textarea id="input-task-desc" rows="2.5" placeholder="Provide brief details of your deliverable..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition"></textarea>
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Column</label>
-          <select id="input-task-column" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-            <option value="todo">To Do</option>
-            <option value="inprogress">In Progress</option>
-            <option value="done">Done</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-400 mb-1.5">Priority</label>
-          <select id="input-task-priority" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-            <option value="high">🔥 High Priority</option>
-            <option value="medium" selected>⚡ Medium</option>
-            <option value="low">☕ Low</option>
-          </select>
-        </div>
-      </div>
-      <div class="pt-2 flex justify-end gap-3">
-        <button type="button" id="btn-cancel-task" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold transition border border-slate-700">Cancel</button>
-        <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-lg shadow-indigo-500/20">Create Task</button>
-      </div>
-    </form>
-  </div>
-</div>
+  <!-- Global Real-Time Toast Alerts Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<!-- MODAL: ADD HABIT -->
-<div id="modal-add-habit" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-  <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-scaleUp">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-bold text-white">Establish Daily Habit</h3>
-      <button id="btn-close-habit-modal" class="text-slate-400 hover:text-white transition">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-      </button>
+  <!-- Footer -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p class="text-xs text-slate-500">&copy; OmniTest Sandbox Suite. Built for rapid front-end verification &amp; dynamic analytics.</p>
+      <div class="flex space-x-4 text-xs text-slate-400">
+        <span class="hover:text-white transition-colors">Client-Side Encrypted</span>
+        <span class="text-slate-700">|</span>
+        <span class="hover:text-white transition-colors">Vanilla JS Core</span>
+      </div>
     </div>
-    
-    <form id="form-add-habit" class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Habit Title *</label>
-        <input id="input-habit-title" type="text" placeholder="e.g., Code for 45 mins" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-      </div>
-      <div>
-        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Category Icon/Color Theme</label>
-        <select id="input-habit-theme" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition">
-          <option value="indigo">⚡ Indigo (Deep Work)</option>
-          <option value="emerald">🍏 Emerald (Wellness)</option>
-          <option value="amber">🔥 Amber (Routine)</option>
-          <option value="pink">💖 Pink (Personal Development)</option>
-        </select>
-      </div>
-      <div class="pt-2 flex justify-end gap-3">
-        <button type="button" id="btn-cancel-habit" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-300 text-xs font-semibold transition border border-slate-700">Cancel</button>
-        <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition shadow-lg shadow-indigo-500/20">Add Habit</button>
-      </div>
-    </form>
-  </div>
+  </footer>
 </div>
   
   <script src="script.js"></script>
