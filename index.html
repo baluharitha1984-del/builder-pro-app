@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telugu Akshara</title>
+  <title>WordDash</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-50 p-6 md:p-12 font-sans text-slate-900"><header class="max-w-3xl mx-auto mb-12 text-center"><h1 class="text-4xl font-extrabold tracking-tight mb-2 text-indigo-700">Telugu Akshara</h1><p class="text-slate-500">Master Telugu Vocabulary with a dynamic word generation game</p></header><main class="max-w-2xl mx-auto"><div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100"><div id="game-container" class="space-y-6"><div class="text-center py-8"><div id="word-display" class="text-5xl font-bold text-slate-800 tracking-wider mb-2">---</div><div class="text-sm uppercase tracking-widest text-indigo-400 font-semibold">Generate a Telugu Word</div></div><div class="flex justify-center gap-4"><button id="generate-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full font-semibold transition-all transform hover:scale-105 active:scale-95 shadow-lg">Generate Word</button><button id="reset-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-full font-semibold transition-all">Reset</button></div><div id="history-section" class="mt-8 border-t border-slate-100 pt-6"><h3 class="text-lg font-semibold mb-3">Generation History</h3><ul id="history-list" class="space-y-2"></ul></div></div></div></main></div>
+  <div class="min-h-screen bg-slate-50 p-4 md:p-8 flex flex-col items-center"><header class="mb-8 text-center"><h1 class="text-4xl font-extrabold text-slate-900">WordDash</h1><p class="text-slate-500">Guess the secret 5-letter word</p></header><div id="game-board" class="grid grid-rows-6 gap-2 mb-8"></div><div class="w-full max-w-sm"><div id="message-area" class="h-12 mb-4 text-center font-bold text-lg"></div><div class="flex gap-2"><input type="text" id="word-input" maxlength="5" class="w-full p-4 text-2xl border-2 border-slate-200 rounded-xl uppercase tracking-widest text-center focus:border-indigo-500 outline-none" placeholder="ENTER WORD"><button id="submit-btn" class="bg-indigo-600 text-white px-6 rounded-xl font-bold hover:bg-indigo-700 transition-colors">GUESS</button></div></div></div>
   
   <script src="script.js"></script>
 </body>
