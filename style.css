@@ -1,43 +1,64 @@
-/* Customized visual animations & glassmorphic aesthetics */
-@keyframes scaleUp {
+/* Customized Active Transitions for tabs */
+.nav-btn {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-btn.active {
+  background-color: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  color: #ffffff;
+}
+
+.nav-btn:not(.active) {
+  border: 1px solid transparent;
+}
+
+.tab-pane {
+  animation: paneFadeIn 0.3s ease-out forwards;
+}
+
+@keyframes paneFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0);
   }
 }
 
-.animate-scaleUp {
-  animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Custom scrollbars */
+/* Custom scrollbar to keep layout modern and sleek */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.5);
+  background: #020617;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(71, 85, 105, 0.5);
+  background: #1e293b;
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
+  background: #334155;
 }
 
-/* Interactive scale and transition presets */
-.card-hover {
-  transition: all 0.2s ease;
+/* Highlight classes for RegEx matching */
+.regex-highlight {
+  background-color: rgba(99, 102, 241, 0.25);
+  border-bottom: 2px solid #818cf8;
+  border-radius: 2px;
+  color: #e0e7ff;
+  font-weight: 500;
 }
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.25);
+
+.regex-group-badge {
+  font-size: 10px;
+  background-color: #312e81;
+  color: #c7d2fe;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-right: 4px;
 }
