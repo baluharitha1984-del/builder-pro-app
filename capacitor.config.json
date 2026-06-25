@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "WordDash",
+  "appName": "Retro Neon Clock",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
