@@ -113,14 +113,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: RetroNeonClock-debug-apk
+          name: ZenGridCalendar-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: RetroNeonClock-release-aab
+          name: ZenGridCalendar-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
