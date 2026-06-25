@@ -1,1 +1,50 @@
-let currentMonth = new Date().getMonth(); let currentYear = new Date().getFullYear(); const events = {}; const renderCalendar = () => { const grid = document.getElementById('calendar-grid'); const monthDisplay = document.getElementById('month-display'); grid.innerHTML = ''; const date = new Date(currentYear, currentMonth, 1); const firstDay = date.getDay(); const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate(); monthDisplay.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' }); for(let i = 0; i < firstDay; i++) { grid.appendChild(document.createElement('div')); } for(let i = 1; i <= daysInMonth; i++) { const dayEl = document.createElement('div'); dayEl.className = 'calendar-day p-2 bg-white border border-slate-200 rounded-xl cursor-pointer'; dayEl.innerHTML = `<span class="text-xs font-bold">${i}</span><div id="events-${i}" class="mt-1 space-y-1"></div>`; dayEl.onclick = () => openModal(i); grid.appendChild(dayEl); } }; const openModal = (day) => { document.getElementById('modal-date').textContent = `Add event for ${day} ${new Date(currentYear, currentMonth).toLocaleString('default', {month:'long'})}`; document.getElementById('event-modal').classList.remove('hidden'); window.selectedDay = day; }; document.getElementById('close-modal').onclick = () => document.getElementById('event-modal').classList.add('hidden'); document.getElementById('save-event').onclick = () => { const input = document.getElementById('event-input'); if(!input.value) return; const container = document.getElementById(`events-${window.selectedDay}`); container.innerHTML += `<div class="event-pill">${input.value}</div>`; input.value = ''; document.getElementById('event-modal').classList.add('hidden'); }; document.getElementById('prev-btn').onclick = () => { currentMonth--; if(currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); }; document.getElementById('next-btn').onclick = () => { currentMonth++; if(currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); }; renderCalendar();
+// Interactive Neon Clock Mechanics
+
+function updateClock() {
+  const now = new Date();
+  
+  // Hours
+  let hours = now.getHours();
+  const ampmStr = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // convert 0 to 12
+  const hoursStr = String(hours).padStart(2, '0');
+  
+  // Minutes / Seconds
+  const minutesStr = String(now.getMinutes()).padStart(2, '0');
+  const secondsStr = String(now.getSeconds()).padStart(2, '0');
+  
+  // Update elements
+  document.getElementById('hours').innerText = hoursStr;
+  document.getElementById('minutes').innerText = minutesStr;
+  document.getElementById('seconds').innerText = secondsStr;
+  document.getElementById('ampm').innerText = ampmStr;
+  
+  // Format Date beautifully
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const dateStr = now.toLocaleDateString(undefined, options);
+  document.getElementById('date').innerText = dateStr;
+}
+
+// Run immediately & set interval
+updateClock();
+setInterval(updateClock, 1000);
+
+// Interaction functions
+let swirlPaused = false;
+function toggleAnimation() {
+  swirlPaused = !swirlPaused;
+  const orbs = document.querySelectorAll('.glow-orb');
+  orbs.forEach(orb => {
+    orb.style.animationPlayState = swirlPaused ? 'paused' : 'running';
+  });
+  
+  const title = document.querySelector('.header-title');
+  title.innerText = swirlPaused ? "SWIRL PAUSED" : "LIVE NEON CLOCK";
+}
+
+function changeTheme() {
+  document.body.classList.toggle('light-theme');
+  const isLight = document.body.classList.contains('light-theme');
+  console.log("Visual atmosphere set to: " + (isLight ? "Daylight Mode" : "Cosmic Dark Mode"));
+}
