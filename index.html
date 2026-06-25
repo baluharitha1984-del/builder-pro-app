@@ -3,40 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retro Neon Clock</title>
+  <title>ZenGrid Calendar</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Retro Digital Glowing Neon Clock -->
-<div class="clock-container">
-  <div class="glow-orb"></div>
-  <div class="glow-orb secondary"></div>
-  
-  <div class="glass-board">
-    <div class="app-header">
-      <span class="status-dot"></span>
-      <span class="header-title">LIVE NEON CLOCK</span>
-    </div>
-    
-    <div class="time-display">
-      <span id="hours">00</span>
-      <span class="colon">:</span>
-      <span id="minutes">00</span>
-      <span class="colon">:</span>
-      <span id="seconds">00</span>
-      <span id="ampm" class="ampm">AM</span>
-    </div>
-    
-    <div class="date-display" id="date">Loading Today's Date...</div>
-    
-    <div class="controls-row">
-      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
-      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
-    </div>
-  </div>
-</div>
+  <div class="min-h-screen bg-slate-50 p-4 md:p-8"><header class="mb-8 flex justify-between items-center"><h1 class="text-3xl font-bold text-slate-900" id="month-display">Loading...</h1><div class="flex gap-2"><button id="prev-btn" class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition shadow-sm">Previous</button><button id="next-btn" class="px-4 py-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition shadow-sm">Next</button></div></header><div class="grid grid-cols-7 gap-2 mb-2 text-center text-sm font-semibold text-slate-500"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div id="calendar-grid" class="grid grid-cols-7 gap-2"></div><div id="event-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4"><div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-xl"><h2 class="text-xl font-bold mb-4" id="modal-date">Add Event</h2><input type="text" id="event-input" class="w-full p-3 border border-slate-200 rounded-xl mb-4" placeholder="What's happening?" /><div class="flex gap-2"><button id="save-event" class="flex-1 bg-indigo-600 text-white py-2 rounded-xl hover:bg-indigo-700">Save</button><button id="close-modal" class="flex-1 bg-slate-100 py-2 rounded-xl hover:bg-slate-200">Cancel</button></div></div></div></div>
   
   <script src="script.js"></script>
 </body>
