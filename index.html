@@ -3,13 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WordDash</title>
+  <title>Retro Neon Clock</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-50 p-4 md:p-8 flex flex-col items-center"><header class="mb-8 text-center"><h1 class="text-4xl font-extrabold text-slate-900">WordDash</h1><p class="text-slate-500">Guess the secret 5-letter word</p></header><div id="game-board" class="grid grid-rows-6 gap-2 mb-8"></div><div class="w-full max-w-sm"><div id="message-area" class="h-12 mb-4 text-center font-bold text-lg"></div><div class="flex gap-2"><input type="text" id="word-input" maxlength="5" class="w-full p-4 text-2xl border-2 border-slate-200 rounded-xl uppercase tracking-widest text-center focus:border-indigo-500 outline-none" placeholder="ENTER WORD"><button id="submit-btn" class="bg-indigo-600 text-white px-6 rounded-xl font-bold hover:bg-indigo-700 transition-colors">GUESS</button></div></div></div>
+  <!-- Retro Digital Glowing Neon Clock -->
+<div class="clock-container">
+  <div class="glow-orb"></div>
+  <div class="glow-orb secondary"></div>
+  
+  <div class="glass-board">
+    <div class="app-header">
+      <span class="status-dot"></span>
+      <span class="header-title">LIVE NEON CLOCK</span>
+    </div>
+    
+    <div class="time-display">
+      <span id="hours">00</span>
+      <span class="colon">:</span>
+      <span id="minutes">00</span>
+      <span class="colon">:</span>
+      <span id="seconds">00</span>
+      <span id="ampm" class="ampm">AM</span>
+    </div>
+    
+    <div class="date-display" id="date">Loading Today's Date...</div>
+    
+    <div class="controls-row">
+      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
+      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
+    </div>
+  </div>
+</div>
   
   <script src="script.js"></script>
 </body>
