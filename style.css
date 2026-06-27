@@ -1,88 +1,45 @@
-/* Custom scrollbars for a modern tech feel */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Tailored Styles for Telugu Writing Application */
+
+/* Visual grid for trace canvas background */
+.grid-bg {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(217, 119, 6, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(217, 119, 6, 0.08) 1px, transparent 1px);
 }
 
-::-webkit-scrollbar-track {
-  background: #0f172a;
+/* Telugu Display Font Fallback Styles */
+.telugu-display-font {
+  font-family: 'Ramabhadra', 'Gidugu', 'NTR', 'Gautami', 'Segoe UI', sans-serif;
+  text-shadow: 2px 2px 0px rgba(251, 191, 36, 0.15);
 }
 
-::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 9999px;
+/* Scrollbars Customization */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(245, 158, 11, 0.05);
+  border-radius: 999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(217, 119, 6, 0.2);
+  border-radius: 999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(217, 119, 6, 0.4);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+/* Interactive scale animation for letter items */
+.letter-card {
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Interactive scale animations */
-@keyframes scaleUp {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+.letter-card:active {
+  transform: scale(0.95);
 }
 
-.animate-scaleUp {
-  animation: scaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Glow/glass properties */
-.glass-panel {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* Custom badge colors */
-.badge-item {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.75rem;
-  padding: 0.125rem 0.625rem;
-  border-radius: 9999px;
-}
-
-.badge-purple {
-  background-color: rgba(139, 92, 246, 0.15);
-  color: #c084fc;
-  border: 1px solid rgba(139, 92, 246, 0.25);
-}
-
-.badge-amber {
-  background-color: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.25);
-}
-
-.badge-emerald {
-  background-color: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-
-.badge-sky {
-  background-color: rgba(14, 165, 233, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(14, 165, 233, 0.25);
-}
-
-.badge-rose {
-  background-color: rgba(244, 63, 94, 0.15);
-  color: #fb7185;
-  border: 1px solid rgba(244, 63, 94, 0.25);
-}
-
-.badge-gray {
-  background-color: rgba(100, 116, 139, 0.15);
-  color: #94a3b8;
-  border: 1px solid rgba(100, 116, 139, 0.25);
+/* Custom Confetti Animation and dynamic active state rings */
+.active-brush-ring {
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4);
 }
