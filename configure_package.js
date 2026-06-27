@@ -59,14 +59,28 @@ if (!appName && fs.existsSync('package.json')) {
   } catch (e) {}
 }
 
+let uniqueAppId = 'com.builderpro.app';
+if (fs.existsSync('capacitor.config.json')) {
+  try {
+    const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
+    if (config.appId) uniqueAppId = config.appId;
+    if (config.appName && (!appName || appName === 'Applet')) appName = config.appName;
+  } catch (e) {}
+} else if (fs.existsSync('capacitor.config.ts')) {
+  try {
+    const content = fs.readFileSync('capacitor.config.ts', 'utf8');
+    const matchId = content.match(/appIds*:s*['"]([^'"]+)['"]/);
+    if (matchId) uniqueAppId = matchId[1];
+    const matchName = content.match(/appNames*:s*['"]([^'"]+)['"]/);
+    if (matchName) appName = matchName[1];
+  } catch (e) {}
+}
+
 const cleanAppName = appName.trim().replace(/^Applet$/i, 'My Application') || 'My Application';
 const uniqueAppLabel = cleanAppName;
 
 console.log("Verified Project Name: " + uniqueAppLabel);
 console.log("Verified Project Description: " + appDescription);
-
-const uniqueAppId = 'com.builderpro.app';
-
 console.log("Newly Generated Unique ApplicationID: " + uniqueAppId);
 
 const conflictTrackingFile = 'built_packages.txt';
