@@ -3,299 +3,228 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tablify</title>
+  <title>Telugu Write Practice Hub</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row font-sans antialiased">
-
-  <!-- SIDEBAR -->
-  <aside class="w-full md:w-80 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0">
-    <!-- Brand -->
-    <div class="p-6 border-b border-slate-800 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 bg-gradient-to-tr from-indigo-500 to-violet-600 rounded-xl shadow-lg shadow-indigo-500/20">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
+  <div class="min-h-screen bg-amber-50 text-slate-800 font-sans flex flex-col">
+  <!-- Top Elegant Header -->
+  <header class="bg-white border-b border-amber-100 shadow-sm sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-3 bg-amber-500 rounded-2xl shadow-md text-white animate-bounce">
+          <span class="text-2xl font-bold">అ</span>
         </div>
         <div>
-          <h1 class="font-bold text-lg text-white tracking-wide">Tablify</h1>
-          <p class="text-xs text-slate-400 font-medium">Smart Table Architect</p>
+          <h1 class="text-2xl font-black tracking-tight text-amber-950">లిపిభ్యాసం <span class="text-amber-600 font-normal text-lg">- Telugu Write</span></h1>
+          <p class="text-xs text-amber-800 font-medium">Telugu Letter Tracing & Vocabulary Practice Hub</p>
+        </div>
+      </div>
+      
+      <!-- Interactive Progress Stats Bar -->
+      <div class="flex items-center space-x-6 bg-amber-50/70 px-4 py-2 rounded-xl border border-amber-100/80">
+        <div class="text-center">
+          <p class="text-[10px] uppercase tracking-wider text-amber-700 font-bold">Letters Practiced</p>
+          <p class="text-lg font-extrabold text-amber-900" id="stat-practiced-count">0</p>
+        </div>
+        <div class="h-8 w-px bg-amber-200"></div>
+        <div class="text-center">
+          <p class="text-[10px] uppercase tracking-wider text-amber-700 font-bold">Current Streak</p>
+          <p class="text-lg font-extrabold text-amber-900" id="stat-streak">0 days</p>
+        </div>
+        <div class="h-8 w-px bg-amber-200"></div>
+        <div class="text-center">
+          <p class="text-[10px] uppercase tracking-wider text-amber-700 font-bold">Quiz Score</p>
+          <p class="text-lg font-extrabold text-amber-900" id="stat-score">0/0</p>
         </div>
       </div>
     </div>
+  </header>
 
-    <!-- Tables List Container -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-6">
-      <div>
-        <div class="flex items-center justify-between mb-3 px-2">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">My Workspaces</span>
-          <button id="btn-open-create-table-modal" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 transition-all hover:translate-x-0.5">
-            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-            </svg>
-            New
-          </button>
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- LEFT PANEL: Letter Bank & Selection (4 Cols) -->
+    <section class="lg:col-span-4 bg-white rounded-3xl p-5 border border-amber-100 shadow-sm flex flex-col h-[calc(100vh-160px)] min-h-[500px]">
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            Letter Bank
+          </h2>
+          <span class="text-xs bg-amber-100 text-amber-800 font-semibold px-2 py-1 rounded-md" id="letters-count-badge">0 Available</span>
         </div>
-        <ul id="sidebar-tables-list" class="space-y-1">
-          <!-- Dynamically filled -->
-        </ul>
-      </div>
-    </div>
-
-    <!-- Quick Stats Summary -->
-    <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-      <div class="bg-slate-950/50 rounded-xl p-3 border border-slate-800">
-        <div class="flex items-center justify-between text-xs text-slate-400">
-          <span>Active Tables</span>
-          <span id="sidebar-total-tables" class="font-semibold text-white">0</span>
-        </div>
-        <div class="flex items-center justify-between text-xs text-slate-400 mt-2">
-          <span>Total Rows</span>
-          <span id="sidebar-total-rows" class="font-semibold text-white">0</span>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN WORKSPACE -->
-  <main class="flex-1 flex flex-col min-w-0 bg-slate-950">
-    
-    <!-- Top Dashboard Header -->
-    <header class="h-20 border-b border-slate-800 px-6 md:px-8 flex items-center justify-between bg-slate-900/20 backdrop-blur-sm sticky top-0 z-10">
-      <div>
-        <div class="flex items-center gap-3">
-          <h2 id="active-table-title" class="text-xl font-bold text-white tracking-tight">Select a Table</h2>
-          <span id="active-table-badge" class="px-2.5 py-0.5 text-[11px] font-semibold tracking-wider rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hidden">Active</span>
-        </div>
-        <p id="active-table-desc" class="text-sm text-slate-400 mt-0.5 truncate max-w-xl">Choose a workspace from the sidebar or build a customized database.</p>
-      </div>
-
-      <!-- Global Actions -->
-      <div class="flex items-center gap-3">
-        <div class="relative group">
-          <button id="btn-export-dropdown" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-850 rounded-xl text-sm font-medium text-slate-200 transition-colors flex items-center gap-2 border border-slate-700">
-            <span>Export</span>
-            <svg class="w-4 h-4 text-slate-400 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <!-- Export dropdown list -->
-          <div id="export-dropdown-menu" class="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-2 hidden z-20">
-            <button id="btn-export-csv" class="w-full text-left px-4 py-2 text-sm hover:bg-slate-800 text-slate-300 hover:text-white flex items-center gap-2">
-              📊 Export as CSV
-            </button>
-            <button id="btn-export-json" class="w-full text-left px-4 py-2 text-sm hover:bg-slate-800 text-slate-300 hover:text-white flex items-center gap-2">
-              ⚙️ Export as JSON
-            </button>
+        
+        <!-- Filter & Search Controls -->
+        <div class="space-y-2">
+          <div class="relative">
+            <input type="text" id="letter-search" placeholder="Search letter or keyword..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-all">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl text-xs">
+            <button id="tab-all" class="py-1.5 rounded-lg font-semibold bg-white text-slate-800 shadow-sm transition-all">All</button>
+            <button id="tab-achulu" class="py-1.5 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition-all">అచ్చులు (Vowels)</button>
+            <button id="tab-hallulu" class="py-1.5 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition-all">హల్లులు (Consonants)</button>
           </div>
         </div>
-
-        <button id="btn-delete-table" class="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl border border-rose-500/20 transition-all" title="Delete Table">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </button>
-      </div>
-    </header>
-
-    <!-- Table Sub-Bar (Filters, Search, Actions) -->
-    <section class="p-6 border-b border-slate-800/80 bg-slate-900/10 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-      
-      <!-- Left: Search and Filtering -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-        <!-- Search box -->
-        <div class="relative flex-1 sm:w-72">
-          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </span>
-          <input type="text" id="input-search" placeholder="Search table data..." class="block w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-sm placeholder-slate-500 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all" />
-        </div>
-
-        <!-- Quick stats info -->
-        <div id="filter-status-container" class="text-xs text-slate-400 flex items-center gap-2 bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-800">
-          <span id="selected-rows-count">0 rows</span> found
-        </div>
       </div>
 
-      <!-- Right: Action Add Buttons -->
-      <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
-        <button id="btn-open-column-modal" class="px-4 py-2 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white rounded-xl text-sm font-medium transition-colors border border-slate-800 flex items-center gap-2">
-          <svg class="w-4.5 h-4.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>Add Column</span>
-        </button>
-        <button id="btn-add-row-direct" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 active:from-indigo-700 text-white rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-lg shadow-indigo-500/10 hover:shadow-indigo-500/20">
-          <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-          </svg>
-          <span>Add Row</span>
-        </button>
+      <!-- Interactive Alphabet List Scroll Container -->
+      <div class="flex-1 overflow-y-auto pr-1 space-y-4 custom-scrollbar" id="alphabet-list-container">
+        <!-- Dynamic letter grids go here -->
       </div>
     </section>
 
-    <!-- Main Data Table Container -->
-    <div class="flex-1 overflow-auto p-6 md:p-8">
-      <div class="bg-slate-900/40 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl relative">
-        <div class="overflow-x-auto">
-          <table id="data-table" class="w-full border-collapse text-left text-sm">
-            <thead class="bg-slate-900/95 sticky top-0 z-10 border-b border-slate-850 select-none">
-              <tr id="table-header-row">
-                <!-- Dynamically Rendered Header -->
-              </tr>
-            </thead>
-            <tbody id="table-body" class="divide-y divide-slate-850/60">
-              <!-- Dynamically Rendered Rows -->
-            </tbody>
-          </table>
+    <!-- MIDDLE PANEL: Interactive Tracing Canvas Board (5 Cols) -->
+    <section class="lg:col-span-5 flex flex-col space-y-4 h-[calc(100vh-160px)] min-h-[500px]">
+      <div class="bg-white rounded-3xl p-5 border border-amber-100 shadow-sm flex-1 flex flex-col">
+        <!-- Canvas Controls Bar -->
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <span class="text-xs font-bold text-amber-600 uppercase tracking-widest">Workspace</span>
+            <h2 class="text-lg font-extrabold text-slate-800 flex items-center gap-1.5">
+              Trace Board
+              <span id="selected-letter-badge" class="text-sm bg-amber-500 text-white rounded-full px-2 py-0.5 font-bold">అ</span>
+            </h2>
+          </div>
+
+          <!-- Visual Guides Toggles -->
+          <div class="flex items-center space-x-2">
+            <button id="btn-toggle-grid" class="p-2 text-slate-600 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all border border-slate-100" title="Toggle Helper Grid">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            </button>
+            <button id="btn-toggle-outline" class="p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all border border-amber-200" title="Toggle Tracing Ghost Guide">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            </button>
+          </div>
         </div>
 
-        <!-- Empty State UI -->
-        <div id="empty-state" class="py-24 px-6 text-center flex flex-col items-center justify-center hidden">
-          <div class="w-16 h-16 bg-slate-800/40 border border-slate-700 rounded-2xl flex items-center justify-center mb-4">
-            <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-            </svg>
+        <!-- The Tracing Canvas Wrapper with custom grid overlay option -->
+        <div class="relative flex-1 bg-amber-50/20 border-2 border-dashed border-amber-200 rounded-2xl overflow-hidden group shadow-inner" id="canvas-zone-wrapper">
+          <!-- Transparent helper grid pattern (CSS handled) -->
+          <div id="canvas-helper-grid" class="absolute inset-0 grid-bg transition-opacity pointer-events-none opacity-100"></div>
+          
+          <!-- Drawing Canvas -->
+          <canvas id="trace-canvas" class="absolute inset-0 w-full h-full cursor-crosshair z-10"></canvas>
+
+          <!-- Canvas watermark/indicator in case of idle -->
+          <div class="absolute bottom-3 right-3 pointer-events-none text-[10px] text-amber-700/60 font-semibold z-20 flex items-center space-x-1">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span>Active Tracing Area</span>
           </div>
-          <h3 class="text-base font-semibold text-white">No records found</h3>
-          <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">Try adjusting your search criteria, add a new row, or custom columns to expand this table.</p>
-          <button id="btn-empty-add-row" class="mt-4 px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-xl text-xs font-semibold border border-indigo-500/20 transition-all">
-            Create First Row
+        </div>
+
+        <!-- Canvas Bottom Toolbar -->
+        <div class="mt-4 flex flex-wrap gap-2 items-center justify-between">
+          <!-- Color & Width Controls -->
+          <div class="flex items-center space-x-3">
+            <!-- Ink Brush Presets -->
+            <div class="flex items-center space-x-1.5" id="brush-colors-container">
+              <button data-color="#b45309" class="w-6 h-6 rounded-full bg-amber-700 border-2 border-white ring-2 ring-amber-700/50 scale-110 transform transition-all brush-color-btn"></button>
+              <button data-color="#059669" class="w-6 h-6 rounded-full bg-emerald-600 border-2 border-white hover:scale-110 transform transition-all brush-color-btn"></button>
+              <button data-color="#2563eb" class="w-6 h-6 rounded-full bg-blue-600 border-2 border-white hover:scale-110 transform transition-all brush-color-btn"></button>
+              <button data-color="#db2777" class="w-6 h-6 rounded-full bg-pink-600 border-2 border-white hover:scale-110 transform transition-all brush-color-btn"></button>
+            </div>
+
+            <!-- Brush Size Slider -->
+            <div class="flex items-center space-x-2 bg-slate-100 px-3 py-1.5 rounded-xl">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle></svg>
+              <input type="range" id="brush-size" min="4" max="20" value="10" class="w-16 accent-amber-600 cursor-pointer">
+            </div>
+          </div>
+
+          <!-- Clear, Self-Assess Action buttons -->
+          <div class="flex items-center space-x-2">
+            <button id="btn-canvas-undo" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all flex items-center gap-1">
+              Undo
+            </button>
+            <button id="btn-canvas-clear" class="px-3 py-2 bg-amber-100 hover:bg-amber-200 text-amber-900 font-semibold text-xs rounded-xl transition-all flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              Clear
+            </button>
+            <button id="btn-mark-done" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-1.5">
+              <span>Save Practice</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Pronunciation, Associated Words, and Quiz Corner (3 Cols) -->
+    <section class="lg:col-span-3 flex flex-col space-y-4 h-[calc(100vh-160px)] min-h-[500px]">
+      <!-- Selected Letter Details Card -->
+      <div class="bg-white rounded-3xl p-5 border border-amber-100 shadow-sm flex flex-col space-y-4">
+        <h3 class="text-xs font-extrabold uppercase tracking-widest text-amber-600">Pronunciation & Context</h3>
+        
+        <div class="bg-amber-50/50 rounded-2xl p-4 text-center border border-amber-100 relative overflow-hidden">
+          <!-- Large Letter Display with custom styled font -->
+          <div class="text-6xl font-extrabold text-amber-950 my-1 telugu-display-font" id="detail-letter-telugu">అ</div>
+          <p class="text-xs text-amber-700 tracking-wide mt-1" id="detail-letter-phonetic">a / ah</p>
+          <p class="text-[11px] text-amber-500 font-bold" id="detail-letter-type">Vowel (అచ్చు)</p>
+
+          <!-- Voice Pronunciation Button -->
+          <button id="btn-play-audio" class="absolute top-3 right-3 p-2 bg-white hover:bg-amber-100 text-amber-800 rounded-full shadow-sm hover:shadow transition-all border border-amber-100" title="Listen Pronunciation">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
           </button>
         </div>
-      </div>
-    </div>
 
-    <!-- Auto Calculation and Analysis Drawer -->
-    <footer class="border-t border-slate-800 bg-slate-900/20 px-6 py-4">
-      <div class="flex flex-wrap gap-4 items-center justify-between text-xs text-slate-400">
-        <div class="flex items-center gap-3">
-          <span class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
-            Active Database Connected
-          </span>
-          <span class="text-slate-600">|</span>
-          <span>Double-click any cell to edit details.</span>
-        </div>
-        <div class="flex items-center gap-6" id="summary-stats-box">
-          <!-- Dynamically populated math helpers (sum, averages, status breakdown) -->
+        <!-- Associated Word Section -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-500">Associated Word</h4>
+          <div class="flex items-center space-x-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+            <div class="text-3xl p-2 bg-white rounded-xl shadow-sm border border-slate-100" id="detail-word-emoji">👩</div>
+            <div class="flex-1 min-w-0">
+              <p class="text-md font-extrabold text-slate-800 truncate" id="detail-word-telugu">అమ్మ</p>
+              <p class="text-xs text-slate-500 truncate" id="detail-word-english">Amma (Mother)</p>
+            </div>
+          </div>
         </div>
       </div>
-    </footer>
+
+      <!-- Interactive Mini-Quiz Section -->
+      <div class="bg-amber-950 text-white rounded-3xl p-5 shadow-lg flex-1 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="bg-amber-500/20 text-amber-300 font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-amber-500/30">Vocabulary Match</span>
+            <span class="text-xs text-amber-300 font-bold" id="quiz-progress">Round 1/3</span>
+          </div>
+          <h3 class="text-base font-black text-amber-100 mb-3">Which letter goes with:</h3>
+          
+          <!-- Question Prompts -->
+          <div class="bg-amber-900/60 p-3 rounded-2xl border border-amber-800/80 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="text-3xl" id="quiz-word-emoji">🐄</span>
+              <div>
+                <p class="text-sm font-extrabold text-white" id="quiz-word-telugu">ఆవు</p>
+                <p class="text-xs text-amber-300" id="quiz-word-english">Aavu (Cow)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multiple Choice Options -->
+        <div class="space-y-2" id="quiz-options-container">
+          <!-- Generated dynamically -->
+        </div>
+
+        <!-- Next Match Button -->
+        <button id="btn-next-quiz" class="w-full mt-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow-md transition-all hidden">
+          Next Challenge &rarr;
+        </button>
+      </div>
+    </section>
   </main>
 
-  <!-- MODAL: CREATE TABLE -->
-  <div id="modal-new-table" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden transition-opacity">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-scaleUp mx-4">
-      <button class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors modal-close-trigger">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
-        <span>📊</span> Create New Table
-      </h3>
-      <p class="text-xs text-slate-400 mb-6">Define a clean workspace. Perfect for tracking projects, items, leads or tasks.</p>
-      
-      <form id="form-create-table" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Table Name</label>
-          <input type="text" id="input-table-name" required placeholder="e.g. Sales Pipeline" class="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Description</label>
-          <textarea id="input-table-desc" rows="2" placeholder="Describe the purpose of this database..." class="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Template Preset</label>
-          <select id="input-table-preset" class="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="empty">Empty Workspace (Customizable)</option>
-            <option value="project">🚀 Project Tracker Template</option>
-            <option value="inventory">📦 Inventory Ledger Template</option>
-            <option value="crm">👥 Basic CRM CRM Leads</option>
-          </select>
-        </div>
-        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
-          <button type="button" class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white modal-close-trigger">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/10">Create Workspace</button>
-        </div>
-      </form>
-    </div>
+  <!-- Audio & Toast Notifications Anchor -->
+  <div id="toast-box" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2">
+    <span id="toast-emoji">🎉</span>
+    <span id="toast-msg">Excellent practice saved!</span>
   </div>
 
-  <!-- MODAL: ADD COLUMN -->
-  <div id="modal-new-column" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden transition-opacity">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative animate-scaleUp mx-4">
-      <button class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors modal-close-trigger">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
-        <span>➕</span> Add New Column
-      </h3>
-      <p class="text-xs text-slate-400 mb-6">Choose a smart data type structure to calculate metrics or enforce values.</p>
-      
-      <form id="form-create-column" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Column Title</label>
-          <input type="text" id="input-col-name" required placeholder="e.g. Budget, Priority, Assignee" class="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Data Type</label>
-          <select id="input-col-type" class="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="text">📝 Short Text (Generic string)</option>
-            <option value="number">🔢 Numeric (For counts, rates, prices)</option>
-            <option value="status">🏷️ Badge Status (To Do, In Progress, Done)</option>
-            <option value="date">📅 Date/Calendar</option>
-          </select>
-        </div>
-        <div id="status-options-group" class="hidden">
-          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Status Options (Comma separated)</label>
-          <input type="text" id="input-col-options" placeholder="To Do, In Progress, Complete, On Hold" class="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          <p class="text-[10px] text-slate-500 mt-1">Separate statuses with commas. They'll render in multiple colors.</p>
-        </div>
-        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
-          <button type="button" class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white modal-close-trigger">Cancel</button>
-          <button type="submit" class="px-5 py-2 bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-lg shadow-indigo-500/10">Inject Column</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL / DRAWER: EDIT ROW DETAILS -->
-  <div id="modal-edit-row" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 hidden transition-opacity">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg p-6 shadow-2xl relative animate-scaleUp mx-4">
-      <button class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors modal-close-trigger">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-      <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
-        <span>✍️</span> Edit Record
-      </h3>
-      <p class="text-xs text-slate-400 mb-6">Update cellular fields for this record row. Changes apply instantly.</p>
-      
-      <form id="form-edit-row" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
-        <!-- Dynamically injected field inputs based on active table schema -->
-        <div id="edit-row-fields-container" class="space-y-4">
-          <!-- Dynamic Inputs -->
-        </div>
-
-        <div class="flex justify-end gap-3 pt-6 border-t border-slate-800 sticky bottom-0 bg-slate-900 mt-4">
-          <button type="button" class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white modal-close-trigger">Discard</button>
-          <button type="submit" class="px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold rounded-xl transition-colors shadow-lg shadow-emerald-500/10">Save Updates</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
+  <!-- Confetti Canvas overlay -->
+  <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50 w-full h-full hidden"></canvas>
 </div>
   
   <script src="script.js"></script>
