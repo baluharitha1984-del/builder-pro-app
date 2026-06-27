@@ -110,14 +110,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: TimesMaster-debug-apk
+          name: DividrUltimateDivisionHub-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: TimesMaster-release-aab
+          name: DividrUltimateDivisionHub-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
