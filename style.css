@@ -1,61 +1,46 @@
-/* Glowing and utility styles for the English Words Game */
-
-/* Game Shake Animation for wrong answers */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-6px); }
-  40%, 80% { transform: translateX(6px); }
+/* Customized visual animations & dynamic responsive layouts */
+.catalog-tab-btn {
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+.active-tab {
+  background-color: #047857 !important; /* Emerald-700 */
+  color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-.shake-wrong {
-  animation: shake 0.4s ease-in-out;
+/* Soft glow for ready-to-harvest vegetables */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
 }
 
-/* Subtle pulsation highlight */
-@keyframes highlight-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
-  50% { box-shadow: 0 0 12px 4px rgba(99, 102, 241, 0.6); }
+.ready-to-harvest {
+  animation: pulseGlow 1.8s infinite;
+  border-color: #10b981 !important;
 }
 
-.pulse-highlight {
-  animation: highlight-pulse 1.5s infinite;
+/* Slide up animation for our custom preview modal */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Custom scrollbars for the side list */
-#journal-list::-webkit-scrollbar {
-  width: 6px;
-}
-#journal-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-#journal-list::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
-}
-#journal-list::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+.animate-slide-up {
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Hive word letters arrangement classes */
-.hive-letter {
-  position: absolute;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #1e293b;
-  color: #f1f5f9;
-  font-weight: 800;
-  border-radius: 50%;
-  border: 1px solid #475569;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
-}
-.hive-letter:hover {
-  background-color: #db2777;
-  border-color: #f472b6;
-  transform: scale(1.15);
-  box-shadow: 0 0 10px rgba(219, 39, 119, 0.5);
+/* Progress Bar Transition */
+.progress-fill {
+  transition: width 1s linear;
 }
