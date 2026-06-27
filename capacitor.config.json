@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "Summit Additions Arena",
+  "appName": "Subtracto - Subtraction Playground & Solver",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
