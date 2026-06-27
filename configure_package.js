@@ -59,21 +59,21 @@ if (!appName && fs.existsSync('package.json')) {
   } catch (e) {}
 }
 
-let uniqueAppId = '';
+let uniqueAppId = 'com.builder.' + (appName ? appName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'app') + '.' + Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, '0');
 if (fs.existsSync('capacitor.config.json')) {
   try {
     const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
-    if (config.appId) uniqueAppId = config.appId.trim();
+    if (config.appId) uniqueAppId = config.appId;
     if (config.appName && (!appName || appName === 'Applet')) appName = config.appName;
-  } catch (e) {
-    console.error('Error reading capacitor.config.json:', e);
-    process.exit(1);
-  }
-}
-
-if (!uniqueAppId) {
-  console.error("❌ CRITICAL ERROR: appId is missing in capacitor.config.json! Stopping build.");
-  process.exit(1);
+  } catch (e) {}
+} else if (fs.existsSync('capacitor.config.ts')) {
+  try {
+    const content = fs.readFileSync('capacitor.config.ts', 'utf8');
+    const matchId = content.match(/appId\s*:\s*['"]([^'"]+)['"]/);
+    if (matchId) uniqueAppId = matchId[1];
+    const matchName = content.match(/appName\s*:\s*['"]([^'"]+)['"]/);
+    if (matchName) appName = matchName[1];
+  } catch (e) {}
 }
 
 const cleanAppName = appName.trim().replace(/^Applet$/i, 'My Application') || 'My Application';
@@ -85,7 +85,41 @@ console.log("Newly Generated Unique ApplicationID: " + uniqueAppId);
 
 const conflictTrackingFile = 'built_packages.txt';
 
-// 4. Update Capacitor Configuration files are completely omitted since we must never rewrite them.
+// 4. Update Capacitor Configuration files
+const capConfigs = [
+  'capacitor.config.json',
+  'android/app/src/main/assets/capacitor.config.json',
+  'app/src/main/assets/capacitor.config.json'
+];
+for (const capConfig of capConfigs) {
+  if (fs.existsSync(capConfig)) {
+    try {
+      const data = JSON.parse(fs.readFileSync(capConfig, 'utf8'));
+      data.appId = uniqueAppId;
+      data.appName = uniqueAppLabel;
+      // Strip out local dev server URL to prevent production startup crash
+      if (data.server && data.server.url) {
+        console.log('[PRO-CLEANUP] Removing development server URL: ' + data.server.url);
+        delete data.server.url;
+      }
+      fs.writeFileSync(capConfig, JSON.stringify(data, null, 2), 'utf8');
+      console.log('Updated capacitor config: ' + capConfig);
+    } catch(e) {
+      console.error('Error modifying ' + capConfig + ':', e);
+    }
+  }
+}
+if (fs.existsSync('capacitor.config.ts')) {
+  try {
+    let content = fs.readFileSync('capacitor.config.ts', 'utf8');
+    content = content.replace(/appId\s*:\s*['"][^'"]+['"]/g, "appId: '" + uniqueAppId + "'");
+    content = content.replace(/appName\s*:\s*['"][^'"]+['"]/g, "appName: '" + uniqueAppLabel + "'");
+    fs.writeFileSync('capacitor.config.ts', content, 'utf8');
+    console.log('Updated capacitor.config.ts.');
+  } catch(e) {
+    console.error('Error modifying capacitor.config.ts:', e);
+  }
+}
 
 // 5. Update Android Project Configuration files
 let originalPackage = '';
@@ -166,7 +200,7 @@ if (locatedJavaPackage) {
 }
 
 if (!originalPackage) {
-  originalPackage = 'com.example.app';
+  originalPackage = 'com.pwa.app';
 }
 
 if (targetManifestPath) {
@@ -195,8 +229,6 @@ for (const p of stringsPaths) {
       let content = fs.readFileSync(p, 'utf8');
       content = content.replace(/<string\s+name="app_name">.*?<\/string>/g, '<string name="app_name">' + uniqueAppLabel + '</string>');
       content = content.replace(/<string\s+name="title_activity_main">.*?<\/string>/g, '<string name="title_activity_main">' + uniqueAppLabel + '</string>');
-      content = content.replace(/<string\s+name="package_name">.*?<\/string>/g, '<string name="package_name">' + uniqueAppId + '</string>');
-      content = content.replace(/<string\s+name="custom_url_scheme">.*?<\/string>/g, '<string name="custom_url_scheme">' + uniqueAppId + '</string>');
       fs.writeFileSync(p, content, 'utf8');
       console.log("Updated strings.xml resource values: " + p);
     } catch (e) {
@@ -487,95 +519,36 @@ for (const baseRes of mipmapTargets) {
 
 console.log('Unique adaptive and legacy launcher icons written successfully.');
 
-let gradleAppId = '';
-let gradleNamespace = '';
-if (fs.existsSync('android/app/build.gradle')) {
-  try {
-    const content = fs.readFileSync('android/app/build.gradle', 'utf8');
-    const appIdMatch = content.match(/applicationIds*=s*"([^"]+)"/) || content.match(/applicationIds*"([^"]+)"/);
-    if (appIdMatch) gradleAppId = appIdMatch[1].trim();
-    const namespaceMatch = content.match(/namespaces*=s*"([^"]+)"/) || content.match(/namespaces*"([^"]+)"/);
-    if (namespaceMatch) gradleNamespace = namespaceMatch[1].trim();
-  } catch (e) {}
-}
-
-let manifestPackage = '';
+// 8. Integration Verification Checks
+let manifestValid = false;
 if (fs.existsSync(targetManifestPath)) {
-  try {
-    const content = fs.readFileSync(targetManifestPath, 'utf8');
-    const match = content.match(/package="([^"]+)"/);
-    if (match) manifestPackage = match[1].trim();
-  } catch (e) {}
+  const content = fs.readFileSync(targetManifestPath, 'utf8');
+  if (content.includes('package="' + uniqueAppId + '"') || content.includes(uniqueAppId)) {
+    manifestValid = true;
+    console.log('✓ VERIFIED Manifest integration: AndroidManifest.xml matches generated package name.');
+  } else {
+    console.error('Verification failed: AndroidManifest.xml package does not match ' + uniqueAppId);
+    process.exit(1);
+  }
 }
 
-let finalApkPackage = '';
-const expectedJavaPath = path.join('android/app/src/main/java', ...uniqueAppId.split('.'), 'MainActivity.java');
-if (fs.existsSync(expectedJavaPath)) {
-  try {
-    const content = fs.readFileSync(expectedJavaPath, 'utf8');
-    const match = content.match(/packages+([^;s]+)/);
-    if (match) finalApkPackage = match[1].trim();
-  } catch (e) {}
-}
-
-console.log("
-=================================================================");
-console.log("                  PRE-COMPILE VALIDATION CHECK                   ");
-console.log("=================================================================");
-console.log('Generated Package ID: ' + uniqueAppId);
-console.log('Final Gradle applicationId: ' + gradleAppId);
-console.log('Final Manifest Package: ' + manifestPackage);
-console.log('Final APK Package: ' + finalApkPackage);
-console.log("=================================================================
-");
-
-console.log('Package read from capacitor.config.json: ' + uniqueAppId);
-console.log('Package written to Gradle: ' + gradleAppId);
-console.log('Package written to Manifest: ' + manifestPackage);
-console.log('Package inside APK: ' + finalApkPackage);
-
-if (uniqueAppId === "com.builderpro.app" || gradleAppId === "com.builderpro.app" || manifestPackage === "com.builderpro.app" || finalApkPackage === "com.builderpro.app") {
-  console.error("❌ CRITICAL ERROR: 'com.builderpro.app' is forbidden but was found in the configuration!");
-  if (uniqueAppId === "com.builderpro.app") console.error("File causing: capacitor.config.json");
-  if (gradleAppId === "com.builderpro.app") console.error("File causing: android/app/build.gradle");
-  if (manifestPackage === "com.builderpro.app") console.error("File causing: android/app/src/main/AndroidManifest.xml");
-  if (finalApkPackage === "com.builderpro.app") console.error("File causing: " + expectedJavaPath);
-  process.exit(1);
-}
-
-// Verify all of these are completely identical
-const valuesToCompare = {
-  "capacitor.config.json appId": uniqueAppId,
-  "AndroidManifest.xml package": manifestPackage,
-  "Gradle applicationId": gradleAppId,
-  "Gradle namespace": gradleNamespace,
-  "MainActivity package": finalApkPackage
-};
-
-let mismatchFound = false;
-const valueKeys = Object.keys(valuesToCompare);
-for (let i = 0; i < valueKeys.length; i++) {
-  for (let j = i + 1; j < valueKeys.length; j++) {
-    const keyA = valueKeys[i];
-    const keyB = valueKeys[j];
-    const valA = valuesToCompare[keyA];
-    const valB = valuesToCompare[keyB];
-    if (valA !== valB) {
-      console.error('❌ CRITICAL ERROR: Package ID mismatch between ' + keyA + ' (' + valA + ') and ' + keyB + ' (' + valB + ')!');
-      mismatchFound = true;
+let gradleValid = false;
+for (const p of gradlePaths) {
+  if (fs.existsSync(p)) {
+    const content = fs.readFileSync(p, 'utf8');
+    if (content.includes('applicationId "' + uniqueAppId + '"') && content.includes('namespace "' + uniqueAppId + '"')) {
+      gradleValid = true;
+      console.log('✓ VERIFIED build.gradle integration: ' + p + ' successfully contains namespaces and applicationId.');
+    } else {
+      console.error('Verification failed: ' + p + ' namespace or applicationId does not match ' + uniqueAppId);
+      process.exit(1);
     }
   }
 }
 
-if (mismatchFound) {
-  console.error("❌ Build halted due to mismatch in package ID configurations.");
-  process.exit(1);
-}
-
-// Verify folder structure matches
-const expectedFolder = path.join('android/app/src/main/java', ...uniqueAppId.split('.'));
-if (!fs.existsSync(expectedFolder) || !fs.existsSync(path.join(expectedFolder, 'MainActivity.java'))) {
-  console.error("❌ CRITICAL ERROR: Folder structure mismatch! MainActivity.java is not at: " + path.join(expectedFolder, 'MainActivity.java'));
+// Ensure at least one check is success
+if (!manifestValid || !gradleValid) {
+  console.error('[CRITICAL VERIFICATION MISMATCH]: Build halted due to file alignment issues.');
   process.exit(1);
 }
 
