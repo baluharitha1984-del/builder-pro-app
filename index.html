@@ -3,258 +3,250 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Summit Additions Arena</title>
+  <title>Subtracto - Subtraction Playground & Solver</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col antialiased pb-12">
   <!-- Header Navigation -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-4">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 py-4">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="p-2.5 bg-gradient-to-tr from-indigo-500 to-violet-500 rounded-xl shadow-lg shadow-indigo-500/20">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-          </svg>
+        <div class="w-10 h-10 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+          <span class="text-2xl font-black text-white select-none">−</span>
         </div>
         <div>
-          <h1 class="text-xl font-black tracking-tight text-white bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">SUMMIT ADDITIONS</h1>
-          <p class="text-xs text-slate-400 font-medium">Ultimate Mathematical Trainer &amp; Visualizer</p>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">Subtracto</h1>
+          <p class="text-xs text-rose-400 font-medium tracking-wider uppercase">The Ultimate Subtraction Playground</p>
         </div>
       </div>
-
-      <div class="flex items-center gap-4 flex-wrap">
-        <div class="bg-slate-800/80 px-3.5 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-300">XP: <span id="global-xp" class="text-white font-mono">0</span></span>
-        </div>
-        <div class="bg-slate-800/80 px-3.5 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
-          <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Streak: <span id="current-streak" class="text-white font-mono">0</span></span>
-        </div>
-        <button id="btn-toggle-sound" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all" title="Toggle Sound Elements">
-          <svg id="sound-icon-on" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
-          <svg id="sound-icon-off" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zm12.364-8.486l-6.364 6.364m0-6.364l6.364 6.364"></path></svg>
+      <div class="flex items-center gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <button id="tab-visual" class="tab-btn active px-4 py-2 text-sm font-semibold rounded-lg transition-all text-white bg-gradient-to-r from-rose-600 to-rose-500 shadow-md shadow-rose-600/10" onclick="switchTab('visual')">
+          🔮 Visual Playground
+        </button>
+        <button id="tab-arcade" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200" onclick="switchTab('arcade')">
+          ⚡ Arcade Challenge
+        </button>
+        <button id="tab-solver" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200" onclick="switchTab('solver')">
+          🧮 Step-by-Step Solver
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Layout -->
-  <main class="flex-1 max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-    
-    <!-- Left/Center Playboard & Visuals: Occupies 8 columns -->
+  <main class="max-w-6xl w-full mx-auto px-4 mt-8 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- LEFT SIDE: Interactive Screens -->
     <div class="lg:col-span-8 flex flex-col gap-6">
       
-      <!-- Workout Configuration & Quick Selectors -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
-        <div class="absolute -right-12 -top-12 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
-        <h2 class="text-sm font-semibold tracking-wider text-indigo-400 uppercase mb-4">1. Customizer Arena Workout</h2>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- TAB 1: VISUAL PLAYGROUND -->
+      <div id="view-visual" class="view-pane bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex justify-between items-center mb-6">
           <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-2">Difficulty / Mode</label>
-            <select id="select-difficulty" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer">
-              <option value="single">Single Digit (1 - 9)</option>
-              <option value="double-easy" selected>Double Digit Easy (10 - 50)</option>
-              <option value="double-hard">Double Digit Hard (50 - 99)</option>
-              <option value="hundreds">Triple digits (100 - 999)</option>
-              <option value="decimals">Decimal Addition</option>
-            </select>
+            <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+              Visual Subtraction Builder
+            </h2>
+            <p class="text-sm text-slate-400 mt-1">Tap objects to subtract them. Watch the equation transform dynamically!</p>
           </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-400 mb-2">Game Goal Mode</label>
-            <select id="select-game-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-slate-200 text-sm focus:outline-none focus:border-indigo-500 transition-colors cursor-pointer">
-              <option value="zen" selected>Zen Practice (No Limit)</option>
-              <option value="sprint-30">Sprint Mode (30s Clock)</option>
-              <option value="sprint-60">Marathon (60s Clock)</option>
-            </select>
-          </div>
-
-          <div class="flex items-end">
-            <button id="btn-restart-game" class="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 group shadow-sm">
-              <svg class="w-4 h-4 text-indigo-400 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.27 15H18"></path></svg>
-              New Formula
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main Active Math Terminal -->
-      <div id="arena-terminal" class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-between relative overflow-hidden transition-all duration-300 min-h-[350px]">
-        
-        <!-- Progress indicator/Active Mode banner -->
-        <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-          <div class="flex items-center gap-2">
-            <span id="active-mode-badge" class="px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">ZEN SYSTEM</span>
-            <span id="score-bubble" class="text-xs font-medium text-slate-400">Score: <strong class="text-indigo-300 font-mono">0</strong></span>
-          </div>
-          <div id="sprint-timer-container" class="hidden items-center gap-2 bg-rose-500/15 border border-rose-500/20 px-3 py-1 rounded-lg animate-pulse">
-            <svg class="w-3.5 h-3.5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span id="sprint-timer-text" class="font-mono text-xs font-bold text-rose-400">30s Left</span>
-          </div>
-        </div>
-
-        <!-- Equation Display Area -->
-        <div class="my-auto py-4 flex flex-col items-center justify-center relative">
-          <div class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-2">ADD THE NUMBERS</div>
-          
-          <div class="flex items-center justify-center gap-4 sm:gap-8 flex-wrap text-4xl sm:text-6xl font-black text-white tracking-tight">
-            <span id="addend-a" class="bg-slate-950/40 px-5 py-3 rounded-2xl border border-slate-800 shadow-inner font-mono text-indigo-300">24</span>
-            <span class="text-indigo-500 font-extrabold animate-pulse">+</span>
-            <span id="addend-b" class="bg-slate-950/40 px-5 py-3 rounded-2xl border border-slate-800 shadow-inner font-mono text-violet-300">18</span>
-            <span class="text-indigo-500 font-extrabold text-3xl sm:text-4xl font-sans">=</span>
-            
-            <!-- User Interactive Input Form -->
-            <div class="relative flex items-center min-w-[120px] sm:min-w-[160px]">
-              <input 
-                type="number" 
-                id="input-user-sum" 
-                placeholder="?"
-                step="any"
-                class="w-full bg-slate-950 border-2 border-slate-800 focus:border-indigo-500 rounded-2xl px-4 py-3 text-center text-3xl sm:text-5xl font-mono text-emerald-400 placeholder-slate-700 shadow-xl transition-all outline-none focus:ring-4 focus:ring-indigo-500/10"
-                autocomplete="off"
-                autofocus
-              />
-              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-slate-500 pointer-events-none hidden sm:inline">↵ Enter</span>
-            </div>
-          </div>
-
-          <!-- Submit button for non-keyboard devices -->
-          <div class="mt-6 w-full max-w-xs">
-            <button id="btn-submit-answer" class="w-full py-3 px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all duration-150 active:scale-95 shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/30 flex items-center justify-center gap-2">
-              Verify sum
-              <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </button>
-          </div>
-
-          <div id="streak-alert-msg" class="mt-4 text-xs font-semibold text-emerald-400 opacity-0 transform translate-y-2 transition-all duration-300 flex items-center gap-1.5">
-            🔥 Streak multipliers active! Double points.
-          </div>
-        </div>
-
-        <!-- feedback flash element (shows correct/incorrect status instantly) -->
-        <div id="terminal-feedback-curtain" class="absolute inset-0 bg-emerald-500/0 pointer-events-none transition-all duration-200 flex items-center justify-center">
-          <span id="terminal-feedback-text" class="text-white font-black text-3xl opacity-0 transform scale-75 transition-all duration-200"></span>
-        </div>
-
-      </div>
-
-      <!-- Interactive Custom Visual Addition Blocks -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h3 class="text-sm font-bold tracking-wider text-slate-300 uppercase">Visual Aid: Counter Addition Blocks</h3>
-            <p class="text-xs text-slate-500 mt-1">Dynamically groups values into units and blocks of tens to visually teach mathematical regrouping.</p>
-          </div>
-          <button id="btn-regenerate-visuals" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.27 15H18"></path></svg>
-            Redraw
+          <button id="reset-playground" class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5">
+            🔄 Reset
           </button>
         </div>
 
-        <div id="visuals-outer-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800 min-h-[140px]">
-          
-          <!-- Addend A visualization group -->
-          <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800/80">
-            <div class="flex items-center justify-between mb-2 border-b border-slate-800/80 pb-1.5">
-              <span class="text-xs font-bold text-indigo-400">Addend A (<span id="vis-label-a">24</span>)</span>
-              <span class="text-[10px] text-slate-500 font-mono">Blue Blocks</span>
-            </div>
-            <div id="vis-blocks-a" class="flex flex-wrap gap-1.5 max-h-[180px] overflow-y-auto pr-1">
-              <!-- Scripted dots will populate here -->
-            </div>
+        <!-- Sandbox Controls -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Starting Amount (Minuend): <span id="val-minuend" class="text-rose-400 font-extrabold text-sm">15</span></label>
+            <input id="range-minuend" type="range" min="1" max="30" value="15" class="w-full accent-rose-500 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none">
           </div>
-
-          <!-- Addend B visualization group -->
-          <div class="p-3 bg-slate-900/60 rounded-lg border border-slate-800/80">
-            <div class="flex items-center justify-between mb-2 border-b border-slate-800/80 pb-1.5">
-              <span class="text-xs font-bold text-violet-400">Addend B (<span id="vis-label-b">18</span>)</span>
-              <span class="text-[10px] text-slate-500 font-mono">Purple Blocks</span>
-            </div>
-            <div id="vis-blocks-b" class="flex flex-wrap gap-1.5 max-h-[180px] overflow-y-auto pr-1">
-              <!-- Scripted dots will populate here -->
-            </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Amount to Subtract (Subtrahend): <span id="val-subtrahend" class="text-amber-400 font-extrabold text-sm">6</span></label>
+            <input id="range-subtrahend" type="range" min="0" max="15" value="6" class="w-full accent-amber-500 cursor-pointer h-2 bg-slate-800 rounded-lg appearance-none">
           </div>
-
         </div>
 
-        <div class="mt-3 flex items-center gap-4 flex-wrap text-xs text-slate-400">
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-indigo-500 inline-block"></span> Solid blocks = 10s Unit</span>
-          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded bg-indigo-300 inline-block"></span> Dot = 1s Unit</span>
+        <!-- Equation Display -->
+        <div class="bg-slate-950 rounded-xl p-5 border border-slate-800 text-center mb-6 relative overflow-hidden">
+          <div class="flex justify-center items-center gap-4 text-3xl md:text-5xl font-black tracking-tight">
+            <span class="text-rose-400 transition-all duration-300 inline-block" id="eq-minuend">15</span>
+            <span class="text-slate-600">−</span>
+            <span class="text-amber-400 transition-all duration-300 inline-block" id="eq-subtrahend">6</span>
+            <span class="text-slate-600">=</span>
+            <span class="text-emerald-400 transition-all duration-300 inline-block scale-110" id="eq-result">9</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-2 font-mono" id="eq-worded">Fifteen minus six equals nine</p>
+        </div>
+
+        <!-- Visual Board -->
+        <div class="border-2 border-dashed border-slate-800 rounded-xl p-6 bg-slate-950/50 min-h-[220px] flex flex-wrap gap-4 items-center justify-center relative">
+          <div id="visual-items-grid" class="flex flex-wrap gap-4 justify-center items-center max-w-xl"></div>
+        </div>
+
+        <!-- Explanatory Tooltip -->
+        <div class="mt-4 flex gap-3 items-center bg-slate-800/40 border border-slate-800 p-3.5 rounded-xl">
+          <span class="text-xl">💡</span>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Each dot represents <span class="text-rose-400 font-semibold">1 unit</span>. The dimmed, crossed out items <span class="text-amber-400 font-semibold">(with −)</span> show exactly what's subtracted. The vibrant active items remaining equal your final outcome.
+          </p>
+        </div>
+      </div>
+
+      <!-- TAB 2: ARCADE CHALLENGE -->
+      <div id="view-arcade" class="view-pane hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+              ⚡ Subtraction Arcade
+            </h2>
+            <p class="text-sm text-slate-400">Test your subtraction speed and build epic calculation streaks.</p>
+          </div>
+          
+          <!-- Difficulty Selector -->
+          <div class="flex gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 self-stretch sm:self-auto">
+            <button class="diff-btn active text-xs px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white transition-all" data-level="easy">Easy</button>
+            <button class="diff-btn text-xs px-3 py-1.5 rounded-lg font-bold text-slate-400 transition-all" data-level="medium">Medium</button>
+            <button class="diff-btn text-xs px-3 py-1.5 rounded-lg font-bold text-slate-400 transition-all" data-level="hard">Hard</button>
+            <button class="diff-btn text-xs px-3 py-1.5 rounded-lg font-bold text-slate-400 transition-all" data-level="insane">Insane</button>
+          </div>
+        </div>
+
+        <!-- Score Bar -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+            <p class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Score</p>
+            <p id="arcade-score" class="text-xl font-extrabold text-indigo-400">0</p>
+          </div>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+            <p class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Streak</p>
+            <p id="arcade-streak" class="text-xl font-extrabold text-amber-400">🔥 0</p>
+          </div>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+            <p class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Best Streak</p>
+            <p id="arcade-best-streak" class="text-xl font-extrabold text-emerald-400">0</p>
+          </div>
+        </div>
+
+        <!-- Active Question Box -->
+        <div id="arcade-playzone" class="bg-slate-950 rounded-2xl border border-slate-800 p-8 text-center relative">
+          <!-- Timer Bar -->
+          <div class="absolute top-0 left-0 right-0 h-1 bg-slate-800 rounded-t-2xl overflow-hidden">
+            <div id="arcade-timer" class="h-full bg-gradient-to-r from-rose-500 to-indigo-500 w-full transition-all duration-100 ease-linear"></div>
+          </div>
+
+          <p class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2">Solve the challenge!</p>
+          <div class="text-5xl md:text-6xl font-black mb-6 tracking-tight text-white flex justify-center items-center gap-3">
+            <span id="q-minuend">12</span>
+            <span class="text-slate-600">−</span>
+            <span id="q-subtrahend">7</span>
+            <span class="text-slate-600">=</span>
+            <span class="text-slate-400">?</span>
+          </div>
+
+          <!-- Options Grid -->
+          <div id="arcade-options" class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+            <button class="option-btn py-4 px-6 bg-slate-900 border border-slate-800 rounded-xl font-bold text-xl hover:bg-indigo-900/40 hover:border-indigo-500 text-white transition-all shadow-md active:scale-95">5</button>
+            <button class="option-btn py-4 px-6 bg-slate-900 border border-slate-800 rounded-xl font-bold text-xl hover:bg-indigo-900/40 hover:border-indigo-500 text-white transition-all shadow-md active:scale-95">6</button>
+            <button class="option-btn py-4 px-6 bg-slate-900 border border-slate-800 rounded-xl font-bold text-xl hover:bg-indigo-900/40 hover:border-indigo-500 text-white transition-all shadow-md active:scale-95">4</button>
+            <button class="option-btn py-4 px-6 bg-slate-900 border border-slate-800 rounded-xl font-bold text-xl hover:bg-indigo-900/40 hover:border-indigo-500 text-white transition-all shadow-md active:scale-95">7</button>
+          </div>
+        </div>
+
+        <!-- Game Over / Start Overlay (Hidden during game) -->
+        <div id="arcade-intro-overlay" class="hidden absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-6 text-center z-20">
+          <span class="text-5xl mb-4">🏆</span>
+          <h3 class="text-2xl font-black text-white mb-2" id="overlay-title">Ready to play?</h3>
+          <p class="text-slate-400 max-w-xs text-xs mb-6" id="overlay-desc">Solve correct subtraction answers before the timer runs out. Lose streak on wrong answers!</p>
+          <button id="btn-start-arcade" class="px-8 py-3.5 bg-gradient-to-r from-rose-500 to-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 hover:opacity-90 transition-opacity active:scale-95">
+            Start Subtraction Battle
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: STEP-BY-STEP SOLVER -->
+      <div id="view-solver" class="view-pane hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="mb-6">
+          <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+            🧮 Step-by-Step Solver
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Enter custom numbers (even larger ones) to visualize borrowing and columns.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Minuend (Top No.)</label>
+            <input id="solver-minuend" type="number" value="52" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-white text-lg font-bold focus:outline-none focus:border-emerald-500 transition-colors">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Subtrahend (Bottom No.)</label>
+            <input id="solver-subtrahend" type="number" value="28" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 text-white text-lg font-bold focus:outline-none focus:border-emerald-500 transition-colors">
+          </div>
+        </div>
+
+        <!-- Column Math Visualizer Container -->
+        <div class="bg-slate-950 rounded-xl p-6 border border-slate-800 flex flex-col items-center justify-center min-h-[180px] mb-6">
+          <div id="solver-math-columns" class="font-mono text-4xl font-extrabold flex flex-col items-end gap-1 relative px-8 py-4 border-b-4 border-slate-800">
+            <!-- Interactive borrowing flags will be rendered here dynamically -->
+          </div>
+          <div id="solver-column-label" class="text-xs text-emerald-400 font-semibold mt-4 text-center"></div>
+        </div>
+
+        <!-- Interactive explanation stages -->
+        <div class="flex flex-col gap-3" id="solver-steps-list">
+          <!-- Dynamically generated explanation blocks go here -->
         </div>
       </div>
 
     </div>
 
-    <!-- Right Side: Stats Panel & Historical Performance log - 4 columns -->
+    <!-- RIGHT SIDE: Metrics, Interactive Logs & Sound Settings -->
     <div class="lg:col-span-4 flex flex-col gap-6">
-
-      <!-- Interactive Virtual Numpad (Perfect for tablet/touch devices) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <h3 class="text-xs font-bold tracking-wider text-slate-400 uppercase mb-3">On-Screen Numeric Pad</h3>
-        <div class="grid grid-cols-3 gap-2">
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="1">1</button>
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="2">2</button>
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="3">3</button>
-          
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="4">4</button>
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="5">5</button>
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="6">6</button>
-          
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="7">7</button>
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="8">8</button>
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="9">9</button>
-          
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="dot">.</button>
-          <button class="numpad-key py-3.5 bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-bold rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/40 text-lg" data-val="0">0</button>
-          <button class="numpad-key py-3.5 bg-rose-900/40 hover:bg-rose-900/60 active:scale-95 text-rose-200 font-bold rounded-xl transition-all border border-rose-800/50 text-base" data-val="clear">Clear</button>
-        </div>
-      </div>
-
-      <!-- Statistics & Insights -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-        <h3 class="text-xs font-bold tracking-wider text-slate-400 uppercase mb-4">Performance Statistics</h3>
+      
+      <!-- Interactive Audio Synthesizer Controls -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <h3 class="text-md font-extrabold text-white mb-3 flex items-center gap-2">
+          🎵 Sound Effects Synthesizer
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">Synthesized real-time chip tunes for subtraction actions!</p>
         
-        <div class="space-y-3.5">
-          <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400">Correct Additions:</span>
-            <span id="stat-correct" class="text-sm font-bold text-white font-mono">0</span>
-          </div>
-          <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400">Incorrect Entries:</span>
-            <span id="stat-incorrect" class="text-sm font-bold text-slate-400 font-mono">0</span>
-          </div>
-          <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400">Accuracy Ratio:</span>
-            <span id="stat-accuracy" class="text-sm font-bold text-emerald-400 font-mono">0%</span>
-          </div>
-          <div class="flex justify-between items-center bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-            <span class="text-xs text-slate-400">Peak Streak Record:</span>
-            <span id="stat-max-streak" class="text-sm font-bold text-indigo-400 font-mono">0</span>
-          </div>
+        <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
+          <span class="text-xs font-bold text-slate-300">Sound FX</span>
+          <button id="btn-toggle-sound" class="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs transition-colors">
+            ON
+          </button>
         </div>
-
-        <button id="btn-reset-stats" class="mt-4 w-full py-2 px-3 text-center bg-slate-950 hover:bg-slate-800 text-xs text-rose-400 hover:text-rose-300 font-semibold rounded-lg transition-colors border border-rose-900/20">
-          Reset Statistics Tracker
-        </button>
+        
+        <div class="mt-3 flex gap-2">
+          <button id="btn-test-sound-pop" class="flex-1 text-[11px] bg-slate-800 hover:bg-slate-700 py-1.5 px-2 rounded-lg text-slate-300 font-semibold transition-colors">
+            🔊 Pop Sound
+          </button>
+          <button id="btn-test-sound-win" class="flex-1 text-[11px] bg-slate-800 hover:bg-slate-700 py-1.5 px-2 rounded-lg text-slate-300 font-semibold transition-colors">
+            🎉 Win Sound
+          </button>
+        </div>
       </div>
 
-      <!-- Additions Log (Real-time Feed of Equation answers) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex-1 flex flex-col min-h-[250px]">
-        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-          <h3 class="text-xs font-bold tracking-wider text-slate-300 uppercase">Verification Feed</h3>
-          <span id="feed-count" class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">0</span>
+      <!-- Interactive Operations log -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col flex-grow min-h-[300px]">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-md font-extrabold text-white flex items-center gap-2">
+            📋 Activity History
+          </h3>
+          <button id="btn-clear-history" class="text-[10px] text-slate-500 hover:text-rose-400 font-bold uppercase transition-colors">
+            Clear
+          </button>
         </div>
 
-        <!-- Scrollable Feed -->
-        <div id="feed-container" class="flex-1 overflow-y-auto space-y-2 pr-1 max-h-[240px] text-xs text-slate-400">
-          <div id="feed-placeholder" class="h-full flex flex-col items-center justify-center text-center py-8 text-slate-600">
-            <svg class="w-8 h-8 text-slate-700 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            No additions solved yet in this arena session.
+        <!-- Scrollable log -->
+        <div id="activity-log" class="flex-grow overflow-y-auto space-y-2.5 max-h-[320px] pr-1 scrollbar-thin scrollbar-thumb-slate-800">
+          <!-- Log states dynamically appended -->
+          <div class="text-center text-slate-500 text-xs py-8">
+            No equations processed yet. Get active in the sandbox or game above!
           </div>
         </div>
       </div>
@@ -262,16 +254,9 @@
     </div>
   </main>
 
-  <!-- Bottom Interactive Guide & Hints Footer -->
-  <footer class="border-t border-slate-800 bg-slate-900/40 py-4 px-4 text-center text-xs text-slate-500 mt-auto">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>Summit Additions Trainer - Built for mathematical speed &amp; visual learners.</p>
-      <p class="flex items-center gap-2">
-        <kbd class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-[10px] text-slate-300 font-mono">Enter</kbd> to submit
-        <span class="text-slate-700">|</span>
-        <kbd class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 text-[10px] text-slate-300 font-mono">Esc</kbd> to clear
-      </p>
-    </div>
+  <!-- Footer Info -->
+  <footer class="max-w-6xl mx-auto px-4 mt-12 text-center text-xs text-slate-600 border-t border-slate-900 pt-6">
+    <p>© Subtracto App - Visually learn subtraction concepts of difference, borrowing, and negative values. Created using modern browser audio & responsive graphics.</p>
   </footer>
 </div>
   
