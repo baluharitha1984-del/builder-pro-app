@@ -1,798 +1,894 @@
 /**
- * Dynamic State & Word Library Management
- * Includes native Hindi voice detection, flashcard flips, custom stats trackers,
- * interactive word banking with search/sort features, and an adaptive Quiz arena.
+ * LEXIQUEST - Elegant Web-Synthesized Interactive English Words Game
  */
 
-// Default baseline dictionary
-const INITIAL_WORDS = [
-  { id: "w1", hindi: "नमस्ते", translit: "Namaste", english: "Hello / Greetings", category: "Common Words", mastered: false, usage: "Namaste! Aap kaise hain?" },
-  { id: "w2", hindi: "धन्यवाद", translit: "Dhanyavaad", english: "Thank you", category: "Common Words", mastered: false, usage: "Helpful gesture: Dhanyavaad, mere dost!" },
-  { id: "w3", hindi: "प्यार", translit: "Pyaar", english: "Love", category: "Common Words", mastered: false, usage: "Pyaar ek sundar bhavna hai." },
-  { id: "w4", hindi: "मित्र", translit: "Mitra", english: "Friend", category: "Common Words", mastered: false, usage: "Mera mitra hamesha madad karta hai." },
-  { id: "w5", hindi: "खुशी", translit: "Khushi", english: "Happiness", category: "Common Words", mastered: false, usage: "Aapko jeevan me dher saari khushi mile." },
-  { id: "w6", hindi: "सूरज", translit: "Sooraj", english: "Sun", category: "Common Words", mastered: false, usage: "Sooraj subah nikalta hai." },
-  { id: "w7", hindi: "किताब", translit: "Kitaab", english: "Book", category: "Common Words", mastered: false, usage: "Mujhe nayi kitaab padhna pasand hai." },
-  { id: "w8", hindi: "नीला", translit: "Neela", english: "Blue", category: "Colors", mastered: false, usage: "Aakash ka rang neela hai." },
-  { id: "w9", hindi: "लाल", translit: "Laal", english: "Red", category: "Colors", mastered: false, usage: "Seb ka rang laal hota hai." },
-  { id: "w10", hindi: "एक", translit: "Ek", english: "One", category: "Numbers", mastered: false, usage: "Mere paas ek hi kalam hai." },
-  { id: "w11", hindi: "पाँच", translit: "Paanch", english: "Five", category: "Numbers", mastered: false, usage: "Hath me paanch ungliyan hoti hain." },
-  { id: "w12", hindi: "हाथी", translit: "Haathi", english: "Elephant", category: "Animals", mastered: false, usage: "Haathi sabse bada thal jantu hai." },
-  { id: "w13", hindi: "बिल्ली", translit: "Billi", english: "Cat", category: "Animals", mastered: false, usage: "Mera billi dhoodh peeti hai." },
-  { id: "w14", hindi: "आम", translit: "Aam", english: "Mango", category: "Food & Fruits", mastered: false, usage: "Aam ko phalo ka raja kaha jata hai." }
+// Dynamic client-side Rich Vocabulary Database
+const WORD_DATABASE = [
+  {
+    word: "EFFERVESCENT",
+    clue: "Vivacious, enthusiastic, or bubbling with excitement",
+    synonyms: ["Bubbly", "Dull", "Heavy", "Sluggish"],
+    correctSynonym: "Bubbly",
+    subwords: ["VECT", "TEEN", "SEVER", "EVER", "RESET", "FEVER", "FREE"]
+  },
+  {
+    word: "COGNIZANT",
+    clue: "Having knowledge or being fully aware of something",
+    synonyms: ["Aware", "Oblivious", "Ignorant", "Asleep"],
+    correctSynonym: "Aware",
+    subwords: ["COIN", "GONG", "COZ", "RAIN", "OAT", "AGO", "ZINC"]
+  },
+  {
+    word: "ZEPHYR",
+    clue: "A gentle, mild, or light breeze from the west",
+    synonyms: ["Breeze", "Hurricane", "Torrent", "Blizzard"],
+    correctSynonym: "Breeze",
+    subwords: ["PRY", "PREY", "HER", "YEZ", "HEP"]
+  },
+  {
+    word: "EPHEMERAL",
+    clue: "Lasting for a very short, transient time",
+    synonyms: ["Fleeting", "Eternal", "Timeless", "Durable"],
+    correctSynonym: "Fleeting",
+    subwords: ["PEAL", "PALE", "HEAL", "MEAL", "HAMP", "RAMP", "PEER"]
+  },
+  {
+    word: "LUMINOUS",
+    clue: "Full of or shedding bright glowing light",
+    synonyms: ["Radiant", "Dim", "Obscure", "Opaque"],
+    correctSynonym: "Radiant",
+    subwords: ["ION", "SOUL", "MINU", "SUN", "NIL", "SUM"]
+  },
+  {
+    word: "QUIRKY",
+    clue: "Characterized by peculiar, eccentric, or unconventional habits",
+    synonyms: ["Eccentric", "Ordinary", "Normal", "Standard"],
+    correctSynonym: "Eccentric",
+    subwords: ["YIRK", "QUIP", "YIP", "YRK", "RUY"]
+  },
+  {
+    word: "WANDERLUST",
+    clue: "A strong, innate desire to travel and explore the world",
+    synonyms: ["Roam", "Stagnancy", "Settle", "Homebound"],
+    correctSynonym: "Roam",
+    subwords: ["WAND", "LUST", "WEST", "LAND", "DUST", "RUST", "LUTE", "SUNT"]
+  },
+  {
+    word: "SAGACIOUS",
+    clue: "Having or showing keen mental discernment and good judgment",
+    synonyms: ["Wise", "Foolish", "Immature", "Naive"],
+    correctSynonym: "Wise",
+    subwords: ["SAGO", "SAGA", "COUS", "GAS", "SUG"]
+  },
+  {
+    word: "NEBULOUS",
+    clue: "Hazy, vague, indistinct, or cloud-like",
+    synonyms: ["Cloudy", "Clear", "Distinct", "Precise"],
+    correctSynonym: "Cloudy",
+    subwords: ["BLUE", "LOBE", "SLOB", "BONE", "SOLE"]
+  },
+  {
+    word: "MELLIFLUOUS",
+    clue: "Sweet or musical, pleasant and smooth to hear",
+    synonyms: ["Dulcet", "Harsh", "Shrill", "Noisy"],
+    correctSynonym: "Dulcet",
+    subwords: ["FILL", "MILL", "FLOW", "SOUL", "LIFE", "LIME", "SLIM"]
+  },
+  {
+    word: "CACOPHONY",
+    clue: "A harsh, discordant mixture of sounds",
+    synonyms: ["Noise", "Harmony", "Melody", "Silence"],
+    correctSynonym: "Noise",
+    subwords: ["PONY", "COCO", "CYAN", "COAX", "COP"]
+  },
+  {
+    word: "CAPRICIOUS",
+    clue: "Given to sudden and unaccountable changes of mood or behavior",
+    synonyms: ["Fickle", "Stable", "Reliable", "Constant"],
+    correctSynonym: "Fickle",
+    subwords: ["CAP", "RICE", "SOUP", "PACE", "SOUR"]
+  }
 ];
 
-// State Store
-let state = {
-  words: [],
-  currentCategory: 'all', 
-  currentWordIndex: 0,
-  quiz: {
-    isActive: false,
-    questions: [],
-    currentIndex: 0,
-    score: 0,
-    totalPointsGained: 0,
-    timerSecs: 15,
-    highScore: 0
-  },
-  streak: 1
+// Audio Synthesis Engine using browser Web Audio API
+class AudioEngine {
+  constructor() {
+    this.enabled = true;
+    this.ctx = null;
+  }
+
+  init() {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }
+
+  playTone(freq, type, duration, vol = 0.1) {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+      
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    } catch (e) {
+      console.warn("Web Audio API not supported/permitted yet.");
+    }
+  }
+
+  correct() {
+    this.playTone(523.25, 'triangle', 0.15, 0.15); // C5
+    setTimeout(() => this.playTone(659.25, 'triangle', 0.25, 0.15), 100); // E5
+  }
+
+  wrong() {
+    this.playTone(220, 'sawtooth', 0.3, 0.15); // A3
+  }
+
+  click() {
+    this.playTone(800, 'sine', 0.05, 0.08);
+  }
+
+  levelUp() {
+    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+      setTimeout(() => {
+        this.playTone(freq, 'sine', 0.2, 0.15);
+      }, idx * 100);
+    });
+  }
+}
+
+const audio = new AudioEngine();
+
+// Global Game State
+const state = {
+  level: 1,
+  xp: 0,
+  xpToNextLevel: 100,
+  score: 0,
+  streak: 0,
+  maxStreak: 0,
+  totalAnswers: 0,
+  correctAnswers: 0,
+  discoveredWords: 0,
+  currentMode: "scramble", // scramble, synonym, builder
+  
+  // Game 1: Scramble
+  scrambleIndex: 0,
+  scrambleOriginalWord: "",
+  scrambleShuffledWord: "",
+
+  // Game 2: Synonym
+  synonymIndex: 0,
+  synonymTimerVal: 15,
+  synonymTimerInterval: null,
+
+  // Game 3: Builder
+  builderCoreLetter: "",
+  builderRingLetters: [],
+  builderCurrentDraft: "",
+  builderPoolIndex: 0,
+  builderFoundList: [],
+
+  // Logs & Achievements
+  questJournal: []
 };
 
-// Load from localStorage or set defaults
-function loadState() {
-  const cachedWords = localStorage.getItem('shabda_vocab_words');
-  const cachedStreak = localStorage.getItem('shabda_streak');
-  const cachedHighScore = localStorage.getItem('shabda_high_score');
-  
-  if (cachedWords) {
-    try {
-      state.words = JSON.parse(cachedWords);
-    } catch (e) {
-      state.words = [...INITIAL_WORDS];
+// Initialize App on DOM Loaded
+document.addEventListener("DOMContentLoaded", () => {
+  loadLocalStorage();
+  setupMenuTabs();
+  setupScrambleGame();
+  setupSynonymGame();
+  setupBuilderGame();
+  setupGlobalEventListeners();
+  renderStats();
+  updateDailyWordWidget();
+  showToast("Welcome to LexiQuest! Choose your arena mode and spell your way to glory.", "⚡", "success");
+});
+
+// LocalStorage helpers
+function saveLocalStorage() {
+  const dataToSave = {
+    level: state.level,
+    xp: state.xp,
+    score: state.score,
+    streak: state.streak,
+    maxStreak: state.maxStreak,
+    totalAnswers: state.totalAnswers,
+    correctAnswers: state.correctAnswers,
+    discoveredWords: state.discoveredWords,
+    questJournal: state.questJournal
+  };
+  localStorage.setItem("lexiquest_save_v1", JSON.stringify(dataToSave));
+}
+
+function loadLocalStorage() {
+  try {
+    const saved = localStorage.getItem("lexiquest_save_v1");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.level = parsed.level || 1;
+      state.xp = parsed.xp || 0;
+      state.score = parsed.score || 0;
+      state.streak = parsed.streak || 0;
+      state.maxStreak = parsed.maxStreak || 0;
+      state.totalAnswers = parsed.totalAnswers || 0;
+      state.correctAnswers = parsed.correctAnswers || 0;
+      state.discoveredWords = parsed.discoveredWords || 0;
+      state.questJournal = parsed.questJournal || [];
     }
-  } else {
-    state.words = [...INITIAL_WORDS];
-  }
-
-  if (cachedStreak) {
-    state.streak = parseInt(cachedStreak, 10) || 1;
-  }
-
-  if (cachedHighScore) {
-    state.quiz.highScore = parseInt(cachedHighScore, 10) || 0;
+  } catch (e) {
+    console.error("Failed reading local storage state", e);
   }
 }
 
-function saveStateToStorage() {
-  localStorage.setItem('shabda_vocab_words', JSON.stringify(state.words));
-  localStorage.setItem('shabda_streak', state.streak.toString());
-  localStorage.setItem('shabda_high_score', state.quiz.highScore.toString());
-}
+// Mode Tab Switcher
+function setupMenuTabs() {
+  const tabScramble = document.getElementById("tab-scramble");
+  const tabSynonym = document.getElementById("tab-synonym");
+  const tabBuilder = document.getElementById("tab-builder");
 
-// Text To Speech Native Voice Loader
-function setupSpeechEngine() {
-  const voiceSelect = document.getElementById('voice-select');
-  if ('speechSynthesis' in window) {
-    const populateVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      // clear default option first
-      voiceSelect.innerHTML = '<option value="default">System Standard Voice</option>';
-      
-      // filter or sort to present Hindi voices first, then general English/others
-      const hiVoices = voices.filter(v => v.lang.startsWith('hi') || v.lang.includes('IN'));
-      const otherVoices = voices.filter(v => !v.lang.startsWith('hi') && !v.lang.includes('IN'));
-      
-      hiVoices.forEach(voice => {
-        const option = document.createElement('option');
-        option.value = voice.name;
-        option.textContent = `🇮🇳 ${voice.name} (${voice.lang})`;
-        option.selected = true; // Auto pick if native hindi found
-        voiceSelect.appendChild(option);
-      });
+  const viewScramble = document.getElementById("game-view-scramble");
+  const viewSynonym = document.getElementById("game-view-synonym");
+  const viewBuilder = document.getElementById("game-view-builder");
 
-      otherVoices.slice(0, 10).forEach(voice => {
-        const option = document.createElement('option');
-        option.value = voice.name;
-        option.textContent = `${voice.name} (${voice.lang})`;
-        voiceSelect.appendChild(option);
-      });
-    };
-
-    populateVoices();
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = populateVoices;
+  function selectTab(mode) {
+    audio.click();
+    state.currentMode = mode;
+    
+    // Clear intervals if applicable
+    if (state.synonymTimerInterval) {
+      clearInterval(state.synonymTimerInterval);
     }
-  } else {
-    voiceSelect.innerHTML = '<option value="unsupported">Not supported by browser</option>';
-    voiceSelect.disabled = true;
-  }
-}
 
-// Pronunciation Speaker
-function speakWord(hindiText) {
-  if ('speechSynthesis' in window) {
-    // Cancel any active speech
-    window.speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(hindiText);
-    const voiceSelect = document.getElementById('voice-select');
-    const selectedVoiceName = voiceSelect.value;
-    
-    if (selectedVoiceName !== 'default' && selectedVoiceName !== 'unsupported') {
-      const voices = window.speechSynthesis.getVoices();
-      const chosenVoice = voices.find(v => v.name === selectedVoiceName);
-      if (chosenVoice) {
-        utterance.voice = chosenVoice;
-      }
-    } else {
-      // fallback language set to Hindi India
-      utterance.lang = 'hi-IN';
-    }
-    
-    utterance.rate = 0.85; // Slightly slower for crisp pronunciation practice
-    window.speechSynthesis.speak(utterance);
-  } else {
-    showToast("Audio synthesis not supported by your current browser.", "⚠️");
-  }
-}
-
-// UI Toast Alerts
-function showToast(message, emoji = '🚀') {
-  const toast = document.getElementById('toast-message');
-  document.getElementById('toast-emoji').innerText = emoji;
-  document.getElementById('toast-text').innerText = message;
-  
-  toast.classList.remove('opacity-0');
-  toast.classList.add('opacity-100');
-  
-  setTimeout(() => {
-    toast.classList.remove('opacity-100');
-    toast.classList.add('opacity-0');
-  }, 3000);
-}
-
-// Filtered words pool based on current dynamic category sidebar selection
-function getFilteredWords() {
-  if (state.currentCategory === 'all') {
-    return state.words;
-  }
-  return state.words.filter(w => w.category === state.currentCategory);
-}
-
-// Extract all unique categories
-function getUniqueCategories() {
-  const cats = new Set(state.words.map(w => w.category));
-  return Array.from(cats);
-}
-
-// Redraw category side menu
-function renderCategoriesMenu() {
-  const container = document.getElementById('categories-container');
-  const badgeCount = document.getElementById('category-badge-count');
-  const uniqueCats = getUniqueCategories();
-  
-  badgeCount.textContent = uniqueCats.length;
-  
-  let html = `
-    <button data-cat="all" class="cat-pill w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${state.currentCategory === 'all' ? 'bg-orange-50 text-orange-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}">
-      <span class="flex items-center gap-2">🌟 Show All</span>
-      <span class="bg-slate-200/60 text-slate-700 px-2 py-0.5 rounded-full text-[10px]">${state.words.length}</span>
-    </button>
-  `;
-
-  uniqueCats.forEach(cat => {
-    const count = state.words.filter(w => w.category === cat).length;
-    const isActive = state.currentCategory === cat;
-    html += `
-      <button data-cat="${cat}" class="cat-pill w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${isActive ? 'bg-orange-50 text-orange-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}">
-        <span>📂 ${cat}</span>
-        <span class="bg-slate-200/60 text-slate-700 px-2 py-0.5 rounded-full text-[10px]">${count}</span>
-      </button>
-    `;
-  });
-
-  container.innerHTML = html;
-
-  // Attach listeners to newly generated side menu options
-  document.querySelectorAll('.cat-pill').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const selectedCat = btn.getAttribute('data-cat');
-      state.currentCategory = selectedCat;
-      state.currentWordIndex = 0;
-      
-      renderCategoriesMenu();
-      updateFlashcardView();
-      showToast(`Switched filter to "${selectedCat}"`, "📂");
+    // Reset buttons styles
+    [tabScramble, tabSynonym, tabBuilder].forEach(btn => {
+      btn.classList.remove("bg-indigo-600/20", "text-indigo-200", "border-indigo-500/50", "bg-purple-600/20", "text-purple-200", "border-purple-500/50", "bg-pink-600/20", "text-pink-200", "border-pink-500/50");
+      btn.classList.add("hover:bg-slate-800", "text-slate-300");
+      // Remove indicator ping
+      const ping = btn.querySelector("span.animate-ping");
+      if (ping) ping.classList.add("hidden");
     });
-  });
-}
 
-// Statistics updates
-function updateStatsDashboard() {
-  const masteredCount = state.words.filter(w => w.mastered).length;
-  const totalCount = state.words.length;
-  
-  document.getElementById('stat-mastered-count').textContent = masteredCount;
-  document.getElementById('stat-streak').textContent = state.streak;
-  
-  document.getElementById('vocab-progress-label').textContent = `${masteredCount} of ${totalCount} mastered`;
-  
-  const percent = totalCount > 0 ? (masteredCount / totalCount) * 100 : 0;
-  document.getElementById('vocab-progress-bar').style.width = `${percent}%`;
-  
-  // highscore display
-  document.getElementById('quiz-high-score').textContent = `${state.quiz.highScore} pts`;
-}
+    // Hide all view screens
+    viewScramble.classList.add("hidden");
+    viewSynonym.classList.add("hidden");
+    viewBuilder.classList.add("hidden");
 
-// Update single flashcard elements
-function updateFlashcardView() {
-  const filtered = getFilteredWords();
-  const cardInner = document.getElementById('flashcard-inner');
-  
-  // Always unflip to front when loading a new card
-  cardInner.classList.remove('card-flipped');
-
-  if (filtered.length === 0) {
-    document.getElementById('card-hindi-word').textContent = "कोई शब्द नहीं";
-    document.getElementById('card-transliteration').textContent = "No words in this category";
-    document.getElementById('card-english-translation').textContent = "Use the word bank to add a card!";
-    document.getElementById('card-usage').textContent = "n/a";
-    document.getElementById('card-badge-category').textContent = "Empty";
-    document.getElementById('card-index-indicator').textContent = "0 of 0";
-    return;
-  }
-
-  // Clamp index
-  if (state.currentWordIndex >= filtered.length) {
-    state.currentWordIndex = 0;
-  }
-  if (state.currentWordIndex < 0) {
-    state.currentWordIndex = filtered.length - 1;
-  }
-
-  const word = filtered[state.currentWordIndex];
-  
-  document.getElementById('card-hindi-word').textContent = word.hindi;
-  document.getElementById('card-transliteration').textContent = word.translit;
-  document.getElementById('card-english-translation').textContent = word.english;
-  document.getElementById('card-usage').textContent = word.usage ? `"${word.usage}"` : "No example custom sentence available.";
-  document.getElementById('card-badge-category').textContent = word.category;
-  document.getElementById('card-index-indicator').textContent = `Card ${state.currentWordIndex + 1} of ${filtered.length}`;
-
-  // Check if easy/mastered to change UI state
-  const btnEasy = document.getElementById('btn-mark-easy');
-  if (word.mastered) {
-    btnEasy.innerHTML = `🌟 Mastered! (Click to Undo)`;
-    btnEasy.className = "flex-1 bg-amber-600 hover:bg-amber-700 text-white py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md";
-  } else {
-    btnEasy.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg> Easy! Mastered`;
-    btnEasy.className = "flex-1 bg-emerald-600/95 hover:bg-emerald-600 text-white py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md";
-  }
-}
-
-// Navigation Switches between panels (Tabs)
-function activateTab(tabId) {
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => {
-    if (btn.id === tabId) {
-      btn.className = "tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-white text-orange-600 shadow-sm";
-    } else {
-      btn.className = "tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900";
+    if (mode === "scramble") {
+      tabScramble.classList.add("bg-indigo-600/20", "text-indigo-200", "border-indigo-500/50");
+      tabScramble.classList.remove("hover:bg-slate-800");
+      viewScramble.classList.remove("hidden");
+      setupScrambleGame();
+    } else if (mode === "synonym") {
+      tabSynonym.classList.add("bg-purple-600/20", "text-purple-200", "border-purple-500/50");
+      tabSynonym.classList.remove("hover:bg-slate-800");
+      viewSynonym.classList.remove("hidden");
+      startSynonymGame();
+    } else if (mode === "builder") {
+      tabBuilder.classList.add("bg-pink-600/20", "text-pink-200", "border-pink-500/50");
+      tabBuilder.classList.remove("hover:bg-slate-800");
+      viewBuilder.classList.remove("hidden");
+      setupBuilderGame();
     }
-  });
-
-  // Hide all main section tags
-  document.getElementById('section-flashcards').classList.add('hidden');
-  document.getElementById('section-quiz').classList.add('hidden');
-  document.getElementById('section-dictionary').classList.add('hidden');
-
-  // Show specific section mapped
-  if (tabId === 'tab-flashcards') {
-    document.getElementById('section-flashcards').classList.remove('hidden');
-  } else if (tabId === 'tab-quiz') {
-    document.getElementById('section-quiz').classList.remove('hidden');
-    // Stop running quiz if switching away and coming back, to let user start cleanly
-  } else if (tabId === 'tab-dictionary') {
-    document.getElementById('section-dictionary').classList.remove('hidden');
-    renderDictionaryTable();
-    populateDictionaryDropdowns();
   }
+
+  tabScramble.addEventListener("click", () => selectTab("scramble"));
+  tabSynonym.addEventListener("click", () => selectTab("synonym"));
+  tabBuilder.addEventListener("click", () => selectTab("builder"));
 }
 
-// --- QUIZ GAME LOGIC STATE MACHINE ---
-function initiateQuiz(size) {
-  const pool = [...state.words];
-  if (pool.length < 4) {
-    showToast("Add at least 4 Hindi words in vocabulary database to play standard Quiz!", "⚠️");
-    return;
-  }
-
-  // Shuffle words
-  const shuffled = pool.sort(() => 0.5 - Math.random());
-  const selectedQuizSize = Math.min(size, shuffled.length);
-  const questions = shuffled.slice(0, selectedQuizSize);
-
-  state.quiz.isActive = true;
-  state.quiz.questions = questions;
-  state.quiz.currentIndex = 0;
-  state.quiz.score = 0;
-  state.quiz.totalPointsGained = 0;
-
-  document.getElementById('quiz-setup-panel').classList.add('hidden');
-  document.getElementById('quiz-finished-panel').classList.add('hidden');
-  document.getElementById('quiz-play-panel').classList.remove('hidden');
-  document.getElementById('quiz-progress-header').classList.remove('hidden');
-
-  renderQuizQuestion();
-}
-
-function renderQuizQuestion() {
-  const currentQuestionIndex = state.quiz.currentIndex;
-  const totalQuestions = state.quiz.questions.length;
-
-  // Setup progress info
-  document.getElementById('quiz-question-index').textContent = `${currentQuestionIndex + 1}/${totalQuestions}`;
-  document.getElementById('quiz-current-points').textContent = state.quiz.score;
-
-  // Retrieve targets
-  const correctWord = state.quiz.questions[currentQuestionIndex];
-  document.getElementById('quiz-question-hindi').textContent = correctWord.hindi;
-  document.getElementById('quiz-question-translit').textContent = correctWord.translit;
-
-  // Clear/hide feedback alert
-  const feedback = document.getElementById('quiz-feedback');
-  feedback.className = "p-4 rounded-xl text-sm font-semibold text-center hidden transition-all duration-300";
-  feedback.textContent = "";
-
-  // Setup multiple choices (4 options)
-  let options = [correctWord.english];
+// --- GAME 1: SCRAMBLE LOGIC ---
+function setupScrambleGame() {
+  // Load current index word
+  const entry = WORD_DATABASE[state.scrambleIndex];
+  state.scrambleOriginalWord = entry.word;
   
-  // Populate random incorrect choices
-  const incorrectPool = state.words.filter(w => w.id !== correctWord.id);
-  const shuffledPool = incorrectPool.sort(() => 0.5 - Math.random());
-  
-  for (let i = 0; i < Math.min(3, shuffledPool.length); i++) {
-    options.push(shuffledPool[i].english);
+  // Suffle word helper
+  state.scrambleShuffledWord = shuffleString(entry.word);
+  // Ensure they are not exactly identical
+  while (state.scrambleShuffledWord === state.scrambleOriginalWord && entry.word.length > 2) {
+    state.scrambleShuffledWord = shuffleString(entry.word);
   }
 
-  // Ensure distinct choices
-  options = Array.from(new Set(options));
-  while (options.length < 4) {
-    options.push("Alternate definition " + Math.floor(Math.random() * 100));
-  }
-
-  // Randomize positions
-  options.sort(() => 0.5 - Math.random());
-
-  // Render Options HTML
-  const container = document.getElementById('quiz-options-container');
+  // Render letter tiles
+  const container = document.getElementById("scramble-letters-container");
   container.innerHTML = "";
   
-  options.forEach(optionText => {
-    const btn = document.createElement('button');
-    btn.className = "quiz-option-btn w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 bg-white font-medium text-slate-700 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500";
-    btn.textContent = optionText;
-    btn.addEventListener('click', () => selectQuizAnswer(btn, optionText, correctWord.english));
+  state.scrambleShuffledWord.split("").forEach((char, index) => {
+    const btn = document.createElement("button");
+    btn.className = "h-12 w-12 bg-slate-800 hover:bg-slate-700 text-slate-100 font-extrabold text-lg rounded-xl transition-all active:scale-95 shadow border border-slate-700 hover:border-indigo-500";
+    btn.textContent = char;
+    btn.addEventListener("click", () => {
+      audio.click();
+      const inputField = document.getElementById("scramble-input");
+      inputField.value += char;
+      // visually disable/scale down selected button momentarily to act as pool
+      btn.classList.add("opacity-40", "scale-90");
+      setTimeout(() => {
+        btn.classList.remove("opacity-40", "scale-90");
+      }, 300);
+    });
     container.appendChild(btn);
   });
 
-  // Disable next button until option selected
-  document.getElementById('btn-next-quiz-question').disabled = true;
+  // Set clue text
+  document.getElementById("scramble-clue-text").textContent = entry.clue;
+  document.getElementById("scramble-input").value = "";
 }
 
-function selectQuizAnswer(selectedButton, optionSelected, correctEnglish) {
-  // Turn off clicks for other options in current question
-  const buttons = document.querySelectorAll('.quiz-option-btn');
-  buttons.forEach(btn => {
-    btn.disabled = true;
-    if (btn.textContent === correctEnglish) {
-      btn.className = "quiz-option-btn w-full text-left p-4 rounded-xl border border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-sm transition-all";
-    }
-  });
-
-  const feedback = document.getElementById('quiz-feedback');
-  feedback.classList.remove('hidden');
-
-  if (optionSelected === correctEnglish) {
-    state.quiz.score += 100;
-    state.quiz.totalPointsGained += 1;
-    feedback.textContent = "✨ Correct! Well done +100 XP!";
-    feedback.className = "p-4 rounded-xl text-sm font-bold text-center text-emerald-700 bg-emerald-50 border border-emerald-100 transition-all duration-300";
-    selectedButton.className = "quiz-option-btn w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-100 text-emerald-900 font-black text-sm transition-all";
-    
-    // Auto speak the word as correction reinforcement
-    const targetWord = state.quiz.questions[state.quiz.currentIndex].hindi;
-    speakWord(targetWord);
-  } else {
-    feedback.textContent = `❌ Incorrect! The correct answer is "${correctEnglish}"`;
-    feedback.className = "p-4 rounded-xl text-sm font-bold text-center text-red-700 bg-red-50 border border-red-100 transition-all duration-300";
-    selectedButton.className = "quiz-option-btn w-full text-left p-4 rounded-xl border-2 border-red-500 bg-red-100 text-red-900 font-black text-sm transition-all";
+// Helper to shuffle strings
+function shuffleString(str) {
+  let arr = str.split("");
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-
-  document.getElementById('quiz-current-points').textContent = state.quiz.score;
-  document.getElementById('btn-next-quiz-question').disabled = false;
+  return arr.join("");
 }
 
-function advanceQuiz() {
-  state.quiz.currentIndex++;
-  if (state.quiz.currentIndex < state.quiz.questions.length) {
-    renderQuizQuestion();
-  } else {
-    finishQuizGame();
-  }
-}
+// Check Scramble Guess
+function submitScramble() {
+  const inputVal = document.getElementById("scramble-input").value.trim().toUpperCase();
+  const entry = WORD_DATABASE[state.scrambleIndex];
 
-function finishQuizGame() {
-  document.getElementById('quiz-play-panel').classList.add('hidden');
-  document.getElementById('quiz-progress-header').classList.add('hidden');
-  document.getElementById('quiz-finished-panel').classList.remove('hidden');
-
-  const total = state.quiz.questions.length;
-  document.getElementById('quiz-final-score').textContent = `${state.quiz.totalPointsGained}/${total}`;
-  document.getElementById('quiz-gained-points').textContent = `+${state.quiz.score}`;
-
-  // If streak multiplier
-  state.streak += 1;
-
-  // Check highscore
-  if (state.quiz.score > state.quiz.highScore) {
-    state.quiz.highScore = state.quiz.score;
-    showToast("New High Score Reached! 🎉", "🏆");
-  }
-
-  saveStateToStorage();
-  updateStatsDashboard();
-}
-
-// --- WORD BANK & DICTIONARY LOGIC ---
-function populateDictionaryDropdowns() {
-  const filterSelect = document.getElementById('dictionary-category-filter');
-  const uniqueCats = getUniqueCategories();
-  
-  // Preserve current value if possible
-  const currentVal = filterSelect.value;
-  
-  filterSelect.innerHTML = '<option value="all">All Categories</option>';
-  uniqueCats.forEach(cat => {
-    const option = document.createElement('option');
-    option.value = cat;
-    option.textContent = cat;
-    filterSelect.appendChild(option);
-  });
-
-  filterSelect.value = currentVal;
-}
-
-function renderDictionaryTable() {
-  const tbody = document.getElementById('dictionary-table-body');
-  const emptyState = document.getElementById('dictionary-empty-state');
-  const searchQuery = document.getElementById('dictionary-search-input').value.toLowerCase().trim();
-  const selectedCategory = document.getElementById('dictionary-category-filter').value;
-  const selectedSort = document.getElementById('dictionary-sort-filter').value;
-
-  // Filter
-  let filtered = state.words.filter(w => {
-    const matchesSearch = w.hindi.toLowerCase().includes(searchQuery) ||
-                          w.translit.toLowerCase().includes(searchQuery) ||
-                          w.english.toLowerCase().includes(searchQuery) ||
-                          (w.usage && w.usage.toLowerCase().includes(searchQuery));
-    
-    const matchesCategory = selectedCategory === 'all' || w.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
-  });
-
-  // Sort
-  if (selectedSort === 'hindi-asc') {
-    filtered.sort((a, b) => a.hindi.localeCompare(b.hindi, 'hi'));
-  } else if (selectedSort === 'english-asc') {
-    filtered.sort((a, b) => a.english.localeCompare(b.english));
-  } else {
-    // custom / recently added is natural state reverse
-    filtered = [...filtered].reverse();
-  }
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = '';
-    emptyState.classList.remove('hidden');
+  if (!inputVal) {
+    showToast("Please enter/click letters to make a word guess first!", "⚠️", "error");
+    shakeContainer("scramble-input");
     return;
   }
-  emptyState.classList.add('hidden');
 
-  tbody.innerHTML = filtered.map(w => {
-    return `
-      <tr class="hover:bg-slate-50 transition-colors group">
-        <td class="px-6 py-4 whitespace-nowrap text-base font-extrabold text-slate-900 font-devanagari">
-          ${w.hindi}
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 italic">
-          ${w.translit}
-        </td>
-        <td class="px-6 py-4 text-sm text-slate-700">
-          <span class="font-medium">${w.english}</span>
-          <p class="text-[11px] text-slate-400 mt-0.5">${w.usage || ''}</p>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-xs">
-          <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full font-semibold">
-            ${w.category}
-          </span>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-xs">
-          <button onclick="toggleMasteredStatus('${w.id}')" class="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all ${w.mastered ? 'bg-amber-100 text-amber-700 border border-amber-200' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'}">
-            <span>${w.mastered ? '🌟 Mastered' : '⏳ Practice'}</span>
-          </button>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-          <div class="flex items-center justify-center gap-1.5">
-            <button onclick="speakWord('${w.hindi}')" class="p-1.5 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all" title="Pronounce">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-            </button>
-            <button onclick="deleteWord('${w.id}')" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Delete Word">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
+  state.totalAnswers++;
+  if (inputVal === entry.word) {
+    // Success!
+    audio.correct();
+    const gainXP = 30 + (state.streak * 5);
+    awardXP(gainXP);
+    state.score += 50;
+    state.streak++;
+    if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+    state.correctAnswers++;
+    state.discoveredWords++;
+
+    addJournalEntry(entry.word, "Scramble Mastered", "Correct");
+    showToast(`Perfect! "${entry.word}" is correct. (+${gainXP} XP)`, "🎉", "success");
+
+    // Proceed to next word
+    state.scrambleIndex = (state.scrambleIndex + 1) % WORD_DATABASE.length;
+    setTimeout(setupScrambleGame, 800);
+  } else {
+    // Failed
+    audio.wrong();
+    state.streak = 0;
+    showToast("Incorrect spelling! Try checking the clue definition again.", "❌", "error");
+    shakeContainer("scramble-input");
+  }
+  renderStats();
+  saveLocalStorage();
 }
 
-// Toggle mastery
-window.toggleMasteredStatus = function(wordId) {
-  const word = state.words.find(w => w.id === wordId);
-  if (word) {
-    word.mastered = !word.mastered;
-    saveStateToStorage();
-    updateStatsDashboard();
-    renderDictionaryTable();
-    updateFlashcardView();
-    showToast(`Updated progress for "${word.translit}"!`, "📈");
-  }
-};
+// --- GAME 2: SYNONYM LOGIC ---
+function startSynonymGame() {
+  const entry = WORD_DATABASE[state.synonymIndex];
+  document.getElementById("synonym-target-word").textContent = entry.word;
+  document.getElementById("synonym-hint-def").textContent = "Definition: " + entry.clue;
 
-// Delete single word
-window.deleteWord = function(wordId) {
-  const target = state.words.find(w => w.id === wordId);
-  if (!target) return;
-  
-  if (confirm(`Are you sure you want to delete "${target.hindi}" (${target.english})?`)) {
-    state.words = state.words.filter(w => w.id !== wordId);
-    saveStateToStorage();
-    updateStatsDashboard();
-    renderCategoriesMenu();
-    renderDictionaryTable();
-    updateFlashcardView();
-    showToast(`Deleted "${target.translit}"`, "🗑️");
-  }
-};
+  // Mix synonyms options
+  const options = [...entry.synonyms];
+  // Shuffle options so correct answer is at variable spot
+  options.sort(() => Math.random() - 0.5);
 
-// Trigger speech utility externally
-window.speakWord = function(hindiText) {
-  speakWord(hindiText);
-};
+  const container = document.getElementById("synonym-options-container");
+  container.innerHTML = "";
 
-// --- EVENT LISTENERS & INITS ---
-function setupEventListeners() {
-  // Tab Switching
-  document.getElementById('tab-flashcards').addEventListener('click', () => activateTab('tab-flashcards'));
-  document.getElementById('tab-quiz').addEventListener('click', () => activateTab('tab-quiz'));
-  document.getElementById('tab-dictionary').addEventListener('click', () => activateTab('tab-dictionary'));
-
-  // Flashcard Actions
-  const card = document.getElementById('flashcard');
-  const cardInner = document.getElementById('flashcard-inner');
-  
-  const flipCard = () => {
-    cardInner.classList.toggle('card-flipped');
-  };
-  
-  // Flip on click
-  card.addEventListener('click', (e) => {
-    // Avoid flip trigger if audio button, easy or needs practice button is clicked
-    if (e.target.closest('#card-audio-btn') || e.target.closest('#btn-mark-easy') || e.target.closest('#btn-mark-hard')) {
-      return;
-    }
-    flipCard();
+  options.forEach(option => {
+    const btn = document.createElement("button");
+    btn.className = "p-4 bg-slate-800 hover:bg-slate-700 hover:border-purple-500 rounded-2xl border border-slate-700/80 text-sm font-black text-slate-100 transition-all text-center tracking-wide uppercase active:scale-95";
+    btn.textContent = option;
+    btn.addEventListener("click", () => {
+      checkSynonym(option, entry.correctSynonym);
+    });
+    container.appendChild(btn);
   });
 
-  document.getElementById('btn-flip-trigger').addEventListener('click', flipCard);
+  // Start speedrun timer
+  state.synonymTimerVal = 15;
+  document.getElementById("synonym-timer").textContent = state.synonymTimerVal + "s";
+  document.getElementById("synonym-timer").className = "text-sm font-bold text-emerald-400";
 
-  // Audio cue inside flashcard front
-  document.getElementById('card-audio-btn').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const filtered = getFilteredWords();
-    if (filtered.length > 0) {
-      speakWord(filtered[state.currentWordIndex].hindi);
-    }
-  });
-
-  // Previous & Next Card Controls
-  document.getElementById('btn-prev').addEventListener('click', () => {
-    state.currentWordIndex--;
-    updateFlashcardView();
-  });
-
-  document.getElementById('btn-next').addEventListener('click', () => {
-    state.currentWordIndex++;
-    updateFlashcardView();
-  });
-
-  // Easy / Hard card rating buttons inside back
-  document.getElementById('btn-mark-easy').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const filtered = getFilteredWords();
-    if (filtered.length > 0) {
-      const word = filtered[state.currentWordIndex];
-      word.mastered = !word.mastered; // Toggle mastery state
-      saveStateToStorage();
-      updateStatsDashboard();
-      updateFlashcardView();
-      showToast(word.mastered ? "Word marked as Mastered! 🎉" : "Word removed from Mastered status.", "⭐");
-    }
-  });
-
-  document.getElementById('btn-mark-hard').addEventListener('click', (e) => {
-    e.stopPropagation();
-    const filtered = getFilteredWords();
-    if (filtered.length > 0) {
-      const word = filtered[state.currentWordIndex];
-      word.mastered = false;
-      saveStateToStorage();
-      updateStatsDashboard();
-      updateFlashcardView();
-      showToast("Kept in daily practice rotation!", "📚");
-      // Auto proceed to next card for flow
-      setTimeout(() => {
-        state.currentWordIndex++;
-        updateFlashcardView();
-      }, 800);
-    }
-  });
-
-  // Reset all mastery status helper
-  document.getElementById('btn-reset-mastery').addEventListener('click', () => {
-    if (confirm("Are you sure you want to reset all vocabulary mastery? This starts all words as 'Needs Practice'.")) {
-      state.words.forEach(w => w.mastered = false);
-      saveStateToStorage();
-      updateStatsDashboard();
-      updateFlashcardView();
-      showToast("All word mastery status cleared!", "🔄");
-    }
-  });
-
-  // Keyboard hotkey listeners
-  document.addEventListener('keydown', (e) => {
-    // Only capture keys if not actively typing inside input fields
-    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') {
-      return;
-    }
-
-    const isFlashcardsVisible = !document.getElementById('section-flashcards').classList.contains('hidden');
-    if (!isFlashcardsVisible) return;
-
-    if (e.code === 'Space') {
-      e.preventDefault();
-      flipCard();
-    } else if (e.code === 'ArrowLeft') {
-      state.currentWordIndex--;
-      updateFlashcardView();
-    } else if (e.code === 'ArrowRight') {
-      state.currentWordIndex++;
-      updateFlashcardView();
-    }
-  });
-
-  // --- QUIZ ACTIONS ---
-  document.getElementById('btn-start-quiz-5').addEventListener('click', () => initiateQuiz(5));
-  document.getElementById('btn-start-quiz-10').addEventListener('click', () => initiateQuiz(10));
-  document.getElementById('btn-next-quiz-question').addEventListener('click', advanceQuiz);
-  
-  document.getElementById('btn-quit-quiz').addEventListener('click', () => {
-    if (confirm("Are you sure you want to quit the current quiz?")) {
-      state.quiz.isActive = false;
-      document.getElementById('quiz-setup-panel').classList.remove('hidden');
-      document.getElementById('quiz-play-panel').classList.add('hidden');
-      document.getElementById('quiz-progress-header').classList.add('hidden');
-      showToast("Quiz abandoned.", "🛑");
-    }
-  });
-
-  document.getElementById('btn-quiz-retry').addEventListener('click', () => {
-    document.getElementById('quiz-finished-panel').classList.add('hidden');
-    document.getElementById('quiz-setup-panel').classList.remove('hidden');
-  });
-
-  document.getElementById('quiz-audio-cue').addEventListener('click', () => {
-    const correctWord = state.quiz.questions[state.quiz.currentIndex];
-    if (correctWord) {
-      speakWord(correctWord.hindi);
-    }
-  });
-
-  // --- DICTIONARY & MODAL MANAGEMENT ---
-  const modal = document.getElementById('add-word-modal');
-  const openModalBtn = document.getElementById('btn-open-add-modal');
-  const closeModalBtn = document.getElementById('btn-close-modal');
-  const cancelModalBtn = document.getElementById('btn-cancel-modal');
-  const form = document.getElementById('add-word-form');
-
-  const openModal = () => {
-    modal.classList.remove('hidden');
-    document.getElementById('form-input-hindi').focus();
-  };
-
-  const closeModal = () => {
-    modal.classList.add('hidden');
-    form.reset();
-  };
-
-  openModalBtn.addEventListener('click', openModal);
-  closeModalBtn.addEventListener('click', closeModal);
-  cancelModalBtn.addEventListener('click', closeModal);
-
-  // Modal outer-click cancel
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-
-  // Form submission handler
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const hindiVal = document.getElementById('form-input-hindi').value.trim();
-    const translitVal = document.getElementById('form-input-translit').value.trim();
-    const englishVal = document.getElementById('form-input-english').value.trim();
-    const categoryVal = document.getElementById('form-input-category').value;
-    const usageVal = document.getElementById('form-input-usage').value.trim();
-
-    if (!hindiVal || !translitVal || !englishVal) {
-      showToast("Please fill all required values!", "⚠️");
-      return;
-    }
-
-    const newWord = {
-      id: 'w_custom_' + Date.now(),
-      hindi: hindiVal,
-      translit: translitVal,
-      english: englishVal,
-      category: categoryVal,
-      usage: usageVal,
-      mastered: false
-    };
-
-    // Add to local list state
-    state.words.push(newWord);
-    saveStateToStorage();
+  if (state.synonymTimerInterval) clearInterval(state.synonymTimerInterval);
+  state.synonymTimerInterval = setInterval(() => {
+    state.synonymTimerVal--;
+    const timerEl = document.getElementById("synonym-timer");
+    timerEl.textContent = state.synonymTimerVal + "s";
     
-    // UI updates
-    updateStatsDashboard();
-    renderCategoriesMenu();
-    populateDictionaryDropdowns();
-    
-    // If in dictionary section, reload
-    if (!document.getElementById('section-dictionary').classList.contains('hidden')) {
-      renderDictionaryTable();
+    if (state.synonymTimerVal <= 5) {
+      timerEl.className = "text-sm font-bold text-red-500 animate-pulse";
+    } else {
+      timerEl.className = "text-sm font-bold text-amber-400";
     }
-    
-    closeModal();
-    showToast(`Successfully added "${translitVal}"!`, "✨");
-  });
 
-  // Search / filter inputs
-  document.getElementById('dictionary-search-input').addEventListener('input', renderDictionaryTable);
-  document.getElementById('dictionary-category-filter').addEventListener('change', renderDictionaryTable);
-  document.getElementById('dictionary-sort-filter').addEventListener('change', renderDictionaryTable);
+    if (state.synonymTimerVal <= 0) {
+      clearInterval(state.synonymTimerInterval);
+      handleSynonymTimeout();
+    }
+  }, 1000);
 }
 
-// --- ENTRY POINT INITIALIZATION ---
-window.addEventListener('DOMContentLoaded', () => {
-  loadState();
-  setupSpeechEngine();
-  renderCategoriesMenu();
-  updateStatsDashboard();
-  updateFlashcardView();
-  setupEventListeners();
+function checkSynonym(selected, correct) {
+  if (state.synonymTimerInterval) clearInterval(state.synonymTimerInterval);
+  state.totalAnswers++;
+
+  if (selected === correct) {
+    audio.correct();
+    // Multiplier for speed
+    const speedBonus = Math.max(0, state.synonymTimerVal * 2);
+    const finalXP = 20 + speedBonus;
+    awardXP(finalXP);
+    state.score += 40;
+    state.streak++;
+    if (state.streak > state.maxStreak) state.maxStreak = state.streak;
+    state.correctAnswers++;
+    state.discoveredWords++;
+
+    addJournalEntry(correct, "Synonym matched fast!", "Correct");
+    showToast(`Superb! "${correct}" synonym linked correctly. (+${finalXP} XP)`, "🔥", "success");
+    
+    state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
+    setTimeout(startSynonymGame, 1000);
+  } else {
+    audio.wrong();
+    state.streak = 0;
+    showToast(`Mistake! The true synonym was "${correct}"`, "❌", "error");
+    shakeContainer("synonym-options-container");
+    
+    state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
+    setTimeout(startSynonymGame, 1500);
+  }
+  renderStats();
+  saveLocalStorage();
+}
+
+function handleSynonymTimeout() {
+  state.totalAnswers++;
+  state.streak = 0;
+  audio.wrong();
+  const correctAns = WORD_DATABASE[state.synonymIndex].correctSynonym;
+  showToast(`Time ran out! The correct synonym was "${correctAns}"`, "⏰", "error");
+  shakeContainer("synonym-target-word");
+  
+  state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
+  setTimeout(startSynonymGame, 1500);
+  renderStats();
+  saveLocalStorage();
+}
+
+
+// --- GAME 3: WORD BUILDER LOGIC ---
+function setupBuilderGame() {
+  const entry = WORD_DATABASE[state.builderPoolIndex];
+  
+  // Extract unique core letters from database entries
+  const chars = Array.from(new Set(entry.word.split("")));
+  if (chars.length < 4) {
+    // backup letters just in case
+    chars.push("A","E","R","S");
+  }
+
+  // Select center mandatory letter
+  state.builderCoreLetter = chars[0];
+  // Outer ring characters
+  state.builderRingLetters = chars.slice(1, 7); // max 6 surrounding characters
+  
+  // Render dynamic values
+  document.getElementById("builder-center-letter").textContent = state.builderCoreLetter;
+  document.getElementById("builder-found-count").textContent = `0/${entry.subwords.length}`;
+  state.builderFoundList = [];
+  state.builderCurrentDraft = "";
+  document.getElementById("builder-current-draft").textContent = "";
+
+  // Render outer ring absolutely positioned circles
+  const ringContainer = document.getElementById("builder-ring-letters-container");
+  ringContainer.innerHTML = "";
+
+  const radius = 64; // px distance from center
+  const count = state.builderRingLetters.length;
+
+  state.builderRingLetters.forEach((char, idx) => {
+    const angle = (idx * 2 * Math.PI) / count;
+    const x = Math.round(radius * Math.cos(angle)) + 88 - 19; // 88 is half of 176 (44rem equivalent)
+    const y = Math.round(radius * Math.sin(angle)) + 88 - 19;
+
+    const item = document.createElement("div");
+    item.className = "hive-letter";
+    item.style.left = `${x}px`;
+    item.style.top = `${y}px`;
+    item.textContent = char;
+    
+    item.addEventListener("click", () => {
+      audio.click();
+      state.builderCurrentDraft += char;
+      updateBuilderDraftUI();
+    });
+    
+    ringContainer.appendChild(item);
+  });
+
+  // Center core click action
+  const centerCore = document.getElementById("builder-center-letter");
+  // clear existing clones to avoid duplicate event bounds
+  const newCenter = centerCore.cloneNode(true);
+  centerCore.parentNode.replaceChild(newCenter, centerCore);
+  newCenter.addEventListener("click", () => {
+    audio.click();
+    state.builderCurrentDraft += state.builderCoreLetter;
+    updateBuilderDraftUI();
+  });
+
+  // Redraw empty found list
+  renderDiscoveredSubwords();
+}
+
+function updateBuilderDraftUI() {
+  document.getElementById("builder-current-draft").textContent = state.builderCurrentDraft;
+}
+
+function renderDiscoveredSubwords() {
+  const tagContainer = document.getElementById("builder-discovered-tags");
+  if (state.builderFoundList.length === 0) {
+    tagContainer.innerHTML = `<span class="text-xs text-slate-500 italic">None yet. Click the letters above to construct!</span>`;
+  } else {
+    tagContainer.innerHTML = state.builderFoundList.map(word => 
+      `<span class="bg-pink-500/10 text-pink-300 px-2.5 py-1 rounded-md text-xs font-bold border border-pink-500/20 uppercase tracking-wider animate-bounce">${word}</span>`
+    ).join("");
+  }
+}
+
+function checkBuilderWord() {
+  const draft = state.builderCurrentDraft.trim().toUpperCase();
+  const entry = WORD_DATABASE[state.builderPoolIndex];
+
+  if (!draft) {
+    showToast("Click letters above to form a word first!", "⚠️", "error");
+    shakeContainer("builder-current-draft");
+    return;
+  }
+
+  // Must contain center mandatory letter
+  if (!draft.includes(state.builderCoreLetter)) {
+    audio.wrong();
+    showToast(`Missing core letter! Form word with center core "${state.builderCoreLetter}"`, "⚠️", "error");
+    shakeContainer("builder-center-letter");
+    return;
+  }
+
+  if (state.builderFoundList.includes(draft)) {
+    showToast(`Already discovered "${draft}"! Find another combination.`, "💡", "error");
+    shakeContainer("builder-current-draft");
+    return;
+  }
+
+  // Check validation in custom database words array list
+  if (entry.subwords.includes(draft) || draft === entry.word) {
+    audio.correct();
+    state.builderFoundList.push(draft);
+    state.discoveredWords++;
+    state.correctAnswers++;
+    state.score += 30;
+    awardXP(25);
+
+    addJournalEntry(draft, `Discovered inside ${entry.word}`, "Success");
+    showToast(`Discovered word "${draft}"! (+25 XP)`, "✨", "success");
+
+    document.getElementById("builder-found-count").textContent = `${state.builderFoundList.length}/${entry.subwords.length}`;
+    renderDiscoveredSubwords();
+    state.builderCurrentDraft = "";
+    updateBuilderDraftUI();
+
+    // Complete whole level bonus if found more than 3
+    if (state.builderFoundList.length >= entry.subwords.length) {
+      showToast(`Sensational! Completed the entire list of words in this pool!`, "🏆", "success");
+      awardXP(100);
+      state.builderPoolIndex = (state.builderPoolIndex + 1) % WORD_DATABASE.length;
+      setTimeout(setupBuilderGame, 2000);
+    }
+  } else {
+    audio.wrong();
+    showToast(`"${draft}" is not in the subwords dictionary pool. Try again!`, "❌", "error");
+    shakeContainer("builder-current-draft");
+  }
+  renderStats();
+  saveLocalStorage();
+}
+
+
+// --- GLOBAL CORE HELPERS & UI UPDATES ---
+
+function awardXP(amount) {
+  state.xp += amount;
+  if (state.xp >= state.xpToNextLevel) {
+    state.xp -= state.xpToNextLevel;
+    state.level++;
+    audio.levelUp();
+    showToast(`LEVEL UP! You reached Rank level ${state.level}!`, "👑", "success");
+  }
+  renderStats();
+}
+
+function renderStats() {
+  // Header levels
+  document.getElementById("user-level-val").textContent = state.level;
+  document.getElementById("xp-ratio-text").textContent = `${state.xp}/${state.xpToNextLevel} XP`;
+  
+  const progressPercent = Math.min(100, Math.floor((state.xp / state.xpToNextLevel) * 100));
+  document.getElementById("xp-progress-bar").style.width = `${progressPercent}%`;
+
+  // Global sidebar state values
+  document.getElementById("streak-val").textContent = state.streak;
+  document.getElementById("score-val").textContent = state.score;
+  document.getElementById("stats-total-answers").textContent = state.totalAnswers;
+  document.getElementById("stats-correct-answers").textContent = state.correctAnswers;
+  document.getElementById("stats-discovered").textContent = state.discoveredWords;
+  document.getElementById("stats-max-streak").textContent = state.maxStreak;
+
+  // Vocabulary Title Ranking mapper
+  let rankName = "Neophyte Novice";
+  if (state.score > 100) rankName = "Word apprentice";
+  if (state.score > 300) rankName = "Lexicon Explorer";
+  if (state.score > 600) rankName = "Elite Grammarian";
+  if (state.score > 1000) rankName = "Phonetic Wizard";
+  if (state.score > 2000) rankName = "Grand LexiQuest Lord";
+  
+  document.getElementById("rank-title").textContent = rankName;
+
+  // Journal Count
+  document.getElementById("journal-count").textContent = state.questJournal.length;
+  renderJournalHTML();
+}
+
+// Sound Toggle Controller
+const btnSound = document.getElementById("btn-toggle-sound");
+btnSound.addEventListener("click", () => {
+  audio.enabled = !audio.enabled;
+  if (audio.enabled) {
+    document.getElementById("sound-on-icon").classList.remove("hidden");
+    document.getElementById("sound-off-icon").classList.add("hidden");
+    audio.click();
+  } else {
+    document.getElementById("sound-on-icon").classList.add("hidden");
+    document.getElementById("sound-off-icon").classList.remove("hidden");
+  }
 });
+
+// Toast Alert Engine
+function showToast(message, emoji = "🔔", type = "success") {
+  const feedbackEl = document.getElementById("game-feedback");
+  const emojiEl = document.getElementById("feedback-emoji");
+  const titleEl = document.getElementById("feedback-title");
+  const bodyEl = document.getElementById("feedback-body");
+
+  emojiEl.textContent = emoji;
+  bodyEl.textContent = message;
+
+  if (type === "success") {
+    feedbackEl.className = "flex items-center justify-between p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/40 text-emerald-200 transition-all duration-300";
+    titleEl.textContent = "Perfect Move!";
+  } else {
+    feedbackEl.className = "flex items-center justify-between p-3.5 rounded-xl border border-red-500/30 bg-red-950/40 text-red-200 transition-all duration-300";
+    titleEl.textContent = "Incorrect / Warning";
+  }
+  feedbackEl.classList.remove("hidden");
+}
+
+// Hide Toast event
+document.getElementById("btn-dismiss-feedback").addEventListener("click", () => {
+  document.getElementById("game-feedback").classList.add("hidden");
+});
+
+// Shake effect helper
+function shakeContainer(elementId) {
+  const target = document.getElementById(elementId);
+  if (target) {
+    target.classList.add("shake-wrong");
+    setTimeout(() => {
+      target.classList.remove("shake-wrong");
+    }, 450);
+  }
+}
+
+// Journal Storage log appends
+function addJournalEntry(word, gameModeText, status) {
+  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  state.questJournal.unshift({
+    word,
+    mode: gameModeText,
+    status,
+    time: timestamp
+  });
+  // limit to 30 history entries
+  if (state.questJournal.length > 30) {
+    state.questJournal.pop();
+  }
+}
+
+function renderJournalHTML() {
+  const container = document.getElementById("journal-list");
+  if (state.questJournal.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8 text-slate-500 text-xs italic">
+        No word completions logged yet. Start playing either mode!
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = state.questJournal.map(item => `
+    <div class="p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all">
+      <div>
+        <p class="text-xs font-bold text-slate-200 uppercase tracking-wide">${item.word}</p>
+        <p class="text-[10px] text-slate-500">${item.mode} • ${item.time}</p>
+      </div>
+      <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-bold">
+        +XP
+      </span>
+    </div>
+  `).join("");
+}
+
+// Reset Quest Game State
+document.getElementById("btn-reset-stats").addEventListener("click", () => {
+  if (confirm("Are you sure you want to completely reset all your LexiQuest score, XP, and words levels?")) {
+    localStorage.removeItem("lexiquest_save_v1");
+    state.level = 1;
+    state.xp = 0;
+    state.score = 0;
+    state.streak = 0;
+    state.maxStreak = 0;
+    state.totalAnswers = 0;
+    state.correctAnswers = 0;
+    state.discoveredWords = 0;
+    state.questJournal = [];
+    
+    renderStats();
+    showToast("All quest progress data successfully wiped clean.", "🔄", "success");
+  }
+});
+
+// Daily Word of the day logic
+function updateDailyWordWidget() {
+  const index = new Date().getDate() % WORD_DATABASE.length;
+  const dailyItem = WORD_DATABASE[index];
+  
+  document.getElementById("daily-word-title").textContent = dailyItem.word;
+  document.getElementById("daily-word-meaning").textContent = dailyItem.clue;
+
+  document.getElementById("btn-learn-word").addEventListener("click", () => {
+    audio.click();
+    showToast(`Learning: ${dailyItem.word} is defined as ${dailyItem.clue}`, "📖", "success");
+  });
+}
+
+// Click event triggers on Buttons inside individual views
+function setupGlobalEventListeners() {
+  // SCRAMBLE Buttons
+  document.getElementById("btn-scramble-submit").addEventListener("click", () => {
+    submitScramble();
+  });
+
+  document.getElementById("scramble-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      submitScramble();
+    }
+  });
+
+  document.getElementById("btn-scramble-clear").addEventListener("click", () => {
+    audio.click();
+    document.getElementById("scramble-input").value = "";
+  });
+
+  document.getElementById("btn-scramble-shuffle").addEventListener("click", () => {
+    audio.click();
+    state.scrambleShuffledWord = shuffleString(state.scrambleOriginalWord);
+    // Re-render
+    const container = document.getElementById("scramble-letters-container");
+    container.innerHTML = "";
+    state.scrambleShuffledWord.split("").forEach((char) => {
+      const btn = document.createElement("button");
+      btn.className = "h-12 w-12 bg-slate-800 hover:bg-slate-700 text-slate-100 font-extrabold text-lg rounded-xl transition-all active:scale-95 shadow border border-slate-700";
+      btn.textContent = char;
+      btn.addEventListener("click", () => {
+        audio.click();
+        document.getElementById("scramble-input").value += char;
+      });
+      container.appendChild(btn);
+    });
+    showToast("Reshuffled spelling board letters!", "🔀", "success");
+  });
+
+  document.getElementById("scramble-hint-btn").addEventListener("click", () => {
+    if (state.xp >= 15) {
+      state.xp -= 15;
+      renderStats();
+      const entry = WORD_DATABASE[state.scrambleIndex];
+      // Provide a letter clue
+      const correctWord = entry.word;
+      const hintChar = correctWord.slice(0, 2);
+      showToast(`Hint letter clues: Starts with "${hintChar}"`, "💡", "success");
+    } else {
+      showToast(`Not enough XP to trade for a hint! Requires 15 XP.`, "❌", "error");
+    }
+  });
+
+  document.getElementById("btn-scramble-skip").addEventListener("click", () => {
+    audio.click();
+    state.streak = 0;
+    state.scrambleIndex = (state.scrambleIndex + 1) % WORD_DATABASE.length;
+    setupScrambleGame();
+    showToast("Word skipped. New scrambled word loaded!", "⏭️", "success");
+    renderStats();
+  });
+
+  // BUILDER Buttons
+  document.getElementById("btn-builder-delete").addEventListener("click", () => {
+    audio.click();
+    state.builderCurrentDraft = state.builderCurrentDraft.slice(0, -1);
+    updateBuilderDraftUI();
+  });
+
+  document.getElementById("btn-builder-clear").addEventListener("click", () => {
+    audio.click();
+    state.builderCurrentDraft = "";
+    updateBuilderDraftUI();
+  });
+
+  document.getElementById("btn-builder-shuffle").addEventListener("click", () => {
+    audio.click();
+    state.builderRingLetters.sort(() => Math.random() - 0.5);
+    
+    // Redraw circles
+    const ringContainer = document.getElementById("builder-ring-letters-container");
+    ringContainer.innerHTML = "";
+    const radius = 64;
+    const count = state.builderRingLetters.length;
+    state.builderRingLetters.forEach((char, idx) => {
+      const angle = (idx * 2 * Math.PI) / count;
+      const x = Math.round(radius * Math.cos(angle)) + 88 - 19;
+      const y = Math.round(radius * Math.sin(angle)) + 88 - 19;
+
+      const item = document.createElement("div");
+      item.className = "hive-letter";
+      item.style.left = `${x}px`;
+      item.style.top = `${y}px`;
+      item.textContent = char;
+      item.addEventListener("click", () => {
+        audio.click();
+        state.builderCurrentDraft += char;
+        updateBuilderDraftUI();
+      });
+      ringContainer.appendChild(item);
+    });
+  });
+
+  document.getElementById("btn-builder-reroll").addEventListener("click", () => {
+    audio.click();
+    state.builderPoolIndex = (state.builderPoolIndex + 1) % WORD_DATABASE.length;
+    setupBuilderGame();
+    showToast("Loaded a brand new Spelling Builder letter challenge!", "🔄", "success");
+  });
+
+  document.getElementById("btn-builder-submit").addEventListener("click", () => {
+    checkBuilderWord();
+  });
+}
