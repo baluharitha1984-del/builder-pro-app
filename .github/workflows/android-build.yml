@@ -15,6 +15,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Configure Unique Android Naming and Identifiers
+        run: |-
+          if [ -f "configure_package.js" ]; then
+            node configure_package.js
+          fi
       - name: Detect and Setup Project
         id: setup_project
         run: |-
@@ -105,14 +110,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: VeggieGro-debug-apk
+          name: SummitAdditionsArena-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: VeggieGro-release-aab
+          name: SummitAdditionsArena-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
