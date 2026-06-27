@@ -1,6 +1,6 @@
 {
   "appId": "com.builderpro.app",
-  "appName": "Shabda - Hindi Vocabulary Practice",
+  "appName": "LexiQuest",
   "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
