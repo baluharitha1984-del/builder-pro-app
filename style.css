@@ -1,46 +1,48 @@
-/* Customized visual animations & dynamic responsive layouts */
-.catalog-tab-btn {
-  white-space: nowrap;
-  transition: all 0.25s ease;
-}
-.active-tab {
-  background-color: #047857 !important; /* Emerald-700 */
-  color: #ffffff !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+/* Glowing indicators and custom math interactive elements */
+#arena-terminal {
+  position: relative;
+  background: radial-gradient(circle at 50% 120%, rgba(99, 102, 241, 0.08) 0%, transparent 70%), rgb(15, 23, 42);
 }
 
-/* Soft glow for ready-to-harvest vegetables */
-@keyframes pulseGlow {
-  0%, 100% {
-    box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-  }
+.input-shake {
+  animation: terminal-shake 0.35s ease-in-out;
 }
 
-.ready-to-harvest {
-  animation: pulseGlow 1.8s infinite;
-  border-color: #10b981 !important;
+@keyframes terminal-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
 }
 
-/* Slide up animation for our custom preview modal */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.vis-dot {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.animate-slide-up {
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.vis-dot:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 8px currentColor;
 }
 
-/* Progress Bar Transition */
-.progress-fill {
-  transition: width 1s linear;
+/* Perfect custom scrollbar formatting for statistics feed */
+#feed-container::-webkit-scrollbar,
+#vis-blocks-a::-webkit-scrollbar,
+#vis-blocks-b::-webkit-scrollbar {
+  width: 5px;
+}
+#feed-container::-webkit-scrollbar-track,
+#vis-blocks-a::-webkit-scrollbar-track,
+#vis-blocks-b::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 99px;
+}
+#feed-container::-webkit-scrollbar-thumb,
+#vis-blocks-a::-webkit-scrollbar-thumb,
+#vis-blocks-b::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.25);
+  border-radius: 99px;
+}
+#feed-container::-webkit-scrollbar-thumb:hover,
+#vis-blocks-a::-webkit-scrollbar-thumb:hover,
+#vis-blocks-b::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
 }
