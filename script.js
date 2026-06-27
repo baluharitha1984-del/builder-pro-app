@@ -1,894 +1,605 @@
-/**
- * LEXIQUEST - Elegant Web-Synthesized Interactive English Words Game
- */
-
-// Dynamic client-side Rich Vocabulary Database
-const WORD_DATABASE = [
-  {
-    word: "EFFERVESCENT",
-    clue: "Vivacious, enthusiastic, or bubbling with excitement",
-    synonyms: ["Bubbly", "Dull", "Heavy", "Sluggish"],
-    correctSynonym: "Bubbly",
-    subwords: ["VECT", "TEEN", "SEVER", "EVER", "RESET", "FEVER", "FREE"]
-  },
-  {
-    word: "COGNIZANT",
-    clue: "Having knowledge or being fully aware of something",
-    synonyms: ["Aware", "Oblivious", "Ignorant", "Asleep"],
-    correctSynonym: "Aware",
-    subwords: ["COIN", "GONG", "COZ", "RAIN", "OAT", "AGO", "ZINC"]
-  },
-  {
-    word: "ZEPHYR",
-    clue: "A gentle, mild, or light breeze from the west",
-    synonyms: ["Breeze", "Hurricane", "Torrent", "Blizzard"],
-    correctSynonym: "Breeze",
-    subwords: ["PRY", "PREY", "HER", "YEZ", "HEP"]
-  },
-  {
-    word: "EPHEMERAL",
-    clue: "Lasting for a very short, transient time",
-    synonyms: ["Fleeting", "Eternal", "Timeless", "Durable"],
-    correctSynonym: "Fleeting",
-    subwords: ["PEAL", "PALE", "HEAL", "MEAL", "HAMP", "RAMP", "PEER"]
-  },
-  {
-    word: "LUMINOUS",
-    clue: "Full of or shedding bright glowing light",
-    synonyms: ["Radiant", "Dim", "Obscure", "Opaque"],
-    correctSynonym: "Radiant",
-    subwords: ["ION", "SOUL", "MINU", "SUN", "NIL", "SUM"]
-  },
-  {
-    word: "QUIRKY",
-    clue: "Characterized by peculiar, eccentric, or unconventional habits",
-    synonyms: ["Eccentric", "Ordinary", "Normal", "Standard"],
-    correctSynonym: "Eccentric",
-    subwords: ["YIRK", "QUIP", "YIP", "YRK", "RUY"]
-  },
-  {
-    word: "WANDERLUST",
-    clue: "A strong, innate desire to travel and explore the world",
-    synonyms: ["Roam", "Stagnancy", "Settle", "Homebound"],
-    correctSynonym: "Roam",
-    subwords: ["WAND", "LUST", "WEST", "LAND", "DUST", "RUST", "LUTE", "SUNT"]
-  },
-  {
-    word: "SAGACIOUS",
-    clue: "Having or showing keen mental discernment and good judgment",
-    synonyms: ["Wise", "Foolish", "Immature", "Naive"],
-    correctSynonym: "Wise",
-    subwords: ["SAGO", "SAGA", "COUS", "GAS", "SUG"]
-  },
-  {
-    word: "NEBULOUS",
-    clue: "Hazy, vague, indistinct, or cloud-like",
-    synonyms: ["Cloudy", "Clear", "Distinct", "Precise"],
-    correctSynonym: "Cloudy",
-    subwords: ["BLUE", "LOBE", "SLOB", "BONE", "SOLE"]
-  },
-  {
-    word: "MELLIFLUOUS",
-    clue: "Sweet or musical, pleasant and smooth to hear",
-    synonyms: ["Dulcet", "Harsh", "Shrill", "Noisy"],
-    correctSynonym: "Dulcet",
-    subwords: ["FILL", "MILL", "FLOW", "SOUL", "LIFE", "LIME", "SLIM"]
-  },
-  {
-    word: "CACOPHONY",
-    clue: "A harsh, discordant mixture of sounds",
-    synonyms: ["Noise", "Harmony", "Melody", "Silence"],
-    correctSynonym: "Noise",
-    subwords: ["PONY", "COCO", "CYAN", "COAX", "COP"]
-  },
-  {
-    word: "CAPRICIOUS",
-    clue: "Given to sudden and unaccountable changes of mood or behavior",
-    synonyms: ["Fickle", "Stable", "Reliable", "Constant"],
-    correctSynonym: "Fickle",
-    subwords: ["CAP", "RICE", "SOUP", "PACE", "SOUR"]
-  }
-];
-
-// Audio Synthesis Engine using browser Web Audio API
-class AudioEngine {
-  constructor() {
-    this.enabled = true;
-    this.ctx = null;
-  }
-
-  init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+document.addEventListener('DOMContentLoaded', () => {
+  // --- DATA SEED: CURATED VEGETABLE LIST ---
+  const vegetables = [
+    {
+      id: 'carrot',
+      name: 'Carrot',
+      emoji: '🥕',
+      type: 'root',
+      calories: '41 kcal',
+      water: '88%',
+      fiber: '2.8g',
+      sunlight: 'Full to partial sun (5-6 hours)',
+      growDays: 12,
+      wateringTips: 'Water deeply once a week, prevent soil from crusting on top.',
+      companion: 'Sow next to Rosemary and Chives to naturally deter carrot rust flies.',
+      color: 'bg-amber-100 text-amber-800 border-amber-200'
+    },
+    {
+      id: 'tomato',
+      name: 'Tomato',
+      emoji: '🍅',
+      type: 'fruiting',
+      calories: '18 kcal',
+      water: '94%',
+      fiber: '1.2g',
+      sunlight: 'Intense direct sunlight (7-8 hours)',
+      growDays: 18,
+      wateringTips: 'Water consistently at base level. Avoid splashing the foliage.',
+      companion: 'Marigolds and Basil companion planting improves taste and repels thrips.',
+      color: 'bg-rose-100 text-rose-800 border-rose-200'
+    },
+    {
+      id: 'spinach',
+      name: 'Spinach',
+      emoji: '🥬',
+      type: 'leafy',
+      calories: '23 kcal',
+      water: '91%',
+      fiber: '2.2g',
+      sunlight: 'Partial shade or filtered sun',
+      growDays: 8,
+      wateringTips: 'Enjoys consistently damp, well-draining soil. Do not overwater.',
+      companion: 'Companion plant with Strawberries or Radishes for excellent space usage.',
+      color: 'bg-emerald-100 text-emerald-800 border-emerald-200'
+    },
+    {
+      id: 'broccoli',
+      name: 'Broccoli',
+      emoji: '🥦',
+      type: 'brassica',
+      calories: '34 kcal',
+      water: '89%',
+      fiber: '2.6g',
+      sunlight: 'Full Sun (6+ hours)',
+      growDays: 20,
+      wateringTips: 'Needs heavy moisture. Mulch well to suppress weeds and cool the roots.',
+      companion: 'Plant beside Dill or Mint. Avoid nightshades like tomatoes near broccoli.',
+      color: 'bg-green-100 text-green-800 border-green-200'
+    },
+    {
+      id: 'cucumber',
+      name: 'Cucumber',
+      emoji: '🥒',
+      type: 'fruiting',
+      calories: '15 kcal',
+      water: '95%',
+      fiber: '0.5g',
+      sunlight: 'Full warm sun (6-8 hours)',
+      growDays: 14,
+      wateringTips: 'Keep soil moist. Dry spells can cause bitter tasting fruit.',
+      companion: 'Sunflowers serve as great natural support trellises for climbing cucumbers.',
+      color: 'bg-teal-100 text-teal-800 border-teal-200'
+    },
+    {
+      id: 'eggplant',
+      name: 'Eggplant',
+      emoji: '🍆',
+      type: 'fruiting',
+      calories: '25 kcal',
+      water: '92%',
+      fiber: '3.0g',
+      sunlight: 'Extremely hot full sun (8 hours)',
+      growDays: 22,
+      wateringTips: 'Requires rich composted soil and deep uniform watering schedule.',
+      companion: 'French beans ward off potato beetles; plant them nearby.',
+      color: 'bg-purple-100 text-purple-800 border-purple-200'
     }
-  }
+  ];
 
-  playTone(freq, type, duration, vol = 0.1) {
-    if (!this.enabled) return;
-    try {
-      this.init();
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      
-      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-      
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      
-      osc.start();
-      osc.stop(this.ctx.currentTime + duration);
-    } catch (e) {
-      console.warn("Web Audio API not supported/permitted yet.");
-    }
-  }
+  // --- GARDEN PLOT INITIAL STATE ---
+  // We define 8 digital garden slots
+  let gardenSlots = [
+    { id: 1, planted: null, progress: 0, watered: true, ready: false },
+    { id: 2, planted: null, progress: 0, watered: true, ready: false },
+    { id: 3, planted: null, progress: 0, watered: true, ready: false },
+    { id: 4, planted: null, progress: 0, watered: true, ready: false },
+    { id: 5, planted: null, progress: 0, watered: true, ready: false },
+    { id: 6, planted: null, progress: 0, watered: true, ready: false },
+    { id: 7, planted: null, progress: 0, watered: true, ready: false },
+    { id: 8, planted: null, progress: 0, watered: true, ready: false }
+  ];
 
-  correct() {
-    this.playTone(523.25, 'triangle', 0.15, 0.15); // C5
-    setTimeout(() => this.playTone(659.25, 'triangle', 0.25, 0.15), 100); // E5
-  }
+  // --- TASKS INITIAL STATE ---
+  let tasks = [
+    { id: 1, text: 'Order Organic Seed Starter Kits', completed: true },
+    { id: 2, text: 'Clear weeds and compost Bed A', completed: false },
+    { id: 3, text: 'Check pH balance of cucumber soil', completed: false }
+  ];
 
-  wrong() {
-    this.playTone(220, 'sawtooth', 0.3, 0.15); // A3
-  }
+  let selectedSeedId = 'carrot'; // default brush
+  let statsHarvestedCount = 0;
+  let activeCategoryFilter = 'all';
 
-  click() {
-    this.playTone(800, 'sine', 0.05, 0.08);
-  }
-
-  levelUp() {
-    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
-    notes.forEach((freq, idx) => {
-      setTimeout(() => {
-        this.playTone(freq, 'sine', 0.2, 0.15);
-      }, idx * 100);
-    });
-  }
-}
-
-const audio = new AudioEngine();
-
-// Global Game State
-const state = {
-  level: 1,
-  xp: 0,
-  xpToNextLevel: 100,
-  score: 0,
-  streak: 0,
-  maxStreak: 0,
-  totalAnswers: 0,
-  correctAnswers: 0,
-  discoveredWords: 0,
-  currentMode: "scramble", // scramble, synonym, builder
+  // --- DOM SELECTORS ---
+  const seedSelectorGrid = document.getElementById('seed-selector-grid');
+  const activeSeedBadge = document.getElementById('active-seed-badge');
+  const gardenGridContainer = document.getElementById('garden-grid-container');
+  const catalogGrid = document.getElementById('catalog-grid');
+  const catalogTabsContainer = document.getElementById('catalog-tabs-container');
+  const catalogSearchInput = document.getElementById('catalog-search');
+  const btnWaterAll = document.getElementById('btn-water-all');
+  const btnClearGarden = document.getElementById('btn-clear-garden');
   
-  // Game 1: Scramble
-  scrambleIndex: 0,
-  scrambleOriginalWord: "",
-  scrambleShuffledWord: "",
+  // Recipe elements
+  const recipeChecklistContainer = document.getElementById('recipe-ingredient-checklist');
+  const btnSuggestRecipes = document.getElementById('btn-suggest-recipes');
+  const recipeResultsBox = document.getElementById('recipe-results-box');
+  const recipeTitle = document.getElementById('recipe-title');
+  const recipeDesc = document.getElementById('recipe-desc');
 
-  // Game 2: Synonym
-  synonymIndex: 0,
-  synonymTimerVal: 15,
-  synonymTimerInterval: null,
+  // Tasks element
+  const todoForm = document.getElementById('todo-form');
+  const todoInput = document.getElementById('todo-input');
+  const todoList = document.getElementById('todo-list');
+  const btnClearCompleted = document.getElementById('btn-clear-completed');
 
-  // Game 3: Builder
-  builderCoreLetter: "",
-  builderRingLetters: [],
-  builderCurrentDraft: "",
-  builderPoolIndex: 0,
-  builderFoundList: [],
+  // Stats element
+  const statsHarvested = document.getElementById('stats-harvested');
+  const statsPlanted = document.getElementById('stats-planted');
+  const statsTasks = document.getElementById('stats-tasks');
 
-  // Logs & Achievements
-  questJournal: []
-};
+  // Modal elements
+  const veggieModal = document.getElementById('veggie-modal');
+  const btnCloseModal = document.getElementById('btn-close-modal');
+  const btnModalCloseConfirm = document.getElementById('btn-modal-close-confirm');
+  const modalEmojiContainer = document.getElementById('modal-emoji-container');
+  const modalTitle = document.getElementById('modal-title');
+  const modalCategory = document.getElementById('modal-category');
+  const modalStatWater = document.getElementById('modal-stat-water');
+  const modalStatCalories = document.getElementById('modal-stat-calories');
+  const modalStatFiber = document.getElementById('modal-stat-fiber');
+  const modalSunlight = document.getElementById('modal-sunlight');
+  const modalTime = document.getElementById('modal-time');
+  const modalWateringAdvice = document.getElementById('modal-watering-advice');
+  const modalCompanionTip = document.getElementById('modal-companion-tip');
 
-// Initialize App on DOM Loaded
-document.addEventListener("DOMContentLoaded", () => {
-  loadLocalStorage();
-  setupMenuTabs();
-  setupScrambleGame();
-  setupSynonymGame();
-  setupBuilderGame();
-  setupGlobalEventListeners();
-  renderStats();
-  updateDailyWordWidget();
-  showToast("Welcome to LexiQuest! Choose your arena mode and spell your way to glory.", "⚡", "success");
-});
+  // --- APP INITIALIZER ---
+  function init() {
+    renderSeedSelector();
+    renderGardenGrid();
+    renderCatalog();
+    renderRecipeChecklist();
+    renderTasks();
+    updateGlobalCounters();
 
-// LocalStorage helpers
-function saveLocalStorage() {
-  const dataToSave = {
-    level: state.level,
-    xp: state.xp,
-    score: state.score,
-    streak: state.streak,
-    maxStreak: state.maxStreak,
-    totalAnswers: state.totalAnswers,
-    correctAnswers: state.correctAnswers,
-    discoveredWords: state.discoveredWords,
-    questJournal: state.questJournal
-  };
-  localStorage.setItem("lexiquest_save_v1", JSON.stringify(dataToSave));
-}
-
-function loadLocalStorage() {
-  try {
-    const saved = localStorage.getItem("lexiquest_save_v1");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state.level = parsed.level || 1;
-      state.xp = parsed.xp || 0;
-      state.score = parsed.score || 0;
-      state.streak = parsed.streak || 0;
-      state.maxStreak = parsed.maxStreak || 0;
-      state.totalAnswers = parsed.totalAnswers || 0;
-      state.correctAnswers = parsed.correctAnswers || 0;
-      state.discoveredWords = parsed.discoveredWords || 0;
-      state.questJournal = parsed.questJournal || [];
-    }
-  } catch (e) {
-    console.error("Failed reading local storage state", e);
+    // Start simulated grow ticker
+    setInterval(simulateGrowthTick, 1000);
   }
-}
 
-// Mode Tab Switcher
-function setupMenuTabs() {
-  const tabScramble = document.getElementById("tab-scramble");
-  const tabSynonym = document.getElementById("tab-synonym");
-  const tabBuilder = document.getElementById("tab-builder");
+  // --- RENDER SEED SELECTOR --- 
+  function renderSeedSelector() {
+    seedSelectorGrid.innerHTML = '';
+    vegetables.forEach(veg => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = `flex items-center gap-2 p-3 rounded-xl border transition-all text-left text-xs font-semibold ${
+        selectedSeedId === veg.id 
+          ? 'border-emerald-600 bg-emerald-50 text-emerald-900 ring-2 ring-emerald-600/20'
+          : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+      }`;
+      
+      btn.innerHTML = `
+        <span class="text-xl">${veg.emoji}</span>
+        <div>
+          <span class="block">${veg.name}</span>
+          <span class="text-[10px] text-slate-400 font-normal">${veg.growDays}s grow</span>
+        </div>
+      `;
 
-  const viewScramble = document.getElementById("game-view-scramble");
-  const viewSynonym = document.getElementById("game-view-synonym");
-  const viewBuilder = document.getElementById("game-view-builder");
+      btn.addEventListener('click', () => {
+        selectedSeedId = veg.id;
+        activeSeedBadge.textContent = `${veg.emoji} ${veg.name}`;
+        renderSeedSelector();
+      });
 
-  function selectTab(mode) {
-    audio.click();
-    state.currentMode = mode;
+      seedSelectorGrid.appendChild(btn);
+    });
     
-    // Clear intervals if applicable
-    if (state.synonymTimerInterval) {
-      clearInterval(state.synonymTimerInterval);
-    }
-
-    // Reset buttons styles
-    [tabScramble, tabSynonym, tabBuilder].forEach(btn => {
-      btn.classList.remove("bg-indigo-600/20", "text-indigo-200", "border-indigo-500/50", "bg-purple-600/20", "text-purple-200", "border-purple-500/50", "bg-pink-600/20", "text-pink-200", "border-pink-500/50");
-      btn.classList.add("hover:bg-slate-800", "text-slate-300");
-      // Remove indicator ping
-      const ping = btn.querySelector("span.animate-ping");
-      if (ping) ping.classList.add("hidden");
-    });
-
-    // Hide all view screens
-    viewScramble.classList.add("hidden");
-    viewSynonym.classList.add("hidden");
-    viewBuilder.classList.add("hidden");
-
-    if (mode === "scramble") {
-      tabScramble.classList.add("bg-indigo-600/20", "text-indigo-200", "border-indigo-500/50");
-      tabScramble.classList.remove("hover:bg-slate-800");
-      viewScramble.classList.remove("hidden");
-      setupScrambleGame();
-    } else if (mode === "synonym") {
-      tabSynonym.classList.add("bg-purple-600/20", "text-purple-200", "border-purple-500/50");
-      tabSynonym.classList.remove("hover:bg-slate-800");
-      viewSynonym.classList.remove("hidden");
-      startSynonymGame();
-    } else if (mode === "builder") {
-      tabBuilder.classList.add("bg-pink-600/20", "text-pink-200", "border-pink-500/50");
-      tabBuilder.classList.remove("hover:bg-slate-800");
-      viewBuilder.classList.remove("hidden");
-      setupBuilderGame();
+    // Update Active Badge Initially
+    const activeVeg = vegetables.find(v => v.id === selectedSeedId);
+    if (activeVeg) {
+      activeSeedBadge.innerHTML = `<span class="inline-block mr-1">${activeVeg.emoji}</span> ${activeVeg.name}`;
     }
   }
 
-  tabScramble.addEventListener("click", () => selectTab("scramble"));
-  tabSynonym.addEventListener("click", () => selectTab("synonym"));
-  tabBuilder.addEventListener("click", () => selectTab("builder"));
-}
+  // --- RENDER GARDEN GRID ---
+  function renderGardenGrid() {
+    gardenGridContainer.innerHTML = '';
+    gardenSlots.forEach(slot => {
+      const card = document.createElement('div');
+      card.className = `p-4 rounded-xl border flex flex-col justify-between items-center text-center transition-all bg-white relative cursor-pointer min-h-[140px] ${
+        slot.ready ? 'ready-to-harvest border-emerald-400' : 'border-slate-200 hover:border-emerald-300'
+      }`;
 
-// --- GAME 1: SCRAMBLE LOGIC ---
-function setupScrambleGame() {
-  // Load current index word
-  const entry = WORD_DATABASE[state.scrambleIndex];
-  state.scrambleOriginalWord = entry.word;
-  
-  // Suffle word helper
-  state.scrambleShuffledWord = shuffleString(entry.word);
-  // Ensure they are not exactly identical
-  while (state.scrambleShuffledWord === state.scrambleOriginalWord && entry.word.length > 2) {
-    state.scrambleShuffledWord = shuffleString(entry.word);
-  }
+      // Click action depending on whether slot is empty, growing, or ready
+      card.addEventListener('click', () => {
+        handleGardenSlotClick(slot);
+      });
 
-  // Render letter tiles
-  const container = document.getElementById("scramble-letters-container");
-  container.innerHTML = "";
-  
-  state.scrambleShuffledWord.split("").forEach((char, index) => {
-    const btn = document.createElement("button");
-    btn.className = "h-12 w-12 bg-slate-800 hover:bg-slate-700 text-slate-100 font-extrabold text-lg rounded-xl transition-all active:scale-95 shadow border border-slate-700 hover:border-indigo-500";
-    btn.textContent = char;
-    btn.addEventListener("click", () => {
-      audio.click();
-      const inputField = document.getElementById("scramble-input");
-      inputField.value += char;
-      // visually disable/scale down selected button momentarily to act as pool
-      btn.classList.add("opacity-40", "scale-90");
-      setTimeout(() => {
-        btn.classList.remove("opacity-40", "scale-90");
-      }, 300);
+      if (!slot.planted) {
+        // Empty soil slot view
+        card.innerHTML = `
+          <div class="my-auto flex flex-col items-center">
+            <span class="text-2xl opacity-60 filter grayscale hover:grayscale-0 transition-all">🟫</span>
+            <span class="text-[10px] text-slate-400 mt-1 font-semibold">Sow Seed</span>
+          </div>
+          <div class="absolute bottom-2 left-2 right-2 text-[9px] text-slate-300">Empty Patch</div>
+        `;
+      } else {
+        // Planted active view
+        const veg = vegetables.find(v => v.id === slot.planted);
+        const percent = Math.min(100, Math.round((slot.progress / veg.growDays) * 100));
+        const isDry = !slot.watered;
+
+        card.innerHTML = `
+          <div class="flex flex-col items-center w-full">
+            <span class="text-3xl animate-bounce">${slot.ready ? veg.emoji : '🌱'}</span>
+            <span class="text-xs font-bold text-slate-800 mt-1">${veg.name}</span>
+            <span class="text-[10px] text-slate-400">${slot.ready ? 'Ripe! Tap to reap' : `Growing ${percent}%`}</span>
+          </div>
+
+          <!-- Progress Bar or Harvest Button -->
+          <div class="w-full mt-2">
+            ${slot.ready 
+              ? `<button class="w-full py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] rounded-lg shadow-sm uppercase tracking-wide">Harvest</button>`
+              : `
+                <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full progress-fill" style="width: ${percent}%"></div>
+                </div>
+                <div class="flex justify-between items-center mt-1 text-[9px]">
+                  <span class="${isDry ? 'text-amber-600 font-bold' : 'text-slate-400'}">${isDry ? '⚠️ Dry soil' : '💧 Hydrated'}</span>
+                  <button class="water-single-btn text-[9px] text-sky-600 hover:underline font-semibold" data-id="${slot.id}">Water</button>
+                </div>
+              `}
+          </div>
+        `;
+
+        // Bind individual watering button click safely
+        const waterBtn = card.querySelector('.water-single-btn');
+        if (waterBtn) {
+          waterBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent planting brush on top of active crop
+            slot.watered = true;
+            renderGardenGrid();
+          });
+        }
+      }
+
+      gardenGridContainer.appendChild(card);
     });
-    container.appendChild(btn);
-  });
-
-  // Set clue text
-  document.getElementById("scramble-clue-text").textContent = entry.clue;
-  document.getElementById("scramble-input").value = "";
-}
-
-// Helper to shuffle strings
-function shuffleString(str) {
-  let arr = str.split("");
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr.join("");
-}
-
-// Check Scramble Guess
-function submitScramble() {
-  const inputVal = document.getElementById("scramble-input").value.trim().toUpperCase();
-  const entry = WORD_DATABASE[state.scrambleIndex];
-
-  if (!inputVal) {
-    showToast("Please enter/click letters to make a word guess first!", "⚠️", "error");
-    shakeContainer("scramble-input");
-    return;
   }
 
-  state.totalAnswers++;
-  if (inputVal === entry.word) {
-    // Success!
-    audio.correct();
-    const gainXP = 30 + (state.streak * 5);
-    awardXP(gainXP);
-    state.score += 50;
-    state.streak++;
-    if (state.streak > state.maxStreak) state.maxStreak = state.streak;
-    state.correctAnswers++;
-    state.discoveredWords++;
-
-    addJournalEntry(entry.word, "Scramble Mastered", "Correct");
-    showToast(`Perfect! "${entry.word}" is correct. (+${gainXP} XP)`, "🎉", "success");
-
-    // Proceed to next word
-    state.scrambleIndex = (state.scrambleIndex + 1) % WORD_DATABASE.length;
-    setTimeout(setupScrambleGame, 800);
-  } else {
-    // Failed
-    audio.wrong();
-    state.streak = 0;
-    showToast("Incorrect spelling! Try checking the clue definition again.", "❌", "error");
-    shakeContainer("scramble-input");
-  }
-  renderStats();
-  saveLocalStorage();
-}
-
-// --- GAME 2: SYNONYM LOGIC ---
-function startSynonymGame() {
-  const entry = WORD_DATABASE[state.synonymIndex];
-  document.getElementById("synonym-target-word").textContent = entry.word;
-  document.getElementById("synonym-hint-def").textContent = "Definition: " + entry.clue;
-
-  // Mix synonyms options
-  const options = [...entry.synonyms];
-  // Shuffle options so correct answer is at variable spot
-  options.sort(() => Math.random() - 0.5);
-
-  const container = document.getElementById("synonym-options-container");
-  container.innerHTML = "";
-
-  options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.className = "p-4 bg-slate-800 hover:bg-slate-700 hover:border-purple-500 rounded-2xl border border-slate-700/80 text-sm font-black text-slate-100 transition-all text-center tracking-wide uppercase active:scale-95";
-    btn.textContent = option;
-    btn.addEventListener("click", () => {
-      checkSynonym(option, entry.correctSynonym);
-    });
-    container.appendChild(btn);
-  });
-
-  // Start speedrun timer
-  state.synonymTimerVal = 15;
-  document.getElementById("synonym-timer").textContent = state.synonymTimerVal + "s";
-  document.getElementById("synonym-timer").className = "text-sm font-bold text-emerald-400";
-
-  if (state.synonymTimerInterval) clearInterval(state.synonymTimerInterval);
-  state.synonymTimerInterval = setInterval(() => {
-    state.synonymTimerVal--;
-    const timerEl = document.getElementById("synonym-timer");
-    timerEl.textContent = state.synonymTimerVal + "s";
-    
-    if (state.synonymTimerVal <= 5) {
-      timerEl.className = "text-sm font-bold text-red-500 animate-pulse";
+  // --- HANDLE GARDEN SLOT CLICK ---
+  function handleGardenSlotClick(slot) {
+    if (!slot.planted) {
+      // Plant selected crop brush
+      if (!selectedSeedId) {
+        alert('Please choose a seed first from the selector.');
+        return;
+      }
+      slot.planted = selectedSeedId;
+      slot.progress = 0;
+      slot.watered = true;
+      slot.ready = false;
     } else {
-      timerEl.className = "text-sm font-bold text-amber-400";
+      // If it is ready, harvest it!
+      if (slot.ready) {
+        const veg = vegetables.find(v => v.id === slot.planted);
+        statsHarvestedCount += 1;
+        
+        // Flash custom dynamic celebration or log
+        createToast(`🎉 Successfully harvested ripe ${veg.name}! (+1 score)`);
+        
+        // Reset slot
+        slot.planted = null;
+        slot.progress = 0;
+        slot.watered = true;
+        slot.ready = false;
+      } else {
+        // Just a nudge that it's growing
+        const veg = vegetables.find(v => v.id === slot.planted);
+        createToast(`⏳ This ${veg.name} is still developing. Ensure it stays watered!`);
+      }
     }
-
-    if (state.synonymTimerVal <= 0) {
-      clearInterval(state.synonymTimerInterval);
-      handleSynonymTimeout();
-    }
-  }, 1000);
-}
-
-function checkSynonym(selected, correct) {
-  if (state.synonymTimerInterval) clearInterval(state.synonymTimerInterval);
-  state.totalAnswers++;
-
-  if (selected === correct) {
-    audio.correct();
-    // Multiplier for speed
-    const speedBonus = Math.max(0, state.synonymTimerVal * 2);
-    const finalXP = 20 + speedBonus;
-    awardXP(finalXP);
-    state.score += 40;
-    state.streak++;
-    if (state.streak > state.maxStreak) state.maxStreak = state.streak;
-    state.correctAnswers++;
-    state.discoveredWords++;
-
-    addJournalEntry(correct, "Synonym matched fast!", "Correct");
-    showToast(`Superb! "${correct}" synonym linked correctly. (+${finalXP} XP)`, "🔥", "success");
-    
-    state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
-    setTimeout(startSynonymGame, 1000);
-  } else {
-    audio.wrong();
-    state.streak = 0;
-    showToast(`Mistake! The true synonym was "${correct}"`, "❌", "error");
-    shakeContainer("synonym-options-container");
-    
-    state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
-    setTimeout(startSynonymGame, 1500);
-  }
-  renderStats();
-  saveLocalStorage();
-}
-
-function handleSynonymTimeout() {
-  state.totalAnswers++;
-  state.streak = 0;
-  audio.wrong();
-  const correctAns = WORD_DATABASE[state.synonymIndex].correctSynonym;
-  showToast(`Time ran out! The correct synonym was "${correctAns}"`, "⏰", "error");
-  shakeContainer("synonym-target-word");
-  
-  state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
-  setTimeout(startSynonymGame, 1500);
-  renderStats();
-  saveLocalStorage();
-}
-
-
-// --- GAME 3: WORD BUILDER LOGIC ---
-function setupBuilderGame() {
-  const entry = WORD_DATABASE[state.builderPoolIndex];
-  
-  // Extract unique core letters from database entries
-  const chars = Array.from(new Set(entry.word.split("")));
-  if (chars.length < 4) {
-    // backup letters just in case
-    chars.push("A","E","R","S");
+    renderGardenGrid();
+    updateGlobalCounters();
   }
 
-  // Select center mandatory letter
-  state.builderCoreLetter = chars[0];
-  // Outer ring characters
-  state.builderRingLetters = chars.slice(1, 7); // max 6 surrounding characters
-  
-  // Render dynamic values
-  document.getElementById("builder-center-letter").textContent = state.builderCoreLetter;
-  document.getElementById("builder-found-count").textContent = `0/${entry.subwords.length}`;
-  state.builderFoundList = [];
-  state.builderCurrentDraft = "";
-  document.getElementById("builder-current-draft").textContent = "";
+  // --- SIMULATED REAL-TIME GROW TICK --- 
+  function simulateGrowthTick() {
+    let updated = false;
+    gardenSlots.forEach(slot => {
+      if (slot.planted && !slot.ready) {
+        const veg = vegetables.find(v => v.id === slot.planted);
+        
+        // Crops grow if hydrated. If dry, growth rate is halved
+        const growMultiplier = slot.watered ? 1.0 : 0.4;
+        slot.progress += growMultiplier;
 
-  // Render outer ring absolutely positioned circles
-  const ringContainer = document.getElementById("builder-ring-letters-container");
-  ringContainer.innerHTML = "";
+        // Chance to dry out the soil randomly each tick
+        if (Math.random() < 0.15) {
+          slot.watered = false;
+        }
 
-  const radius = 64; // px distance from center
-  const count = state.builderRingLetters.length;
-
-  state.builderRingLetters.forEach((char, idx) => {
-    const angle = (idx * 2 * Math.PI) / count;
-    const x = Math.round(radius * Math.cos(angle)) + 88 - 19; // 88 is half of 176 (44rem equivalent)
-    const y = Math.round(radius * Math.sin(angle)) + 88 - 19;
-
-    const item = document.createElement("div");
-    item.className = "hive-letter";
-    item.style.left = `${x}px`;
-    item.style.top = `${y}px`;
-    item.textContent = char;
-    
-    item.addEventListener("click", () => {
-      audio.click();
-      state.builderCurrentDraft += char;
-      updateBuilderDraftUI();
+        if (slot.progress >= veg.growDays) {
+          slot.ready = true;
+        }
+        updated = true;
+      }
     });
-    
-    ringContainer.appendChild(item);
-  });
-
-  // Center core click action
-  const centerCore = document.getElementById("builder-center-letter");
-  // clear existing clones to avoid duplicate event bounds
-  const newCenter = centerCore.cloneNode(true);
-  centerCore.parentNode.replaceChild(newCenter, centerCore);
-  newCenter.addEventListener("click", () => {
-    audio.click();
-    state.builderCurrentDraft += state.builderCoreLetter;
-    updateBuilderDraftUI();
-  });
-
-  // Redraw empty found list
-  renderDiscoveredSubwords();
-}
-
-function updateBuilderDraftUI() {
-  document.getElementById("builder-current-draft").textContent = state.builderCurrentDraft;
-}
-
-function renderDiscoveredSubwords() {
-  const tagContainer = document.getElementById("builder-discovered-tags");
-  if (state.builderFoundList.length === 0) {
-    tagContainer.innerHTML = `<span class="text-xs text-slate-500 italic">None yet. Click the letters above to construct!</span>`;
-  } else {
-    tagContainer.innerHTML = state.builderFoundList.map(word => 
-      `<span class="bg-pink-500/10 text-pink-300 px-2.5 py-1 rounded-md text-xs font-bold border border-pink-500/20 uppercase tracking-wider animate-bounce">${word}</span>`
-    ).join("");
-  }
-}
-
-function checkBuilderWord() {
-  const draft = state.builderCurrentDraft.trim().toUpperCase();
-  const entry = WORD_DATABASE[state.builderPoolIndex];
-
-  if (!draft) {
-    showToast("Click letters above to form a word first!", "⚠️", "error");
-    shakeContainer("builder-current-draft");
-    return;
-  }
-
-  // Must contain center mandatory letter
-  if (!draft.includes(state.builderCoreLetter)) {
-    audio.wrong();
-    showToast(`Missing core letter! Form word with center core "${state.builderCoreLetter}"`, "⚠️", "error");
-    shakeContainer("builder-center-letter");
-    return;
-  }
-
-  if (state.builderFoundList.includes(draft)) {
-    showToast(`Already discovered "${draft}"! Find another combination.`, "💡", "error");
-    shakeContainer("builder-current-draft");
-    return;
-  }
-
-  // Check validation in custom database words array list
-  if (entry.subwords.includes(draft) || draft === entry.word) {
-    audio.correct();
-    state.builderFoundList.push(draft);
-    state.discoveredWords++;
-    state.correctAnswers++;
-    state.score += 30;
-    awardXP(25);
-
-    addJournalEntry(draft, `Discovered inside ${entry.word}`, "Success");
-    showToast(`Discovered word "${draft}"! (+25 XP)`, "✨", "success");
-
-    document.getElementById("builder-found-count").textContent = `${state.builderFoundList.length}/${entry.subwords.length}`;
-    renderDiscoveredSubwords();
-    state.builderCurrentDraft = "";
-    updateBuilderDraftUI();
-
-    // Complete whole level bonus if found more than 3
-    if (state.builderFoundList.length >= entry.subwords.length) {
-      showToast(`Sensational! Completed the entire list of words in this pool!`, "🏆", "success");
-      awardXP(100);
-      state.builderPoolIndex = (state.builderPoolIndex + 1) % WORD_DATABASE.length;
-      setTimeout(setupBuilderGame, 2000);
+    if (updated) {
+      renderGardenGrid();
+      updateGlobalCounters();
     }
-  } else {
-    audio.wrong();
-    showToast(`"${draft}" is not in the subwords dictionary pool. Try again!`, "❌", "error");
-    shakeContainer("builder-current-draft");
   }
-  renderStats();
-  saveLocalStorage();
-}
 
+  // --- RENDER VEGETABLES CATALOG WIKI ---
+  function renderCatalog() {
+    catalogGrid.innerHTML = '';
+    const searchVal = catalogSearchInput.value.toLowerCase().trim();
 
-// --- GLOBAL CORE HELPERS & UI UPDATES ---
+    const filtered = vegetables.filter(veg => {
+      const matchesSearch = veg.name.toLowerCase().includes(searchVal) || veg.type.toLowerCase().includes(searchVal);
+      const matchesCategory = activeCategoryFilter === 'all' || veg.type === activeCategoryFilter;
+      return matchesSearch && matchesCategory;
+    });
 
-function awardXP(amount) {
-  state.xp += amount;
-  if (state.xp >= state.xpToNextLevel) {
-    state.xp -= state.xpToNextLevel;
-    state.level++;
-    audio.levelUp();
-    showToast(`LEVEL UP! You reached Rank level ${state.level}!`, "👑", "success");
+    if (filtered.length === 0) {
+      catalogGrid.innerHTML = `
+        <div class="col-span-full text-center py-8 text-slate-400 text-xs">
+          No catalog matches found. Try another search terms!
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach(veg => {
+      const card = document.createElement('div');
+      card.className = `p-4 rounded-xl border border-slate-200 hover:border-emerald-300 bg-white transition-all shadow-xs flex justify-between items-start gap-3 hover:shadow-sm`;
+      
+      card.innerHTML = `
+        <div class="flex gap-3">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${veg.color.split(' ')[0]} border ${veg.color.split(' ')[2]}">
+            ${veg.emoji}
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+              ${veg.name}
+              <span class="text-[9px] uppercase tracking-wider text-slate-400 font-bold px-1.5 py-0.5 bg-slate-100 rounded">
+                ${veg.type}
+              </span>
+            </h3>
+            <p class="text-[11px] text-slate-500 mt-1 line-clamp-2">${veg.wateringTips}</p>
+            <span class="text-[10px] text-emerald-700 font-medium block mt-1.5">💡 Companion: ${veg.name === 'Carrot' ? 'Rosemary & Chives' : 'Basil / Marigold'}</span>
+          </div>
+        </div>
+        <button class="btn-view-details text-xs bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-200 shrink-0 transition-all" data-id="${veg.id}">
+          Details
+        </button>
+      `;
+
+      // Event details
+      card.querySelector('.btn-view-details').addEventListener('click', () => {
+        openVeggieModal(veg);
+      });
+
+      catalogGrid.appendChild(card);
+    });
   }
-  renderStats();
-}
 
-function renderStats() {
-  // Header levels
-  document.getElementById("user-level-val").textContent = state.level;
-  document.getElementById("xp-ratio-text").textContent = `${state.xp}/${state.xpToNextLevel} XP`;
-  
-  const progressPercent = Math.min(100, Math.floor((state.xp / state.xpToNextLevel) * 100));
-  document.getElementById("xp-progress-bar").style.width = `${progressPercent}%`;
+  // --- MODAL ACTION FUNCTIONS ---
+  function openVeggieModal(veg) {
+    modalEmojiContainer.innerHTML = veg.emoji;
+    modalTitle.textContent = veg.name;
+    modalCategory.textContent = veg.type.toUpperCase();
+    modalStatWater.textContent = veg.water;
+    modalStatCalories.textContent = veg.calories;
+    modalStatFiber.textContent = veg.fiber;
+    modalSunlight.textContent = veg.sunlight;
+    modalTime.textContent = veg.growDays;
+    modalWateringAdvice.textContent = veg.wateringTips;
+    modalCompanionTip.textContent = veg.companion;
 
-  // Global sidebar state values
-  document.getElementById("streak-val").textContent = state.streak;
-  document.getElementById("score-val").textContent = state.score;
-  document.getElementById("stats-total-answers").textContent = state.totalAnswers;
-  document.getElementById("stats-correct-answers").textContent = state.correctAnswers;
-  document.getElementById("stats-discovered").textContent = state.discoveredWords;
-  document.getElementById("stats-max-streak").textContent = state.maxStreak;
-
-  // Vocabulary Title Ranking mapper
-  let rankName = "Neophyte Novice";
-  if (state.score > 100) rankName = "Word apprentice";
-  if (state.score > 300) rankName = "Lexicon Explorer";
-  if (state.score > 600) rankName = "Elite Grammarian";
-  if (state.score > 1000) rankName = "Phonetic Wizard";
-  if (state.score > 2000) rankName = "Grand LexiQuest Lord";
-  
-  document.getElementById("rank-title").textContent = rankName;
-
-  // Journal Count
-  document.getElementById("journal-count").textContent = state.questJournal.length;
-  renderJournalHTML();
-}
-
-// Sound Toggle Controller
-const btnSound = document.getElementById("btn-toggle-sound");
-btnSound.addEventListener("click", () => {
-  audio.enabled = !audio.enabled;
-  if (audio.enabled) {
-    document.getElementById("sound-on-icon").classList.remove("hidden");
-    document.getElementById("sound-off-icon").classList.add("hidden");
-    audio.click();
-  } else {
-    document.getElementById("sound-on-icon").classList.add("hidden");
-    document.getElementById("sound-off-icon").classList.remove("hidden");
+    veggieModal.classList.remove('hidden');
   }
-});
 
-// Toast Alert Engine
-function showToast(message, emoji = "🔔", type = "success") {
-  const feedbackEl = document.getElementById("game-feedback");
-  const emojiEl = document.getElementById("feedback-emoji");
-  const titleEl = document.getElementById("feedback-title");
-  const bodyEl = document.getElementById("feedback-body");
-
-  emojiEl.textContent = emoji;
-  bodyEl.textContent = message;
-
-  if (type === "success") {
-    feedbackEl.className = "flex items-center justify-between p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/40 text-emerald-200 transition-all duration-300";
-    titleEl.textContent = "Perfect Move!";
-  } else {
-    feedbackEl.className = "flex items-center justify-between p-3.5 rounded-xl border border-red-500/30 bg-red-950/40 text-red-200 transition-all duration-300";
-    titleEl.textContent = "Incorrect / Warning";
+  function closeModal() {
+    veggieModal.classList.add('hidden');
   }
-  feedbackEl.classList.remove("hidden");
-}
 
-// Hide Toast event
-document.getElementById("btn-dismiss-feedback").addEventListener("click", () => {
-  document.getElementById("game-feedback").classList.add("hidden");
-});
-
-// Shake effect helper
-function shakeContainer(elementId) {
-  const target = document.getElementById(elementId);
-  if (target) {
-    target.classList.add("shake-wrong");
-    setTimeout(() => {
-      target.classList.remove("shake-wrong");
-    }, 450);
-  }
-}
-
-// Journal Storage log appends
-function addJournalEntry(word, gameModeText, status) {
-  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  state.questJournal.unshift({
-    word,
-    mode: gameModeText,
-    status,
-    time: timestamp
+  btnCloseModal.addEventListener('click', closeModal);
+  btnModalCloseConfirm.addEventListener('click', closeModal);
+  veggieModal.addEventListener('click', (e) => {
+    if (e.target === veggieModal) closeModal();
   });
-  // limit to 30 history entries
-  if (state.questJournal.length > 30) {
-    state.questJournal.pop();
-  }
-}
 
-function renderJournalHTML() {
-  const container = document.getElementById("journal-list");
-  if (state.questJournal.length === 0) {
-    container.innerHTML = `
-      <div class="text-center py-8 text-slate-500 text-xs italic">
-        No word completions logged yet. Start playing either mode!
-      </div>
+  // --- RENDER RECIPE INGREDIENTS CHECKLIST ---
+  function renderRecipeChecklist() {
+    recipeChecklistContainer.innerHTML = '';
+    vegetables.forEach(veg => {
+      const label = document.createElement('label');
+      label.className = 'flex items-center gap-2.5 p-2 bg-slate-50 hover:bg-slate-100 rounded-lg cursor-pointer transition-all border border-slate-200 text-xs text-slate-700';
+      
+      label.innerHTML = `
+        <input type="checkbox" value="${veg.id}" class="recipe-checkbox rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+        <span class="text-sm">${veg.emoji}</span>
+        <span class="font-medium">${veg.name}</span>
+      `;
+
+      recipeChecklistContainer.appendChild(label);
+    });
+  }
+
+  // --- GENERATE Dynamic Recipe ideas based on checkboxes ---
+  btnSuggestRecipes.addEventListener('click', () => {
+    const checkedCheckboxes = document.querySelectorAll('.recipe-checkbox:checked');
+    const selectedIds = Array.from(checkedCheckboxes).map(cb => cb.value);
+
+    if (selectedIds.length === 0) {
+      recipeResultsBox.classList.remove('hidden');
+      recipeTitle.textContent = 'Simple Herb Water & Broth';
+      recipeDesc.textContent = 'Select one or more garden vegetables above to craft a culinary masterpiece filled with wholesome dietary fibers!';
+      return;
+    }
+
+    const matchedNames = selectedIds.map(id => {
+      const v = vegetables.find(veg => veg.id === id);
+      return v ? v.name : '';
+    });
+
+    recipeResultsBox.classList.remove('hidden');
+    
+    if (selectedIds.length === 1) {
+      const singleName = matchedNames[0];
+      recipeTitle.textContent = `Roasted Garden ${singleName}`;
+      recipeDesc.textContent = `Lightly toss sliced ${singleName} with extra virgin olive oil, pink salt, coarse pepper, and rosemary. Roast at 400°F (200°C) until tender and caramelized.`;
+    } else if (selectedIds.length === 2) {
+      recipeTitle.textContent = `${matchedNames[0]} & ${matchedNames[1]} Duo Medley`;
+      recipeDesc.textContent = `Sauté premium chopped ${matchedNames[0]} alongside robust ${matchedNames[1]} in grass-fed butter or coconut oil. Garnish with sesame seeds, freshly chopped green onions, and lemon juice.`;
+    } else {
+      recipeTitle.textContent = 'Ultimate Veggie-Gro Harvest Soup';
+      recipeDesc.textContent = `Boil a flavorful stock and toss in diced ${matchedNames.slice(0, -1).join(', ')}, and ${matchedNames[matchedNames.length - 1]}. Simmer with garlic, bay leaf, and cracked black peppercorn for 25 mins. Rich in plant vitamins!`;
+    }
+  });
+
+  // --- RENDER TASKS LOG ---
+  function renderTasks() {
+    todoList.innerHTML = '';
+    tasks.forEach(task => {
+      const li = document.createElement('li');
+      li.className = `flex justify-between items-center p-3 rounded-xl border text-xs transition-all ${ 
+        task.completed 
+          ? 'bg-slate-50 border-slate-200 text-slate-400 line-through' 
+          : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-300'
+      }`;
+
+      li.innerHTML = `
+        <div class="flex items-center gap-3 flex-1 cursor-pointer" id="task-toggle-${task.id}">
+          <input type="checkbox" ${task.completed ? 'checked' : ''} class="rounded text-emerald-600 focus:ring-emerald-500" />
+          <span class="font-medium">${task.text}</span>
+        </div>
+        <button class="text-rose-500 hover:text-rose-700 font-bold px-2" id="task-del-${task.id}">✕</button>
+      `;
+
+      // Bind Toggle Complete
+      li.querySelector(`#task-toggle-${task.id}`).addEventListener('click', () => {
+        task.completed = !task.completed;
+        renderTasks();
+        updateGlobalCounters();
+      });
+
+      // Bind Delete
+      li.querySelector(`#task-del-${task.id}`).addEventListener('click', (e) => {
+        e.stopPropagation();
+        tasks = tasks.filter(t => t.id !== task.id);
+        renderTasks();
+        updateGlobalCounters();
+      });
+
+      todoList.appendChild(li);
+    });
+  }
+
+  // --- ADD TASK --- 
+  todoForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = todoInput.value.trim();
+    if (!text) return;
+
+    const newTask = {
+      id: Date.now(),
+      text: text,
+      completed: false
+    };
+    
+    tasks.push(newTask);
+    todoInput.value = '';
+    renderTasks();
+    updateGlobalCounters();
+    createToast(`📋 Task Added: "${text}"`);
+  });
+
+  // --- CLEAR COMPLETED TASKS ---
+  btnClearCompleted.addEventListener('click', () => {
+    tasks = tasks.filter(t => !t.completed);
+    renderTasks();
+    updateGlobalCounters();
+  });
+
+  // --- GLOBAL COUNTERS & STATS ---
+  function updateGlobalCounters() {
+    statsHarvested.textContent = statsHarvestedCount;
+    
+    const plantedCount = gardenSlots.filter(s => s.planted !== null).length;
+    statsPlanted.textContent = plantedCount;
+    
+    const activeTasks = tasks.filter(t => !t.completed).length;
+    statsTasks.textContent = activeTasks;
+  }
+
+  // --- WATER ALL GARDEN CROPS ---
+  btnWaterAll.addEventListener('click', () => {
+    gardenSlots.forEach(slot => {
+      if (slot.planted) {
+        slot.watered = true;
+      }
+    });
+    renderGardenGrid();
+    createToast('🌊 Garden watered! All active vegetables are hydrated.');
+  });
+
+  // --- CLEAR/RESET GARDEN ---
+  btnClearGarden.addEventListener('click', () => {
+    if (confirm('Are you sure you want to pull out all sowed vegetables and clear the plot?')) {
+      gardenSlots.forEach(slot => {
+        slot.planted = null;
+        slot.progress = 0;
+        slot.watered = true;
+        slot.ready = false;
+      });
+      renderGardenGrid();
+      updateGlobalCounters();
+      createToast('🧹 Garden cleared and prepared for fresh compost.');
+    }
+  });
+
+  // --- CATALOG TABS & FILTER HANDLERS ---
+  catalogTabsContainer.addEventListener('click', (e) => {
+    const btn = e.target.closest('.catalog-tab-btn');
+    if (!btn) return;
+
+    // Remove active style from all
+    document.querySelectorAll('.catalog-tab-btn').forEach(b => {
+      b.className = 'catalog-tab-btn text-slate-600 bg-slate-100 hover:bg-slate-200 text-xs px-3 py-1.5 rounded-lg transition-all font-medium';
+    });
+
+    // Set active
+    btn.className = 'catalog-tab-btn active-tab';
+    activeCategoryFilter = btn.dataset.category;
+    renderCatalog();
+  });
+
+  catalogSearchInput.addEventListener('input', () => {
+    renderCatalog();
+  });
+
+  // --- HELPER TOAST SYSTEM ---
+  function createToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'fixed bottom-4 right-4 z-50 bg-slate-900 text-white text-xs py-3 px-4 rounded-xl shadow-xl flex items-center gap-2 border border-slate-800 animate-slide-up';
+    toast.innerHTML = `
+      <span>🌿</span>
+      <span>${message}</span>
     `;
-    return;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('opacity-0');
+      setTimeout(() => toast.remove(), 400);
+    }, 2800);
   }
 
-  container.innerHTML = state.questJournal.map(item => `
-    <div class="p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all">
-      <div>
-        <p class="text-xs font-bold text-slate-200 uppercase tracking-wide">${item.word}</p>
-        <p class="text-[10px] text-slate-500">${item.mode} • ${item.time}</p>
-      </div>
-      <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-bold">
-        +XP
-      </span>
-    </div>
-  `).join("");
-}
-
-// Reset Quest Game State
-document.getElementById("btn-reset-stats").addEventListener("click", () => {
-  if (confirm("Are you sure you want to completely reset all your LexiQuest score, XP, and words levels?")) {
-    localStorage.removeItem("lexiquest_save_v1");
-    state.level = 1;
-    state.xp = 0;
-    state.score = 0;
-    state.streak = 0;
-    state.maxStreak = 0;
-    state.totalAnswers = 0;
-    state.correctAnswers = 0;
-    state.discoveredWords = 0;
-    state.questJournal = [];
-    
-    renderStats();
-    showToast("All quest progress data successfully wiped clean.", "🔄", "success");
-  }
+  // RUN EVERYTHING
+  init();
 });
-
-// Daily Word of the day logic
-function updateDailyWordWidget() {
-  const index = new Date().getDate() % WORD_DATABASE.length;
-  const dailyItem = WORD_DATABASE[index];
-  
-  document.getElementById("daily-word-title").textContent = dailyItem.word;
-  document.getElementById("daily-word-meaning").textContent = dailyItem.clue;
-
-  document.getElementById("btn-learn-word").addEventListener("click", () => {
-    audio.click();
-    showToast(`Learning: ${dailyItem.word} is defined as ${dailyItem.clue}`, "📖", "success");
-  });
-}
-
-// Click event triggers on Buttons inside individual views
-function setupGlobalEventListeners() {
-  // SCRAMBLE Buttons
-  document.getElementById("btn-scramble-submit").addEventListener("click", () => {
-    submitScramble();
-  });
-
-  document.getElementById("scramble-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      submitScramble();
-    }
-  });
-
-  document.getElementById("btn-scramble-clear").addEventListener("click", () => {
-    audio.click();
-    document.getElementById("scramble-input").value = "";
-  });
-
-  document.getElementById("btn-scramble-shuffle").addEventListener("click", () => {
-    audio.click();
-    state.scrambleShuffledWord = shuffleString(state.scrambleOriginalWord);
-    // Re-render
-    const container = document.getElementById("scramble-letters-container");
-    container.innerHTML = "";
-    state.scrambleShuffledWord.split("").forEach((char) => {
-      const btn = document.createElement("button");
-      btn.className = "h-12 w-12 bg-slate-800 hover:bg-slate-700 text-slate-100 font-extrabold text-lg rounded-xl transition-all active:scale-95 shadow border border-slate-700";
-      btn.textContent = char;
-      btn.addEventListener("click", () => {
-        audio.click();
-        document.getElementById("scramble-input").value += char;
-      });
-      container.appendChild(btn);
-    });
-    showToast("Reshuffled spelling board letters!", "🔀", "success");
-  });
-
-  document.getElementById("scramble-hint-btn").addEventListener("click", () => {
-    if (state.xp >= 15) {
-      state.xp -= 15;
-      renderStats();
-      const entry = WORD_DATABASE[state.scrambleIndex];
-      // Provide a letter clue
-      const correctWord = entry.word;
-      const hintChar = correctWord.slice(0, 2);
-      showToast(`Hint letter clues: Starts with "${hintChar}"`, "💡", "success");
-    } else {
-      showToast(`Not enough XP to trade for a hint! Requires 15 XP.`, "❌", "error");
-    }
-  });
-
-  document.getElementById("btn-scramble-skip").addEventListener("click", () => {
-    audio.click();
-    state.streak = 0;
-    state.scrambleIndex = (state.scrambleIndex + 1) % WORD_DATABASE.length;
-    setupScrambleGame();
-    showToast("Word skipped. New scrambled word loaded!", "⏭️", "success");
-    renderStats();
-  });
-
-  // BUILDER Buttons
-  document.getElementById("btn-builder-delete").addEventListener("click", () => {
-    audio.click();
-    state.builderCurrentDraft = state.builderCurrentDraft.slice(0, -1);
-    updateBuilderDraftUI();
-  });
-
-  document.getElementById("btn-builder-clear").addEventListener("click", () => {
-    audio.click();
-    state.builderCurrentDraft = "";
-    updateBuilderDraftUI();
-  });
-
-  document.getElementById("btn-builder-shuffle").addEventListener("click", () => {
-    audio.click();
-    state.builderRingLetters.sort(() => Math.random() - 0.5);
-    
-    // Redraw circles
-    const ringContainer = document.getElementById("builder-ring-letters-container");
-    ringContainer.innerHTML = "";
-    const radius = 64;
-    const count = state.builderRingLetters.length;
-    state.builderRingLetters.forEach((char, idx) => {
-      const angle = (idx * 2 * Math.PI) / count;
-      const x = Math.round(radius * Math.cos(angle)) + 88 - 19;
-      const y = Math.round(radius * Math.sin(angle)) + 88 - 19;
-
-      const item = document.createElement("div");
-      item.className = "hive-letter";
-      item.style.left = `${x}px`;
-      item.style.top = `${y}px`;
-      item.textContent = char;
-      item.addEventListener("click", () => {
-        audio.click();
-        state.builderCurrentDraft += char;
-        updateBuilderDraftUI();
-      });
-      ringContainer.appendChild(item);
-    });
-  });
-
-  document.getElementById("btn-builder-reroll").addEventListener("click", () => {
-    audio.click();
-    state.builderPoolIndex = (state.builderPoolIndex + 1) % WORD_DATABASE.length;
-    setupBuilderGame();
-    showToast("Loaded a brand new Spelling Builder letter challenge!", "🔄", "success");
-  });
-
-  document.getElementById("btn-builder-submit").addEventListener("click", () => {
-    checkBuilderWord();
-  });
-}
