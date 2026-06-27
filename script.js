@@ -1,615 +1,794 @@
-// Subtraction Playground, Game & Solver Implementation
+document.addEventListener('DOMContentLoaded', () => {
+  // --- STATE MANAGERS ---
+  let soundEnabled = true;
+  let currentFactorA = 6;
+  let currentFactorB = 7;
+  let exploreHighlightMode = 'crosshair'; // 'crosshair' or 'rectangle'
 
-// Sound Synthesizer
-const AudioEngine = {
-  ctx: null,
-  enabled: true,
+  // Quiz state variables
+  let quizRange = 10;
+  let quizMaxTime = 60;
+  let quizTimeRemaining = 60;
+  let quizTimerInterval = null;
+  let quizScore = 0;
+  let quizStreak = 0;
+  let quizMaxStreak = 0;
+  let quizTotalAnswered = 0;
+  let quizCorrectAnswered = 0;
+  let currentQuizAnswer = 0;
+  let quizInputMode = 'choice'; // 'choice' or 'direct'
 
-  init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  // Solver state variables
+  let solverA = 43;
+  let solverB = 12;
+  let solverSteps = [];
+  let solverCurrentStepIdx = 0;
+
+  // --- AUDIO SYNTH (Web Audio API) ---
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSynthSound(freq, type, duration) {
+    if (!soundEnabled) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.value = freq;
+      
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+      
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (e) {
+      console.warn('Audio play failed', e);
     }
-  },
+  }
 
-  playPop() {
-    if (!this.enabled) return;
-    this.init();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
+  function playCorrectSound() {
+    playSynthSound(523.25, 'sine', 0.15); // C5
+    setTimeout(() => playSynthSound(659.25, 'sine', 0.25), 80); // E5
+  }
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(220, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(110, this.ctx.currentTime + 0.15);
+  function playWrongSound() {
+    playSynthSound(180, 'sawtooth', 0.3);
+  }
+
+  function playClickSound() {
+    playSynthSound(800, 'sine', 0.05);
+  }
+
+  // --- DOM ELEMENTS ---
+  // Nav/Header
+  const btnToggleSound = document.getElementById('btn-toggle-sound');
+  const soundIconOn = document.getElementById('sound-icon-on');
+  const soundIconOff = document.getElementById('sound-icon-off');
+  const highScoreVal = document.getElementById('high-score-val');
+
+  // Tab Switches
+  const tabBtnExplore = document.getElementById('tab-btn-explore');
+  const tabBtnPlay = document.getElementById('tab-btn-play');
+  const tabBtnSolver = document.getElementById('tab-btn-solver');
+
+  const tabPanelExplore = document.getElementById('tab-panel-explore');
+  const tabPanelPlay = document.getElementById('tab-panel-play');
+  const tabPanelSolver = document.getElementById('tab-panel-solver');
+
+  // Tab 1: Explore Components
+  const sliderA = document.getElementById('slider-a');
+  const sliderB = document.getElementById('slider-b');
+  const sliderAVal = document.getElementById('slider-a-val');
+  const sliderBVal = document.getElementById('slider-b-val');
+  const formulaA = document.getElementById('formula-a');
+  const formulaB = document.getElementById('formula-b');
+  const formulaResult = document.getElementById('formula-result');
+  const visualizerSubtext = document.getElementById('visualizer-subtext');
+  const dotGrid = document.getElementById('dot-grid');
+
+  const tableHeaderRow = document.getElementById('table-header-row');
+  const tableBodyMatrix = document.getElementById('table-body-matrix');
+  const btnHlCross = document.getElementById('btn-hl-cross');
+  const btnHlRect = document.getElementById('btn-hl-rect');
+
+  // Tab 2: Quiz Components
+  const quizSetupContainer = document.getElementById('quiz-setup-container');
+  const quizActiveContainer = document.getElementById('quiz-active-container');
+  const quizGameoverContainer = document.getElementById('quiz-gameover-container');
+
+  const selectGameRange = document.getElementById('game-range');
+  const btnStartGame = document.getElementById('btn-start-game');
+  const quizScoreDisplay = document.getElementById('quiz-score-display');
+  const quizStreakDisplay = document.getElementById('quiz-streak-display');
+  const quizTimeDisplay = document.getElementById('quiz-time-display');
+  const quizNumA = document.getElementById('quiz-num-a');
+  const quizNumB = document.getElementById('quiz-num-b');
+  const quizOptionsContainer = document.getElementById('quiz-options-container');
+  const btnToggleInputMode = document.getElementById('btn-toggle-input-mode');
+  const quizDirectInputContainer = document.getElementById('quiz-direct-input-container');
+  const quizDirectForm = document.getElementById('quiz-direct-form');
+  const quizDirectInput = document.getElementById('quiz-direct-input');
+  const quizFeedbackBanner = document.getElementById('quiz-feedback-banner');
+
+  const gameoverScore = document.getElementById('gameover-score');
+  const gameoverAccuracy = document.getElementById('gameover-accuracy');
+  const gameoverAnswered = document.getElementById('gameover-answered');
+  const gameoverStreak = document.getElementById('gameover-streak');
+  const btnRestartGame = document.getElementById('btn-restart-game');
+  const btnBackSetup = document.getElementById('btn-back-setup');
+
+  // Tab 3: Solver Components
+  const solverNumA = document.getElementById('solver-num-a');
+  const solverNumB = document.getElementById('solver-num-b');
+  const btnTriggerSolve = document.getElementById('btn-trigger-solve');
+  const btnSolverClear = document.getElementById('btn-solver-clear');
+  const solverRenderArea = document.getElementById('solver-render-area');
+  const solverCurrentStepSpan = document.getElementById('solver-current-step');
+  const solverTotalStepsSpan = document.getElementById('solver-total-steps');
+  const solverBtnPrev = document.getElementById('solver-btn-prev');
+  const solverBtnNext = document.getElementById('solver-btn-next');
+
+  // --- PERSISTENCE INITIALIZATION ---
+  let localHighScore = localStorage.getItem('timesmaster_highscore') || 0;
+  highScoreVal.textContent = localHighScore;
+
+  // --- TAB NAVIGATION SYSTEM ---
+  function switchTab(tabId) {
+    playClickSound();
     
-    gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+    // Reset elements state
+    tabBtnExplore.className = "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/60";
+    tabBtnPlay.className = "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/60";
+    tabBtnSolver.className = "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white hover:bg-slate-800/60";
 
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.16);
-  },
+    tabPanelExplore.classList.add('hidden');
+    tabPanelPlay.classList.add('hidden');
+    tabPanelSolver.classList.add('hidden');
 
-  playSuccess() {
-    if (!this.enabled) return;
-    this.init();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(330, this.ctx.currentTime);
-    osc.frequency.setValueAtTime(440, this.ctx.currentTime + 0.08);
-    osc.frequency.setValueAtTime(660, this.ctx.currentTime + 0.16);
-
-    gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.32);
-  },
-
-  playFail() {
-    if (!this.enabled) return;
-    this.init();
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(180, this.ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(90, this.ctx.currentTime + 0.25);
-
-    gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.28);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.3);
+    if (tabId === 'explore') {
+      tabBtnExplore.className = "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow";
+      tabPanelExplore.classList.remove('hidden');
+    } else if (tabId === 'play') {
+      tabBtnPlay.className = "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow";
+      tabPanelPlay.classList.remove('hidden');
+      resetQuizToSetup();
+    } else if (tabId === 'solver') {
+      tabBtnSolver.className = "flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-indigo-600 text-white shadow";
+      tabPanelSolver.classList.remove('hidden');
+      triggerCalculationStepVisualizer();
+    }
   }
-};
 
-// State Variables
-let currentTab = 'visual';
-let minuendVal = 15;
-let subtrahendVal = 6;
-let historyList = [
-  { id: 1, text: '15 − 6 = 9', label: 'Playground', timestamp: 'Initial state' }
-];
+  tabBtnExplore.addEventListener('click', () => switchTab('explore'));
+  tabBtnPlay.addEventListener('click', () => switchTab('play'));
+  tabBtnSolver.addEventListener('click', () => switchTab('solver'));
 
-// Game variables
-let gameActive = false;
-let gameScore = 0;
-let gameStreak = 0;
-let gameBestStreak = 0;
-let gameDifficulty = 'easy'; // easy, medium, hard, insane
-let currentQuestion = { a: 0, b: 0, ans: 0 };
-let gameTimerInterval = null;
-let gameTimeLeft = 100; // in percentage
-
-// DOM Elements
-const elements = {
-  tabVisual: document.getElementById('tab-visual'),
-  tabArcade: document.getElementById('tab-arcade'),
-  tabSolver: document.getElementById('tab-solver'),
-  viewVisual: document.getElementById('view-visual'),
-  viewArcade: document.getElementById('view-arcade'),
-  viewSolver: document.getElementById('view-solver'),
-
-  rangeMinuend: document.getElementById('range-minuend'),
-  rangeSubtrahend: document.getElementById('range-subtrahend'),
-  valMinuend: document.getElementById('val-minuend'),
-  valSubtrahend: document.getElementById('val-subtrahend'),
-  eqMinuend: document.getElementById('eq-minuend'),
-  eqSubtrahend: document.getElementById('eq-subtrahend'),
-  eqResult: document.getElementById('eq-result'),
-  eqWorded: document.getElementById('eq-worded'),
-  visualGrid: document.getElementById('visual-items-grid'),
-  resetPlayground: document.getElementById('reset-playground'),
-
-  btnToggleSound: document.getElementById('btn-toggle-sound'),
-  btnTestSoundPop: document.getElementById('btn-test-sound-pop'),
-  btnTestSoundWin: document.getElementById('btn-test-sound-win'),
-  btnClearHistory: document.getElementById('btn-clear-history'),
-  activityLog: document.getElementById('activity-log'),
-
-  // Arcade
-  arcadeScore: document.getElementById('arcade-score'),
-  arcadeStreak: document.getElementById('arcade-streak'),
-  arcadeBestStreak: document.getElementById('arcade-best-streak'),
-  qMinuend: document.getElementById('q-minuend'),
-  qSubtrahend: document.getElementById('q-subtrahend'),
-  optionsContainer: document.getElementById('arcade-options'),
-  timerBar: document.getElementById('arcade-timer'),
-  introOverlay: document.getElementById('arcade-intro-overlay'),
-  btnStartArcade: document.getElementById('btn-start-arcade'),
-  overlayTitle: document.getElementById('overlay-title'),
-  overlayDesc: document.getElementById('overlay-desc'),
-
-  // Solver
-  solverMinuend: document.getElementById('solver-minuend'),
-  solverSubtrahend: document.getElementById('solver-subtrahend'),
-  solverColumns: document.getElementById('solver-math-columns'),
-  solverStepsList: document.getElementById('solver-steps-list'),
-  solverColumnLabel: document.getElementById('solver-column-label')
-};
-
-// Tab Management
-function switchTab(tabId) {
-  currentTab = tabId;
-  const tabs = [elements.tabVisual, elements.tabArcade, elements.tabSolver];
-  const views = [elements.viewVisual, elements.viewArcade, elements.viewSolver];
-  
-  tabs.forEach(tab => {
-    tab.className = "tab-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-400 hover:text-slate-200";
-  });
-  views.forEach(v => v.classList.add('hidden'));
-
-  if (tabId === 'visual') {
-    elements.tabVisual.className = "tab-btn active px-4 py-2 text-sm font-semibold rounded-lg transition-all text-white bg-gradient-to-r from-rose-600 to-rose-500 shadow-md shadow-rose-600/10";
-    elements.viewVisual.classList.remove('hidden');
-    renderPlayground();
-  } else if (tabId === 'arcade') {
-    elements.tabArcade.className = "tab-btn active px-4 py-2 text-sm font-semibold rounded-lg transition-all text-white bg-gradient-to-r from-indigo-600 to-indigo-500 shadow-md shadow-indigo-600/10";
-    elements.viewArcade.classList.remove('hidden');
-    resetArcadeStats();
-  } else if (tabId === 'solver') {
-    elements.tabSolver.className = "tab-btn active px-4 py-2 text-sm font-semibold rounded-lg transition-all text-white bg-gradient-to-r from-emerald-600 to-emerald-500 shadow-md shadow-emerald-600/10";
-    elements.viewSolver.classList.remove('hidden');
-    runSolver();
-  }
-  AudioEngine.playPop();
-}
-
-// Sound controls initialization
-if (elements.btnToggleSound) {
-  elements.btnToggleSound.addEventListener('click', () => {
-    AudioEngine.enabled = !AudioEngine.enabled;
-    elements.btnToggleSound.textContent = AudioEngine.enabled ? "ON" : "OFF";
-    elements.btnToggleSound.className = AudioEngine.enabled 
-      ? "px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs transition-colors"
-      : "px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 font-bold rounded-lg text-xs transition-colors";
-    AudioEngine.playPop();
-  });
-}
-if (elements.btnTestSoundPop) {
-  elements.btnTestSoundPop.addEventListener('click', () => AudioEngine.playPop());
-}
-if (elements.btnTestSoundWin) {
-  elements.btnTestSoundWin.addEventListener('click', () => AudioEngine.playSuccess());
-}
-
-// Convert numbers to words for friendly voice representation
-function numberToWords(num) {
-  if (num < 0) return 'negative ' + numberToWords(Math.abs(num));
-  const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
-  if (words[num]) return words[num];
-  if (num < 100) {
-    const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-    const single = num % 10;
-    return tens[Math.floor(num / 10)] + (single ? '-' + words[single] : '');
-  }
-  return num.toString();
-}
-
-// Interactive Playground Engine
-function renderPlayground() {
-  const m = minuendVal;
-  const s = subtrahendVal;
-  const result = m - s;
-
-  elements.valMinuend.textContent = m;
-  elements.valSubtrahend.textContent = s;
-  elements.eqMinuend.textContent = m;
-  elements.eqSubtrahend.textContent = s;
-  elements.eqResult.textContent = result;
-  elements.eqWorded.textContent = `${numberToWords(m)} minus ${numberToWords(s)} equals ${numberToWords(result)}`;
-
-  // Clear grid
-  elements.visualGrid.innerHTML = '';
-
-  // Render dots. Subtrahend dots are flagged visually as "taken away"
-  for (let i = 1; i <= m; i++) {
-    const dot = document.createElement('div');
-    const isSubtracted = i > (m - s);
-
-    dot.className = `item-dot w-12 h-12 flex flex-col items-center justify-center rounded-2xl text-xs font-black transition-all cursor-pointer relative select-none
-      ${isSubtracted 
-        ? 'bg-slate-900 border border-amber-500/40 text-amber-500/50 dimmed'
-        : 'bg-gradient-to-tr from-rose-500 to-pink-500 text-white shadow-md shadow-rose-500/20 hover:scale-105 active:scale-95'
-      }`;
-
-    // Visual Indicator labels
-    dot.innerHTML = `
-      <span class="leading-none">${i}</span>
-      ${isSubtracted ? '<span class="text-[10px] text-amber-500 leading-none mt-0.5">−1</span>' : ''}
-    `;
-
-    // User can manually tap a positive dot to increment subtraction!
-    if (!isSubtracted) {
-      dot.addEventListener('click', () => {
-        if (subtrahendVal < minuendVal) {
-          subtrahendVal++;
-          elements.rangeSubtrahend.value = subtrahendVal;
-          renderPlayground();
-          AudioEngine.playPop();
-          triggerContainerFlash(elements.viewVisual, 'flash-red');
-        }
-      });
+  // Toggle sound
+  btnToggleSound.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    if (soundEnabled) {
+      soundIconOn.classList.remove('hidden');
+      soundIconOff.classList.add('hidden');
+      playSynthSound(600, 'sine', 0.1);
     } else {
-      // Clicking a subtracted dot restores it!
-      dot.addEventListener('click', () => {
-        if (subtrahendVal > 0) {
-          subtrahendVal--;
-          elements.rangeSubtrahend.value = subtrahendVal;
-          renderPlayground();
-          AudioEngine.playPop();
-          triggerContainerFlash(elements.viewVisual, 'flash-green');
-        }
+      soundIconOn.classList.add('hidden');
+      soundIconOff.classList.remove('hidden');
+    }
+  });
+
+  // --- TAB 1: EXPLORER AND GRID LOGIC ---
+
+  function setupExploreTable() {
+    // Headers
+    tableHeaderRow.innerHTML = '';
+    for (let c = 1; c <= 12; c++) {
+      const th = document.createElement('th');
+      th.id = `header-col-${c}`;
+      th.className = "p-2.5 text-xs font-black text-slate-400 hover:text-white hover:bg-slate-800/40 transition-colors min-w-[40px] border-b border-slate-800";
+      th.textContent = c;
+      tableHeaderRow.appendChild(th);
+    }
+
+    // Rows
+    tableBodyMatrix.innerHTML = '';
+    for (let r = 1; r <= 12; r++) {
+      const row = document.createElement('tr');
+      row.className = "border-b border-slate-900/60 hover:bg-slate-900/10";
+      
+      // Left Row Indicator
+      const firstCell = document.createElement('td');
+      firstCell.id = `header-row-${r}`;
+      firstCell.className = "p-2 text-xs font-black text-indigo-400 bg-slate-950/80 border-r border-slate-850 cursor-pointer hover:text-white transition-all";
+      firstCell.textContent = r;
+      firstCell.addEventListener('click', () => {
+        currentFactorA = r;
+        sliderA.value = r;
+        updateExplorerVisuals();
+        playClickSound();
       });
+      row.appendChild(firstCell);
+
+      // Multiplication Cells
+      for (let c = 1; c <= 12; c++) {
+        const cell = document.createElement('td');
+        cell.id = `cell-${r}-${c}`;
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        
+        const product = r * c;
+        cell.textContent = product;
+
+        // Standard diagonal styling
+        if (r === c) {
+          cell.className = "cell-neutral cell-diagonal p-2.5 cursor-pointer font-bold relative";
+        } else {
+          cell.className = "cell-neutral p-2.5 cursor-pointer text-slate-400 hover:text-slate-100 relative";
+        }
+
+        // Click to lock coordinates
+        cell.addEventListener('click', () => {
+          currentFactorA = r;
+          currentFactorB = c;
+          sliderA.value = r;
+          sliderB.value = c;
+          updateExplorerVisuals();
+          playSynthSound(400 + product, 'sine', 0.12);
+        });
+
+        row.appendChild(cell);
+      }
+      tableBodyMatrix.appendChild(row);
+    }
+  }
+
+  function updateExplorerVisuals() {
+    sliderAVal.textContent = currentFactorA;
+    sliderBVal.textContent = currentFactorB;
+    formulaA.textContent = currentFactorA;
+    formulaB.textContent = currentFactorB;
+    formulaResult.textContent = currentFactorA * currentFactorB;
+    visualizerSubtext.textContent = `"${currentFactorA} groups of ${currentFactorB} equals ${currentFactorA * currentFactorB}"`;
+
+    // Repaint Highlights on the grid
+    for (let r = 1; r <= 12; r++) {
+      // Reset header highlights
+      const rHeader = document.getElementById(`header-row-${r}`);
+      if (rHeader) rHeader.className = "p-2 text-xs font-black text-indigo-400 bg-slate-950/80 border-r border-slate-850 cursor-pointer hover:text-white transition-all";
+    }
+    for (let c = 1; c <= 12; c++) {
+      const cHeader = document.getElementById(`header-col-${c}`);
+      if (cHeader) cHeader.className = "p-2.5 text-xs font-black text-slate-400 hover:text-white hover:bg-slate-800/40 transition-colors min-w-[40px] border-b border-slate-800";
     }
 
-    elements.visualGrid.appendChild(dot);
-  }
-}
+    for (let r = 1; r <= 12; r++) {
+      for (let c = 1; c <= 12; c++) {
+        const cell = document.getElementById(`cell-${r}-${c}`);
+        if (!cell) continue;
 
-function triggerContainerFlash(element, className) {
-  element.classList.remove('flash-green', 'flash-red');
-  // Force reflow
-  void element.offsetWidth;
-  element.classList.add(className);
-}
+        // Remove custom states
+        cell.classList.remove('cell-row-highlight', 'cell-col-highlight', 'cell-target-highlight');
 
-// Handle slider updates
-elements.rangeMinuend.addEventListener('input', (e) => {
-  minuendVal = parseInt(e.target.value);
-  // Clamp subtrahend values to never exceed minuend
-  elements.rangeSubtrahend.max = minuendVal;
-  if (subtrahendVal > minuendVal) {
-    subtrahendVal = minuendVal;
-    elements.rangeSubtrahend.value = subtrahendVal;
-  }
-  renderPlayground();
-});
+        const isDiagonal = (r === c);
+        cell.className = isDiagonal 
+          ? "cell-neutral cell-diagonal p-2.5 cursor-pointer font-bold relative" 
+          : "cell-neutral p-2.5 cursor-pointer text-slate-400 hover:text-slate-100 relative";
 
-elements.rangeSubtrahend.addEventListener('input', (e) => {
-  subtrahendVal = parseInt(e.target.value);
-  renderPlayground();
-});
+        if (exploreHighlightMode === 'crosshair') {
+          // Row highlighting
+          if (r === currentFactorA) {
+            cell.classList.add('cell-row-highlight');
+          }
+          // Column highlighting
+          if (c === currentFactorB) {
+            cell.classList.add('cell-col-highlight');
+          }
+        } else {
+          // Rectangle area highlighting
+          if (r <= currentFactorA && c <= currentFactorB) {
+            cell.classList.add('cell-row-highlight');
+          }
+        }
 
-elements.resetPlayground.addEventListener('click', () => {
-  minuendVal = 15;
-  subtrahendVal = 6;
-  elements.rangeMinuend.value = 15;
-  elements.rangeSubtrahend.max = 15;
-  elements.rangeSubtrahend.value = 6;
-  renderPlayground();
-  AudioEngine.playPop();
-  pushHistory('15 − 6 = 9', 'Reset Playground');
-});
-
-// --- ARCADE GAME ENGINE ---
-const arcadeDifficultyRules = {
-  easy: { maxM: 12, maxSub: 10, time: 12 },
-  medium: { maxM: 40, maxSub: 30, time: 10 },
-  hard: { maxM: 99, maxSub: 80, time: 8 },
-  insane: { maxM: 200, maxSub: 150, time: 6 }
-};
-
-document.querySelectorAll('.diff-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    document.querySelectorAll('.diff-btn').forEach(b => b.className = "diff-btn text-xs px-3 py-1.5 rounded-lg font-bold text-slate-400 transition-all");
-    e.target.className = "diff-btn active text-xs px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white transition-all";
-    gameDifficulty = e.target.getAttribute('data-level');
-    AudioEngine.playPop();
-    stopArcadeGame();
-  });
-});
-
-function resetArcadeStats() {
-  gameScore = 0;
-  gameStreak = 0;
-  elements.arcadeScore.textContent = '0';
-  elements.arcadeStreak.textContent = '🔥 0';
-  stopArcadeGame();
-}
-
-function stopArcadeGame() {
-  gameActive = false;
-  clearInterval(gameTimerInterval);
-  elements.introOverlay.classList.remove('hidden');
-  elements.overlayTitle.textContent = "Prepare your brain!";
-  elements.overlayDesc.textContent = `Difficulty: ${gameDifficulty.toUpperCase()}. Quick mental math is required.`;
-  elements.timerBar.style.width = '100%';
-}
-
-elements.btnStartArcade.addEventListener('click', () => {
-  gameActive = true;
-  gameScore = 0;
-  gameStreak = 0;
-  elements.arcadeScore.textContent = '0';
-  elements.arcadeStreak.textContent = '🔥 0';
-  elements.introOverlay.classList.add('hidden');
-  nextArcadeQuestion();
-});
-
-function nextArcadeQuestion() {
-  if (!gameActive) return;
-  clearInterval(gameTimerInterval);
-  
-  const rule = arcadeDifficultyRules[gameDifficulty];
-  const m = Math.floor(Math.random() * (rule.maxM - 4)) + 5;
-  // Ensure we can have positive results or negative options based on difficulty level
-  let s = Math.floor(Math.random() * m);
-  if (gameDifficulty === 'insane' && Math.random() > 0.6) {
-    // allow negative outputs occasionally
-    s = Math.floor(Math.random() * (rule.maxSub + 20));
-  }
-
-  const answer = m - s;
-  currentQuestion = { a: m, b: s, ans: answer };
-
-  elements.qMinuend.textContent = m;
-  elements.qSubtrahend.textContent = s;
-
-  // Generate options
-  const correctOption = answer;
-  const uniqueOptions = new Set([correctOption]);
-  
-  while (uniqueOptions.size < 4) {
-    const offset = Math.floor(Math.random() * 11) - 5; // offset between -5 and 5
-    const fake = correctOption + offset;
-    uniqueOptions.add(fake);
-  }
-
-  const sortedOptions = Array.from(uniqueOptions).sort(() => Math.random() - 0.5);
-  elements.optionsContainer.innerHTML = '';
-  
-  sortedOptions.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = "option-btn py-4 px-6 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl font-bold text-xl text-white transition-all shadow-md active:scale-95";
-    btn.textContent = opt;
-    btn.addEventListener('click', () => selectAnswer(opt, btn));
-    elements.optionsContainer.appendChild(btn);
-  });
-
-  // Start Countdown Timer
-  let limit = rule.time * 10;
-  let elapsed = 0;
-  elements.timerBar.style.width = '100%';
-
-  gameTimerInterval = setInterval(() => {
-    elapsed++;
-    const percentage = 100 - (elapsed / limit) * 100;
-    elements.timerBar.style.width = `${Math.max(0, percentage)}%`;
-
-    if (elapsed >= limit) {
-      clearInterval(gameTimerInterval);
-      handleTimeOut();
+        // Exact match target
+        if (r === currentFactorA && c === currentFactorB) {
+          cell.classList.add('cell-target-highlight');
+          cell.className += " font-black text-white text-sm";
+        }
+      }
     }
-  }, 100);
-}
 
-function selectAnswer(selected, buttonElement) {
-  if (!gameActive) return;
-  clearInterval(gameTimerInterval);
-
-  const correct = currentQuestion.ans;
-  if (selected === correct) {
-    AudioEngine.playSuccess();
-    gameScore += 10 + (gameStreak * 2);
-    gameStreak++;
-    if (gameStreak > gameBestStreak) {
-      gameBestStreak = gameStreak;
-      elements.arcadeBestStreak.textContent = gameBestStreak;
+    // Highlight matching row/col headers
+    const matchingRowHeader = document.getElementById(`header-row-${currentFactorA}`);
+    if (matchingRowHeader) {
+      matchingRowHeader.className = "p-2 text-xs font-black bg-indigo-600/40 text-white border-r border-indigo-500/50 cursor-pointer transition-all";
     }
-    buttonElement.classList.add('bg-emerald-600', 'border-emerald-500');
-    buttonElement.classList.remove('bg-slate-900');
-    pushHistory(`${currentQuestion.a} − ${currentQuestion.b} = ${correct}`, `Arcade (${gameDifficulty}) ✅`);
+    const matchingColHeader = document.getElementById(`header-col-${currentFactorB}`);
+    if (matchingColHeader) {
+      matchingColHeader.className = "p-2.5 text-xs font-black bg-purple-600/40 text-white border-b border-purple-500/50 min-w-[40px] transition-all";
+    }
+
+    updateDotMatrixVisual();
+  }
+
+  function updateDotMatrixVisual() {
+    dotGrid.innerHTML = '';
+    dotGrid.style.gridTemplateRows = `repeat(${currentFactorA}, minmax(0, 1fr))`;
+    dotGrid.style.gridTemplateColumns = `repeat(${currentFactorB}, minmax(0, 1fr))`;
+
+    const totalCount = currentFactorA * currentFactorB;
     
-    setTimeout(() => {
-      elements.arcadeScore.textContent = gameScore;
-      elements.arcadeStreak.textContent = `🔥 ${gameStreak}`;
-      nextArcadeQuestion();
-    }, 600);
-  } else {
-    AudioEngine.playFail();
-    gameStreak = 0;
-    buttonElement.classList.add('bg-rose-600', 'border-rose-500');
-    buttonElement.classList.remove('bg-slate-900');
-    pushHistory(`${currentQuestion.a} − ${currentQuestion.b} ❌ (Ans: ${correct})`, `Arcade (${gameDifficulty})`);
-    
-    // Highlight correct one
-    Array.from(elements.optionsContainer.children).forEach(btn => {
-      if (parseInt(btn.textContent) === correct) {
-        btn.className = "option-btn py-4 px-6 bg-emerald-600 border border-emerald-500 rounded-xl font-bold text-xl text-white transition-all";
+    for (let i = 0; i < totalCount; i++) {
+      const dot = document.createElement('div');
+      dot.className = "dot-item bg-gradient-to-br from-indigo-500 to-purple-500 shadow-md transform hover:scale-125 hover:rotate-12 duration-200 cursor-pointer";
+      dot.setAttribute('title', `Element ${i + 1}`);
+      dotGrid.appendChild(dot);
+    }
+  }
+
+  // Controls listener
+  sliderA.addEventListener('input', (e) => {
+    currentFactorA = parseInt(e.target.value);
+    updateExplorerVisuals();
+  });
+
+  sliderB.addEventListener('input', (e) => {
+    currentFactorB = parseInt(e.target.value);
+    updateExplorerVisuals();
+  });
+
+  btnHlCross.addEventListener('click', () => {
+    exploreHighlightMode = 'crosshair';
+    btnHlCross.className = "px-2.5 py-1 rounded bg-slate-800 text-white font-medium";
+    btnHlRect.className = "px-2.5 py-1 rounded text-slate-400 hover:text-white";
+    playClickSound();
+    updateExplorerVisuals();
+  });
+
+  btnHlRect.addEventListener('click', () => {
+    exploreHighlightMode = 'rectangle';
+    btnHlRect.className = "px-2.5 py-1 rounded bg-slate-800 text-white font-medium";
+    btnHlCross.className = "px-2.5 py-1 rounded text-slate-400 hover:text-white";
+    playClickSound();
+    updateExplorerVisuals();
+  });
+
+  // Pattern buttons
+  const patternBtns = document.querySelectorAll('.pattern-btn');
+  patternBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pattern = btn.dataset.pattern;
+      playClickSound();
+      
+      // Clean up previous classes first
+      updateExplorerVisuals();
+
+      if (pattern === 'squares') {
+        for (let r = 1; r <= 12; r++) {
+          const cell = document.getElementById(`cell-${r}-${r}`);
+          if (cell) {
+            cell.className = "cell-neutral bg-amber-500/30 text-amber-200 p-2.5 cursor-pointer font-black border border-amber-500/60 relative";
+          }
+        }
+      } else if (pattern === 'evens') {
+        for (let r = 1; r <= 12; r++) {
+          for (let c = 1; c <= 12; c++) {
+            const product = r * c;
+            if (product % 2 === 0) {
+              const cell = document.getElementById(`cell-${r}-${c}`);
+              if (cell && (r !== currentFactorA || c !== currentFactorB)) {
+                cell.className += " bg-purple-900/15 text-purple-200";
+              }
+            }
+          }
+        }
+      } else if (pattern === 'fives') {
+        for (let r = 1; r <= 12; r++) {
+          for (let c = 1; c <= 12; c++) {
+            if (r === 5 || c === 5) {
+              const cell = document.getElementById(`cell-${r}-${c}`);
+              if (cell && (r !== currentFactorA || c !== currentFactorB)) {
+                cell.className += " bg-indigo-900/30 text-indigo-100 border-indigo-500/20 border";
+              }
+            }
+          }
+        }
+      } else if (pattern === 'clear') {
+        updateExplorerVisuals();
       }
     });
+  });
 
-    setTimeout(() => {
-      elements.arcadeStreak.textContent = '🔥 0';
-      gameOverOverlay("Wrong Answer!", `You chose ${selected}, but the answer was ${correct}.`);
-    }, 1200);
-  }
-}
 
-function handleTimeOut() {
-  AudioEngine.playFail();
-  gameStreak = 0;
-  elements.arcadeStreak.textContent = '🔥 0';
-  gameOverOverlay("Time's Up!", "Be faster next round to keep the streak going.");
-}
-
-function gameOverOverlay(title, subtitle) {
-  gameActive = false;
-  elements.introOverlay.classList.remove('hidden');
-  elements.overlayTitle.textContent = title;
-  elements.overlayDesc.innerHTML = `${subtitle}<br><br><span class="text-indigo-400 font-extrabold">Final Score: ${gameScore}</span>`;
-  elements.btnStartArcade.textContent = "Play Again";
-}
-
-// --- STEP-BY-STEP SOLVER ---
-function runSolver() {
-  const m = parseInt(elements.solverMinuend.value) || 0;
-  const s = parseInt(elements.solverSubtrahend.value) || 0;
-  const result = m - s;
-
-  elements.solverStepsList.innerHTML = '';
+  // --- TAB 2: MULTIPLICATION SPEED CHALLENGE GAME ---
   
-  if (m < s) {
-    elements.solverColumnLabel.textContent = "Note: The Minuend is smaller than Subtrahend. Output is negative!";
-    elements.solverColumns.innerHTML = `
-      <div class="text-slate-500 text-xl mb-2">Calculated:</div>
-      <div>${m}</div>
-      <div class="border-b border-slate-700 pb-1"><span class="text-rose-500 mr-2">−</span>${s}</div>
-      <div class="text-emerald-400 mt-1">${result}</div>
-    `;
+  // Setup Selection Highlighting for game duration
+  let selectedDuration = 60;
+  const timeBtns = document.querySelectorAll('.game-time-btn');
+  timeBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      playClickSound();
+      timeBtns.forEach(b => {
+        b.className = "game-time-btn py-2.5 rounded-xl border border-slate-800 bg-slate-950 hover:bg-slate-800 text-sm font-semibold text-slate-200 transition-all";
+      });
+      btn.className = "game-time-btn py-2.5 rounded-xl border border-indigo-500/50 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-300 text-sm font-semibold transition-all";
+      selectedDuration = parseInt(btn.dataset.time);
+    });
+  });
+
+  function resetQuizToSetup() {
+    clearInterval(quizTimerInterval);
+    quizSetupContainer.classList.remove('hidden');
+    quizActiveContainer.classList.add('hidden');
+    quizGameoverContainer.classList.add('hidden');
+    quizFeedbackBanner.classList.add('opacity-0');
+  }
+
+  btnStartGame.addEventListener('click', () => {
+    playSynthSound(440, 'sine', 0.15);
+    setTimeout(() => playSynthSound(554.37, 'sine', 0.15), 100);
+    setTimeout(() => playSynthSound(659.25, 'sine', 0.25), 200);
+
+    quizRange = parseInt(selectGameRange.value);
+    quizMaxTime = selectedDuration;
+    quizTimeRemaining = selectedDuration;
+    quizScore = 0;
+    quizStreak = 0;
+    quizTotalAnswered = 0;
+    quizCorrectAnswered = 0;
     
-    elements.solverStepsList.innerHTML = `
-      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-        <p class="text-xs font-bold uppercase text-amber-500 mb-1">Negative Result Warning</p>
-        <p class="text-xs text-slate-300">Because you are taking away more than you have, you will cross below zero by <strong>${Math.abs(result)}</strong> units.</p>
-      </div>
-    `;
-    return;
+    quizScoreDisplay.textContent = "0 pts";
+    quizStreakDisplay.textContent = "🔥 0";
+    quizTimeDisplay.textContent = `${quizTimeRemaining}s`;
+
+    quizSetupContainer.classList.add('hidden');
+    quizActiveContainer.classList.remove('hidden');
+    quizGameoverContainer.classList.add('hidden');
+
+    generateNextQuizQuestion();
+    startQuizTimer();
+  });
+
+  function startQuizTimer() {
+    clearInterval(quizTimerInterval);
+    quizTimerInterval = setInterval(() => {
+      quizTimeRemaining--;
+      quizTimeDisplay.textContent = `${quizTimeRemaining}s`;
+      
+      if (quizTimeRemaining <= 10) {
+        quizTimeDisplay.classList.add('animate-pulse');
+        // Subtle heartbeat alert ticks
+        playSynthSound(150, 'triangle', 0.05);
+      } else {
+        quizTimeDisplay.classList.remove('animate-pulse');
+      }
+
+      if (quizTimeRemaining <= 0) {
+        endQuizSession();
+      }
+    }, 1000);
   }
 
-  elements.solverColumnLabel.textContent = "Aligned place-value columns (Ones, Tens, Hundreds)";
-  
-  // Build detailed borrowing step-by-step for multi-digit numbers
-  const mStr = m.toString();
-  const sStr = s.toString();
-  
-  // Format standard stacked subtraction html
-  elements.solverColumns.innerHTML = `
-    <div class="text-slate-500 text-xs mb-2 uppercase tracking-widest font-sans">Place-value stack</div>
-    <div class="tracking-wider">${m}</div>
-    <div class="border-b-2 border-slate-700 pb-1 tracking-wider"><span class="text-rose-500 mr-2">−</span>${s}</div>
-    <div class="text-emerald-400 mt-1 tracking-wider">${result}</div>
-  `;
+  function generateNextQuizQuestion() {
+    // Pick random factors based on choice
+    const factorA = Math.floor(Math.random() * quizRange) + 1;
+    const factorB = Math.floor(Math.random() * (quizRange > 10 ? quizRange : 10)) + 1;
+    currentQuizAnswer = factorA * factorB;
 
-  // Step generation
-  let stepsHtml = '';
-  const mDigits = mStr.split('').map(Number).reverse();
-  const sDigits = sStr.split('').map(Number).reverse();
-  const maxLen = Math.max(mDigits.length, sDigits.length);
-  
-  let borrowed = Array(maxLen + 1).fill(false);
-  let currentM = [...mDigits];
+    quizNumA.textContent = factorA;
+    quizNumB.textContent = factorB;
 
-  stepsHtml += `
-    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-      <p class="text-xs font-bold uppercase text-slate-400 mb-1">Goal</p>
-      <p class="text-xs text-slate-300">We want to solve <strong>${m} − ${s}</strong> by processing columns from right to left.</p>
-    </div>
-  `;
+    // Populate Multiple Choice Option Buttons
+    const correctAns = currentQuizAnswer;
+    const options = new Set();
+    options.add(correctAns);
 
-  for (let i = 0; i < maxLen; i++) {
-    const colName = i === 0 ? 'Ones' : i === 1 ? 'Tens' : i === 2 ? 'Hundreds' : `10^${i}s`;
-    const digitM = currentM[i] || 0;
-    const digitS = sDigits[i] || 0;
-
-    if (digitM < digitS) {
-      // Need to borrow!
-      let borrowIndex = i + 1;
-      while (borrowIndex < currentM.length && currentM[borrowIndex] === 0) {
-        borrowIndex++;
+    // Generate credible distractors
+    while (options.size < 4) {
+      const offset = (Math.floor(Math.random() * 5) - 2) * (Math.random() > 0.5 ? factorA : factorB);
+      const fakeAns = correctAns + offset + (Math.floor(Math.random() * 6) - 3);
+      if (fakeAns > 0 && fakeAns !== correctAns) {
+        options.add(fakeAns);
       }
-      
-      if (borrowIndex < currentM.length) {
-        currentM[borrowIndex] -= 1;
-        currentM[i] += 10;
-        stepsHtml += `
-          <div class="bg-slate-950 p-4 rounded-xl border border-rose-500/20">
-            <p class="text-xs font-bold uppercase text-rose-400 mb-1">Column ${colName} (Borrowing Needed)</p>
-            <p class="text-xs text-slate-300">
-              We cannot subtract <strong>${digitS}</strong> from <strong>${digitM}</strong>. 
-              We borrow 1 from the next column (${colName === 'Ones' ? 'Tens' : 'Hundreds'}), transforming the current column value to <strong>${digitM + 10}</strong>.
-              Now we subtract: <strong>${digitM + 10} − ${digitS} = ${digitM + 10 - digitS}</strong>.
-            </p>
-          </div>
-        `;
-      } else {
-        // Fallback simple column subtraction step
-        stepsHtml += `
-          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-            <p class="text-xs font-bold uppercase text-emerald-400 mb-1">Column ${colName}</p>
-            <p class="text-xs text-slate-300">Subtract <strong>${digitS}</strong> from <strong>${digitM}</strong> to get <strong>${digitM - digitS}</strong>.</p>
-          </div>
-        `;
-      }
+    }
+
+    // Shuffled choice array conversion
+    const choiceArray = Array.from(options).sort(() => Math.random() - 0.5);
+
+    quizOptionsContainer.innerHTML = '';
+    choiceArray.forEach(val => {
+      const btn = document.createElement('button');
+      btn.className = "py-4 px-6 bg-slate-950 hover:bg-slate-800 border border-slate-850 hover:border-indigo-500/50 text-white font-black rounded-xl text-lg transition-all transform hover:scale-102 flex items-center justify-center";
+      btn.textContent = val;
+      btn.addEventListener('click', () => handleQuizSubmission(val));
+      quizOptionsContainer.appendChild(btn);
+    });
+  }
+
+  function handleQuizSubmission(chosenVal) {
+    quizTotalAnswered++;
+    const isCorrect = (chosenVal === currentQuizAnswer);
+
+    if (isCorrect) {
+      quizCorrectAnswered++;
+      quizStreak++;
+      // Score scales with quickness and active streaks
+      const calculatedGain = 10 + Math.min(quizStreak * 2, 30);
+      quizScore += calculatedGain;
+
+      playCorrectSound();
+      triggerFeedbackBanner(true, `Correct! +${calculatedGain} pts`);
     } else {
-      stepsHtml += `
-        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-          <p class="text-xs font-bold uppercase text-slate-400 mb-1">Column ${colName}</p>
-          <p class="text-xs text-slate-300">No borrowing required! <strong>${digitM} − ${digitS} = ${digitM - digitS}</strong>.</p>
+      quizStreak = 0;
+      playWrongSound();
+      triggerFeedbackBanner(false, `Oops! Correct answer was ${currentQuizAnswer}`);
+    }
+
+    // Update max streak recorded
+    if (quizStreak > quizMaxStreak) {
+      quizMaxStreak = quizStreak;
+    }
+
+    quizScoreDisplay.textContent = `${quizScore} pts`;
+    quizStreakDisplay.textContent = `🔥 ${quizStreak}`;
+
+    // Generate next question
+    generateNextQuizQuestion();
+  }
+
+  function triggerFeedbackBanner(isCorrect, text) {
+    quizFeedbackBanner.textContent = text;
+    quizFeedbackBanner.className = isCorrect 
+      ? "mt-8 p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-center text-xs font-semibold opacity-100 transition-opacity duration-200"
+      : "mt-8 p-3 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 text-center text-xs font-semibold opacity-100 transition-opacity duration-200";
+  }
+
+  btnToggleInputMode.addEventListener('click', () => {
+    playClickSound();
+    if (quizInputMode === 'choice') {
+      quizInputMode = 'direct';
+      quizOptionsContainer.classList.add('hidden');
+      quizDirectInputContainer.classList.remove('hidden');
+      btnToggleInputMode.textContent = "Prefer multiple choice answers?";
+      quizDirectInput.focus();
+    } else {
+      quizInputMode = 'choice';
+      quizOptionsContainer.classList.remove('hidden');
+      quizDirectInputContainer.classList.add('hidden');
+      btnToggleInputMode.textContent = "Prefer typing your answer?";
+    }
+  });
+
+  // Direct Form Answer Input Submissions
+  quizDirectForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const val = parseInt(quizDirectInput.value);
+    if (isNaN(val)) return;
+    handleQuizSubmission(val);
+    quizDirectInput.value = '';
+    quizDirectInput.focus();
+  });
+
+  function endQuizSession() {
+    clearInterval(quizTimerInterval);
+    
+    // Evaluate high score comparison
+    if (quizScore > localHighScore) {
+      localHighScore = quizScore;
+      localStorage.setItem('timesmaster_highscore', localHighScore);
+      highScoreVal.textContent = localHighScore;
+    }
+
+    const accuracy = quizTotalAnswered > 0 ? Math.round((quizCorrectAnswered / quizTotalAnswered) * 100) : 0;
+
+    gameoverScore.textContent = `${quizScore} pts`;
+    gameoverAccuracy.textContent = `${accuracy}%`;
+    gameoverAnswered.textContent = `${quizCorrectAnswered} / ${quizTotalAnswered}`;
+    gameoverStreak.textContent = `🔥 ${quizMaxStreak}`;
+
+    quizActiveContainer.classList.add('hidden');
+    quizGameoverContainer.classList.remove('hidden');
+  }
+
+  btnRestartGame.addEventListener('click', () => {
+    playClickSound();
+    btnStartGame.click();
+  });
+
+  btnBackSetup.addEventListener('click', () => {
+    playClickSound();
+    resetQuizToSetup();
+  });
+
+
+  // --- TAB 3: STEP-BY-STEP DOUBLE-DIGIT MULTIPLICATION SOLVER ---
+
+  function getStepByStepBreakdown(a, b) {
+    const steps = [];
+    const bStr = b.toString();
+    const bDigits = bStr.split('').map(Number).reverse();
+
+    steps.push({
+      type: 'setup',
+      label: 'Write down the multiplication problem vertically.',
+      desc: `Setting up the operation: ${a} Multiplicand and ${b} Multiplier.`
+    });
+
+    let partials = [];
+    
+    // Multiply with each place value digit of multiplier b
+    for (let i = 0; i < bDigits.length; i++) {
+      const multiplierDigit = bDigits[i];
+      const placeValueMultiplier = Math.pow(10, i);
+      const rawProductPart = a * multiplierDigit;
+      const computedPart = rawProductPart * placeValueMultiplier;
+      partials.push(computedPart);
+
+      let explanationStr = '';
+      if (placeValueMultiplier === 1) {
+        explanationStr = `Step 1: Multiply ${a} by ${multiplierDigit} (units digit) = ${rawProductPart}.`;
+      } else {
+        explanationStr = `Step 2: Multiply ${a} by ${multiplierDigit} (tens digit). Since it represents ${placeValueMultiplier}, write down a placeholder zero and multiply ${a} × ${multiplierDigit} = ${rawProductPart}. This gives ${computedPart}.`;
+      }
+
+      steps.push({
+        type: 'partial_mul',
+        place: i,
+        digit: multiplierDigit,
+        value: rawProductPart,
+        shiftedValue: computedPart,
+        label: explanationStr
+      });
+    }
+
+    // If multiplier has multiple digits, calculate sum
+    const finalSum = a * b;
+    if (bDigits.length > 1) {
+      steps.push({
+        type: 'addition',
+        partials: [...partials],
+        result: finalSum,
+        label: `Step 3: Add the partial products together: ${partials.join(' + ')} = ${finalSum}.`
+      });
+    }
+
+    steps.push({
+      type: 'final',
+      result: finalSum,
+      label: `Task Complete! The final product of ${a} × ${b} equals ${finalSum}.`
+    });
+
+    return steps;
+  }
+
+  function renderSolverStep() {
+    if (solverSteps.length === 0) return;
+    const step = solverSteps[solverCurrentStepIdx];
+
+    solverCurrentStepSpan.textContent = solverCurrentStepIdx + 1;
+    solverTotalStepsSpan.textContent = solverSteps.length;
+
+    solverBtnPrev.disabled = (solverCurrentStepIdx === 0);
+    solverBtnNext.disabled = (solverCurrentStepIdx === solverSteps.length - 1);
+
+    let renderHtml = '';
+    
+    const aVal = parseInt(solverNumA.value) || 0;
+    const bVal = parseInt(solverNumB.value) || 0;
+
+    if (step.type === 'setup') {
+      renderHtml = `
+        <div class="text-right text-2xl pr-8 tracking-widest font-black">
+          <div class="text-indigo-400">${aVal}</div>
+          <div class="text-purple-400 border-b-4 border-slate-700 pb-2"><span class="text-slate-600 mr-4">×</span>${bVal}</div>
+          <div class="text-slate-500 pt-2 text-sm italic">Awaiting operations...</div>
+        </div>
+        <div class="mt-6 text-center text-xs text-indigo-300 font-sans p-3 bg-indigo-950/40 border border-indigo-500/20 rounded-lg">
+          ${step.label}
+        </div>
+      `;
+    } 
+    else if (step.type === 'partial_mul') {
+      const placeholderZeros = "0".repeat(step.place);
+      const nonZeroPart = step.value;
+      
+      renderHtml = `
+        <div class="text-right text-2xl pr-8 tracking-widest font-black">
+          <div class="text-slate-500">${aVal}</div>
+          <div class="text-slate-500 border-b-4 border-slate-700 pb-2"><span class="text-slate-600 mr-4">×</span>${bVal}</div>
+          <div class="text-amber-400 pt-2">
+            <span>${nonZeroPart}</span><span class="text-rose-500 font-bold">${placeholderZeros}</span>
+          </div>
+        </div>
+        <div class="mt-6 text-left text-xs font-sans p-4 bg-amber-950/20 border border-amber-500/20 rounded-lg space-y-2">
+          <p class="font-bold text-amber-400">✍️ Processing digit multiplication:</p>
+          <p class="text-slate-300">${step.label}</p>
+        </div>
+      `;
+    } 
+    else if (step.type === 'addition') {
+      const partitionRows = step.partials.map((val, idx) => {
+        return `<div class="text-slate-300">${val}</div>`;
+      }).join('');
+
+      renderHtml = `
+        <div class="text-right text-2xl pr-8 tracking-widest font-black">
+          <div class="text-slate-600">${aVal}</div>
+          <div class="text-slate-600 border-b border-slate-800 pb-1"><span class="text-slate-800 mr-4">×</span>${bVal}</div>
+          <div class="text-sm text-slate-500">Partial Products:</div>
+          <div class="space-y-1 text-slate-300 border-b-4 border-slate-700 pb-2">
+            ${partitionRows}
+          </div>
+          <div class="text-emerald-400 pt-2">${step.result}</div>
+        </div>
+        <div class="mt-6 text-left text-xs font-sans p-4 bg-purple-950/20 border border-purple-500/20 rounded-lg space-y-2">
+          <p class="font-bold text-purple-400">➕ Summation Phase:</p>
+          <p class="text-slate-300">${step.label}</p>
+        </div>
+      `;
+    } 
+    else if (step.type === 'final') {
+      renderHtml = `
+        <div class="text-right text-2xl pr-8 tracking-widest font-black">
+          <div class="text-slate-600">${aVal}</div>
+          <div class="text-slate-600 border-b-4 border-slate-850 pb-2"><span class="text-slate-800 mr-4">×</span>${bVal}</div>
+          <div class="text-emerald-400 drop-shadow-[0_0_12px_rgba(52,211,153,0.4)] text-3xl pt-2">${step.result}</div>
+        </div>
+        <div class="mt-6 text-center text-xs font-sans p-4 bg-emerald-950/30 border border-emerald-500/30 rounded-lg">
+          <p class="font-black text-emerald-400 mb-1">🏁 Solution Confirmed</p>
+          <p class="text-slate-200">${step.label}</p>
         </div>
       `;
     }
-    
-    // Update our simulated subtraction digit outcome
-    currentM[i] = digitM - digitS;
+
+    solverRenderArea.innerHTML = renderHtml;
   }
 
-  stepsHtml += `
-    <div class="bg-emerald-950/20 p-4 rounded-xl border border-emerald-500/25">
-      <p class="text-xs font-bold uppercase text-emerald-400 mb-1">Final Combined Result</p>
-      <p class="text-xs text-slate-300">Reading outputs from left to right gives the correct final answer: <strong>${result}</strong>.</p>
-    </div>
-  `;
+  function triggerCalculationStepVisualizer() {
+    solverA = parseInt(solverNumA.value) || 43;
+    solverB = parseInt(solverNumB.value) || 12;
 
-  elements.solverStepsList.innerHTML = stepsHtml;
-  pushHistory(`${m} − ${s} = ${result}`, "Interactive Solver");
-}
+    // Restrict extreme sizes for readable display
+    if (solverA > 9999) solverA = 9999;
+    if (solverB > 999) solverB = 999;
+    solverNumA.value = solverA;
+    solverNumB.value = solverB;
 
-elements.solverMinuend.addEventListener('input', runSolver);
-elements.solverSubtrahend.addEventListener('input', runSolver);
-
-// --- HISTORY LOG & UTILS ---
-function pushHistory(eqText, sourceLabel) {
-  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const id = Date.now();
-  historyList.unshift({ id, text: eqText, label: sourceLabel, timestamp: time });
-  
-  // limit to 8 items
-  if (historyList.length > 8) {
-    historyList.pop();
-  }
-  renderHistory();
-}
-
-function renderHistory() {
-  elements.activityLog.innerHTML = '';
-  if (historyList.length === 0) {
-    elements.activityLog.innerHTML = `
-      <div class="text-center text-slate-500 text-xs py-8">
-        No equations processed yet.
-      </div>
-    `;
-    return;
+    solverSteps = getStepByStepBreakdown(solverA, solverB);
+    solverCurrentStepIdx = 0;
+    renderSolverStep();
   }
 
-  historyList.forEach(item => {
-    const div = document.createElement('div');
-    div.className = "flex justify-between items-center p-3 bg-slate-950/80 hover:bg-slate-950 rounded-xl border border-slate-800 transition-colors";
-    div.innerHTML = `
-      <div>
-        <p class="text-sm font-extrabold text-white tracking-wide">${item.text}</p>
-        <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider">${item.label}</span>
-      </div>
-      <span class="text-[10px] text-slate-500 font-mono">${item.timestamp}</span>
-    `;
-    elements.activityLog.appendChild(div);
+  btnTriggerSolve.addEventListener('click', () => {
+    playSynthSound(500, 'triangle', 0.15);
+    triggerCalculationStepVisualizer();
   });
-}
 
-elements.btnClearHistory.addEventListener('click', () => {
-  historyList = [];
-  renderHistory();
-  AudioEngine.playPop();
+  btnSolverClear.addEventListener('click', () => {
+    playClickSound();
+    solverNumA.value = 43;
+    solverNumB.value = 12;
+    triggerCalculationStepVisualizer();
+  });
+
+  solverBtnPrev.addEventListener('click', () => {
+    if (solverCurrentStepIdx > 0) {
+      playClickSound();
+      solverCurrentStepIdx--;
+      renderSolverStep();
+    }
+  });
+
+  solverBtnNext.addEventListener('click', () => {
+    if (solverCurrentStepIdx < solverSteps.length - 1) {
+      playSynthSound(700, 'sine', 0.08);
+      solverCurrentStepIdx++;
+      renderSolverStep();
+    }
+  });
+
+  // Initialize on load
+  setupExploreTable();
+  updateExplorerVisuals();
 });
-
-// Initialize Sandbox on Load
-renderPlayground();
-renderHistory();
