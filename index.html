@@ -3,39 +3,467 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retro Neon Clock</title>
+  <title>Shabda - Hindi Vocabulary Practice</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Retro Digital Glowing Neon Clock -->
-<div class="clock-container">
-  <div class="glow-orb"></div>
-  <div class="glow-orb secondary"></div>
-  
-  <div class="glass-board">
-    <div class="app-header">
-      <span class="status-dot"></span>
-      <span class="header-title">LIVE NEON CLOCK</span>
+  <div class="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col">
+  <!-- Top Navigation Header -->
+  <header class="bg-white border-b border-orange-100 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white font-bold text-xl shadow-md shadow-orange-100">
+          हिं
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+            Shabda <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">Hindi Practice</span>
+          </h1>
+          <p class="text-xs text-slate-500">Learn, practice, and master Hindi vocabulary</p>
+        </div>
+      </div>
+      
+      <!-- Global Navigation Tabs -->
+      <nav class="flex space-x-1 bg-slate-100 p-1 rounded-xl w-full sm:w-auto">
+        <button id="tab-flashcards" class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-white text-orange-600 shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          Flashcards
+        </button>
+        <button id="tab-quiz" class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+          Quiz Arena
+        </button>
+        <button id="tab-dictionary" class="tab-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+          Word Bank
+        </button>
+      </nav>
     </div>
-    
-    <div class="time-display">
-      <span id="hours">00</span>
-      <span class="colon">:</span>
-      <span id="minutes">00</span>
-      <span class="colon">:</span>
-      <span id="seconds">00</span>
-      <span id="ampm" class="ampm">AM</span>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- Left Sidebar: Learning Dashboard Stats & Category Selector -->
+      <div class="space-y-6 lg:col-span-1">
+        <!-- Progress Dashboard -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Learning Stats</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-orange-50 p-3 rounded-xl border border-orange-100">
+              <div class="text-2xl font-bold text-orange-700" id="stat-mastered-count">0</div>
+              <div class="text-xs text-orange-600 font-medium">Words Mastered</div>
+            </div>
+            <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
+              <div class="text-2xl font-bold text-amber-700" id="stat-streak">1</div>
+              <div class="text-xs text-amber-600 font-medium">Day Streak 🔥</div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-slate-100">
+            <div class="flex justify-between text-xs text-slate-500 mb-1">
+              <span>Total Vocabulary Size</span>
+              <span id="vocab-progress-label" class="font-semibold">10 words</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+              <div id="vocab-progress-bar" class="bg-orange-500 h-2 rounded-full transition-all duration-500" style="width: 30%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Category Quick Selection -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Categories</h3>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full" id="category-badge-count">5</span>
+          </div>
+          <div class="space-y-1" id="categories-container">
+            <!-- Dynamic Categories injected here -->
+          </div>
+        </div>
+
+        <!-- Quick Audio Settings helper -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-teal-50 rounded-full -z-10"></div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Text-to-Speech Voice</h3>
+          <p class="text-xs text-slate-500 mb-3">Select Hindi voice if available in your system for crisp pronunciations.</p>
+          <select id="voice-select" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-2 focus:ring-1 focus:ring-orange-500 outline-none">
+            <option value="default">System Default Voice</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Playgrounds -->
+      <div class="lg:col-span-3 space-y-6">
+        
+        <!-- SECTIONS: FLASHCARDS (Active by default) -->
+        <section id="section-flashcards" class="space-y-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-orange-500 text-white p-6 rounded-2xl shadow-md relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-36 h-36 bg-orange-400 rounded-full opacity-40 blur-md"></div>
+            <div>
+              <span class="bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Mode: Practice</span>
+              <h2 class="text-2xl font-bold mt-2">Interactive Flashcards</h2>
+              <p class="text-sm text-orange-100 mt-1">Click the card to reveal the translation, transliteration, and usage.</p>
+            </div>
+            <div class="flex gap-2 self-stretch sm:self-auto">
+              <button id="btn-reset-mastery" class="bg-orange-600/30 hover:bg-orange-600/60 text-white border border-orange-400/30 text-xs px-3 py-2 rounded-xl transition-all font-semibold flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                Reset Marks
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Flashcard Container -->
+          <div class="flex flex-col items-center justify-center py-6">
+            <!-- Card Element -->
+            <div id="flashcard" class="w-full max-w-lg aspect-[1.6/1] bg-transparent cursor-pointer relative group card-3d">
+              <div id="flashcard-inner" class="card-inner relative w-full h-full rounded-2xl shadow-xl transition-all duration-500 ease-out border border-amber-100">
+                
+                <!-- FRONT (Hindi Side) -->
+                <div class="card-front absolute inset-0 bg-gradient-to-br from-white via-orange-50/20 to-amber-50/30 rounded-2xl flex flex-col justify-between p-8 backface-hidden">
+                  <div class="flex justify-between items-center">
+                    <span id="card-badge-category" class="bg-orange-100 text-orange-800 text-xs font-bold px-2.5 py-1 rounded-full">Common Words</span>
+                    <span class="text-xs text-slate-400 font-semibold tracking-wider flex items-center gap-1">
+                      Click to Flip 
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-slate-300 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+                    </span>
+                  </div>
+                  
+                  <div class="text-center space-y-4 my-auto">
+                    <h2 id="card-hindi-word" class="text-5xl font-extrabold text-slate-900 tracking-wide font-devanagari select-none">नमस्ते</h2>
+                    <p id="card-transliteration" class="text-lg text-amber-700 italic font-medium">Namaste</p>
+                  </div>
+
+                  <div class="flex justify-between items-center border-t border-slate-100 pt-4">
+                    <button id="card-audio-btn" class="text-orange-500 hover:text-orange-700 hover:bg-orange-50 p-2 rounded-full transition-all duration-200 flex items-center gap-2 text-sm font-semibold" title="Listen to Pronunciation">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                      Listen
+                    </button>
+                    <span class="text-xs text-slate-400 font-medium" id="card-index-indicator">Card 1 of 10</span>
+                  </div>
+                </div>
+
+                <!-- BACK (English Side) -->
+                <div class="card-back absolute inset-0 bg-slate-900 text-white rounded-2xl flex flex-col justify-between p-8 backface-hidden transform rotate-y-180">
+                  <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <span class="text-xs text-orange-400 font-semibold uppercase tracking-widest">English Translation</span>
+                    <span class="text-xs text-slate-500">Click to Flip back</span>
+                  </div>
+
+                  <div class="text-center my-auto space-y-3">
+                    <h3 id="card-english-translation" class="text-3xl font-bold text-amber-300">Hello / Greetings</h3>
+                    <div class="inline-block px-3 py-1 bg-slate-800 rounded-lg text-slate-300 text-xs border border-slate-700">
+                      Example Usage: <span id="card-usage" class="text-orange-300 italic">"Namaste, aap kaise hain?"</span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between border-t border-slate-800 pt-4">
+                    <div class="flex gap-2 w-full">
+                      <button id="btn-mark-easy" class="flex-1 bg-emerald-600/95 hover:bg-emerald-600 text-white py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-emerald-950/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                        Easy! Mastered
+                      </button>
+                      <button id="btn-mark-hard" class="flex-1 bg-orange-600/95 hover:bg-orange-600 text-white py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md shadow-orange-950/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                        Needs Practice
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex items-center gap-6 mt-8">
+              <button id="btn-prev" class="w-12 h-12 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-orange-600 hover:border-orange-200 flex items-center justify-center shadow-sm transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              
+              <button id="btn-flip-trigger" class="px-6 py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold shadow-md shadow-amber-100 transition-all flex items-center gap-2">
+                <span>Flip Card</span>
+                <kbd class="bg-amber-600 text-amber-100 text-[10px] px-1.5 py-0.5 rounded">Space</kbd>
+              </button>
+
+              <button id="btn-next" class="w-12 h-12 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-orange-600 hover:border-orange-200 flex items-center justify-center shadow-sm transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
+
+            <!-- Info/Helper Box -->
+            <div class="mt-8 max-w-lg text-center text-xs text-slate-400 bg-white p-4 rounded-xl border border-slate-100">
+              <span class="font-semibold text-slate-500">Pro-tip:</span> Use left/right arrow keys to switch cards. Press <kbd class="px-1.5 py-0.5 bg-slate-100 rounded text-[10px] font-bold border">Space</kbd> to flip.
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTIONS: QUIZ ARENA (Hidden by default) -->
+        <section id="section-quiz" class="space-y-6 hidden">
+          <div class="bg-indigo-950 text-white p-6 rounded-2xl shadow-xl relative overflow-hidden border border-indigo-900">
+            <div class="absolute -right-16 -top-16 w-48 h-48 bg-indigo-800 rounded-full opacity-30 blur-xl"></div>
+            <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-purple-950 rounded-full opacity-40 blur-lg"></div>
+            
+            <div class="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <span class="bg-indigo-500/30 text-indigo-300 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-indigo-500/20">Interactive Assessment</span>
+                <h2 class="text-2xl font-bold mt-2 text-indigo-100">Hindi Vocabulary Quiz</h2>
+                <p class="text-sm text-indigo-300 mt-1">Test your knowledge. Match the Hindi script with the correct translation!</p>
+              </div>
+              <div class="bg-indigo-900/60 px-4 py-2.5 rounded-xl border border-indigo-800 text-center">
+                <p class="text-xs text-indigo-400 uppercase font-bold tracking-wider">High Score</p>
+                <p id="quiz-high-score" class="text-lg font-black text-amber-400">0 pts</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quiz Setup/Interface Container -->
+          <div class="bg-white border border-slate-100 shadow-sm rounded-2xl p-6 md:p-8">
+            <!-- Quiz Scoreboard / Active Status -->
+            <div id="quiz-progress-header" class="flex justify-between items-center mb-6 hidden">
+              <div class="flex items-center space-x-2">
+                <span class="text-xs font-bold text-slate-400 uppercase">Question</span>
+                <span id="quiz-question-index" class="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded-lg text-xs">1/5</span>
+              </div>
+              
+              <!-- Quiz Live Score Indicator -->
+              <div class="flex items-center space-x-3">
+                <div class="text-right">
+                  <span class="text-xs text-slate-400">Current Points:</span>
+                  <span id="quiz-current-points" class="font-bold text-emerald-600 text-sm ml-1">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quiz Workspace State Machine -->
+            <div id="quiz-setup-panel" class="text-center py-8 space-y-6">
+              <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-800">Ready to test your vocabulary?</h3>
+              <p class="text-sm text-slate-500 max-w-md mx-auto">The quiz generates dynamic, high-fidelity questions based on your current words in the select categories. Complete the quiz to earn Mastery Points!</p>
+              
+              <div class="flex flex-wrap justify-center gap-3">
+                <button id="btn-start-quiz-5" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-100 transition-all">
+                  Start 5-Word Challenge
+                </button>
+                <button id="btn-start-quiz-10" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold text-sm rounded-xl shadow-lg shadow-slate-200 transition-all">
+                  Start 10-Word Marathon
+                </button>
+              </div>
+            </div>
+
+            <!-- Quiz Running Workspace -->
+            <div id="quiz-play-panel" class="hidden space-y-8">
+              <!-- Quiz Hindi Query Display -->
+              <div class="bg-slate-50 border border-slate-100 rounded-2xl p-8 text-center space-y-3 relative">
+                <span class="absolute top-3 left-3 bg-white border border-slate-100 text-slate-400 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md">Target Word</span>
+                
+                <div class="inline-block p-1 bg-white rounded-full shadow-sm hover:scale-105 transition-transform">
+                  <button id="quiz-audio-cue" class="p-2.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-full transition-all" title="Hear Target Word">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                  </button>
+                </div>
+                
+                <h3 id="quiz-question-hindi" class="text-5xl font-extrabold text-slate-900 font-devanagari">नमस्ते</h3>
+                <p id="quiz-question-translit" class="text-sm text-indigo-600 font-semibold tracking-wider italic">Namaste</p>
+              </div>
+
+              <!-- Multiple Choice Answer Options -->
+              <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Select correct English meaning:</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quiz-options-container">
+                  <!-- Dynamic options will appear here -->
+                </div>
+              </div>
+
+              <!-- Status message / Result feedback area -->
+              <div id="quiz-feedback" class="p-4 rounded-xl text-sm font-semibold text-center hidden transition-all duration-300"></div>
+
+              <!-- Quiz Action controls -->
+              <div class="flex justify-between items-center border-t border-slate-100 pt-6">
+                <button id="btn-quit-quiz" class="text-xs text-red-500 hover:text-red-700 font-bold uppercase tracking-wider">
+                  Quit Quiz
+                </button>
+                <button id="btn-next-quiz-question" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold rounded-xl transition-all shadow-md" disabled>
+                  Next Question
+                </button>
+              </div>
+            </div>
+
+            <!-- Quiz Finished Screen -->
+            <div id="quiz-finished-panel" class="hidden text-center py-8 space-y-6">
+              <div class="w-24 h-24 mx-auto relative flex items-center justify-center">
+                <div class="absolute inset-0 bg-yellow-100 rounded-full animate-ping opacity-75"></div>
+                <div class="w-20 h-20 bg-amber-400 text-white rounded-full flex items-center justify-center text-3xl font-black relative shadow-lg">
+                  🏆
+                </div>
+              </div>
+              
+              <div class="space-y-2">
+                <h3 class="text-2xl font-black text-slate-800">Spectacular Job!</h3>
+                <p class="text-sm text-slate-500">You successfully completed the Hindi Vocabulary test.</p>
+              </div>
+
+              <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 max-w-sm mx-auto flex justify-around">
+                <div>
+                  <p class="text-xs text-slate-400 uppercase font-semibold">Final Score</p>
+                  <p id="quiz-final-score" class="text-2xl font-extrabold text-indigo-700">0/5</p>
+                </div>
+                <div class="border-r border-slate-200"></div>
+                <div>
+                  <p class="text-xs text-slate-400 uppercase font-semibold">Points Won</p>
+                  <p id="quiz-gained-points" class="text-2xl font-extrabold text-amber-500">+0</p>
+                </div>
+              </div>
+
+              <button id="btn-quiz-retry" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-100 transition-all">
+                Practice Again
+              </button>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- SECTIONS: DICTIONARY / WORD BANK (Hidden by default) -->
+        <section id="section-dictionary" class="space-y-6 hidden">
+          <!-- Mini Banner -->
+          <div class="bg-emerald-600 text-white p-6 rounded-2xl shadow-md relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-40 h-40 bg-emerald-500 rounded-full opacity-40 blur-lg"></div>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <span class="bg-emerald-700 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Word Inventory</span>
+                <h2 class="text-2xl font-bold mt-2">Master Dictionary</h2>
+                <p class="text-sm text-emerald-100 mt-1">Review details, browse categories, delete, or inject custom self-made Hindi words.</p>
+              </div>
+              <button id="btn-open-add-modal" class="bg-white text-emerald-700 hover:bg-emerald-50 text-sm font-bold px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                Add New Word
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              </span>
+              <input type="text" id="dictionary-search-input" placeholder="Search Hindi, transliteration, English or notes..." class="pl-10 pr-4 py-2.5 w-full bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all" />
+            </div>
+            <div class="flex gap-2">
+              <select id="dictionary-category-filter" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="all">All Categories</option>
+              </select>
+              <select id="dictionary-sort-filter" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <option value="hindi-asc">Hindi (अ-ज्ञ)</option>
+                <option value="english-asc">English (A-Z)</option>
+                <option value="custom">Recently Added</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Word List Table Grid -->
+          <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-slate-100">
+                <thead class="bg-slate-50">
+                  <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Word (Hindi)</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Transliteration</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">English Meaning</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Category</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white" id="dictionary-table-body">
+                  <!-- Row injection -->
+                </tbody>
+              </table>
+            </div>
+            <div id="dictionary-empty-state" class="hidden p-12 text-center text-slate-400 space-y-2">
+              <p class="text-sm font-semibold">No matching Hindi words found</p>
+              <p class="text-xs">Try typing another query or change selected categories.</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </div>
-    
-    <div class="date-display" id="date">Loading Today's Date...</div>
-    
-    <div class="controls-row">
-      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
-      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
+  </main>
+
+  <!-- MODAL: ADD CUSTOM HINDI WORD -->
+  <div id="add-word-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 border border-emerald-100">
+      <div class="bg-emerald-600 p-5 text-white flex justify-between items-center">
+        <h3 class="text-lg font-bold flex items-center gap-2">
+          ✨ Add Word to Dictionary
+        </h3>
+        <button id="btn-close-modal" class="text-emerald-100 hover:text-white hover:bg-emerald-700/50 p-1.5 rounded-lg transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+        </button>
+      </div>
+      
+      <form id="add-word-form" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Hindi Word in Devanagari script <span class="text-red-500">*</span></label>
+          <input type="text" id="form-input-hindi" placeholder="e.g., नमस्ते" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-base font-devanagari focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">English Transliteration <span class="text-red-500">*</span></label>
+            <input type="text" id="form-input-translit" placeholder="e.g., Namaste" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 mb-1">Category <span class="text-red-500">*</span></label>
+            <select id="form-input-category" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="Common Words">Common Words</option>
+              <option value="Colors">Colors</option>
+              <option value="Numbers">Numbers</option>
+              <option value="Animals">Animals</option>
+              <option value="Food & Fruits">Food & Fruits</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">English Translation <span class="text-red-500">*</span></label>
+          <input type="text" id="form-input-english" placeholder="e.g., Hello" required class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">Usage/Sentence Example <span class="text-slate-400">(Optional)</span></label>
+          <input type="text" id="form-input-usage" placeholder="e.g., Namaste, how are you?" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+        </div>
+
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" id="btn-cancel-modal" class="px-4 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-50 rounded-lg transition-all">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg transition-all shadow-md shadow-emerald-100">
+            Save Word
+          </button>
+        </div>
+      </form>
     </div>
   </div>
+
+  <!-- Simple toast notification channel -->
+  <div id="toast-message" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white py-3 px-5 rounded-xl shadow-xl flex items-center space-x-2 text-xs font-bold opacity-0 transition-opacity duration-300 pointer-events-none">
+    <span id="toast-emoji">🚀</span>
+    <span id="toast-text">Settings updated</span>
+  </div>
+
+  <!-- Footer with elegant branding -->
+  <footer class="mt-auto border-t border-slate-100 bg-white py-6 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>🇮🇳 Shabda Hindi Practice Application. Standard pronunciation utilizes native browser Text-to-Speech voices.</p>
+      <p class="mt-1 text-[10px]">&copy; Shabda App Sandbox. Build custom learning systems locally.</p>
+    </div>
+  </footer>
 </div>
   
   <script src="script.js"></script>
