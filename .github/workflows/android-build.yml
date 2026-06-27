@@ -105,14 +105,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: LexiQuest-debug-apk
+          name: VeggieGro-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: LexiQuest-release-aab
+          name: VeggieGro-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
