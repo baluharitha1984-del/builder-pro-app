@@ -110,14 +110,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: DoodlePadKids-debug-apk
+          name: TeluguMelodies-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: DoodlePadKids-release-aab
+          name: TeluguMelodies-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
