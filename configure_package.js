@@ -8,19 +8,63 @@ let appName = '';
 let appDescription = 'Optimized Android progressive hybrid container application wrapper.';
 let themeColorPrimary = '#4f46e5';
 let themeColorBg = '#0b0f19';
+let uniqueAppId = '';
+let loadedFromSource = 'N/A';
 
+// Check capacitor.config.json first (the current active project config)
+if (fs.existsSync('capacitor.config.json')) {
+  try {
+    const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
+    if (config.appId) {
+      uniqueAppId = config.appId;
+      loadedFromSource = 'capacitor.config.json';
+    }
+    if (config.appName) {
+      appName = config.appName;
+    }
+  } catch (e) {
+    console.warn('Error parsing capacitor.config.json:', e);
+  }
+}
+
+// Fallback to capacitor.config.ts
+if (!uniqueAppId && fs.existsSync('capacitor.config.ts')) {
+  try {
+    const content = fs.readFileSync('capacitor.config.ts', 'utf8');
+    const matchId = content.match(/appId\s*:\s*['"]([^'"]+)['"]/);
+    if (matchId) {
+      uniqueAppId = matchId[1];
+      loadedFromSource = 'capacitor.config.ts';
+    }
+    const matchName = content.match(/appName\s*:\s*['"]([^'"]+)['"]/);
+    if (matchName) {
+      appName = matchName[1];
+    }
+  } catch (e) {
+    console.warn('Error parsing capacitor.config.ts:', e);
+  }
+}
+
+// Fallback to project-metadata.json for description, themes, or missing name/appId
 if (fs.existsSync('project-metadata.json')) {
   try {
     const meta = JSON.parse(fs.readFileSync('project-metadata.json', 'utf8'));
-    if (meta.name) appName = meta.name;
     if (meta.description) appDescription = meta.description;
     if (meta.themePrimary) themeColorPrimary = meta.themePrimary;
     if (meta.themeBg) themeColorBg = meta.themeBg;
+    if (!appName && meta.name) {
+      appName = meta.name;
+    }
+    if (!uniqueAppId && meta.appId) {
+      uniqueAppId = meta.appId;
+      loadedFromSource = 'project-metadata.json';
+    }
   } catch (e) {
     console.warn('Metadata parsing warning:', e);
   }
 }
 
+// Fallbacks: index.html parsing
 if (!appName && fs.existsSync('www/index.html')) {
   try {
     const htmlContent = fs.readFileSync('www/index.html', 'utf8');
@@ -31,25 +75,11 @@ if (!appName && fs.existsSync('www/index.html')) {
     const descMatch = htmlContent.match(/<meta\s+name="description"\s+content="([^"]+)"/i);
     if (descMatch) {
        appDescription = descMatch[1].trim();
-    }
+     }
   } catch (e) {}
 }
 
-if (!appName) {
-  if (fs.existsSync('capacitor.config.json')) {
-    try {
-      const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
-      if (config.appName) appName = config.appName;
-    } catch (e) {}
-  } else if (fs.existsSync('capacitor.config.ts')) {
-    try {
-      const content = fs.readFileSync('capacitor.config.ts', 'utf8');
-      const match = content.match(/appName\s*:\s*['"]([^'"]+)['"]/);
-      if (match) appName = match[1];
-    } catch (e) {}
-  }
-}
-
+// Fallback: package.json parsing
 if (!appName && fs.existsSync('package.json')) {
   try {
     const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -59,21 +89,9 @@ if (!appName && fs.existsSync('package.json')) {
   } catch (e) {}
 }
 
-let uniqueAppId = 'com.builder.' + (appName ? appName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'app') + '.' + Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, '0');
-if (fs.existsSync('capacitor.config.json')) {
-  try {
-    const config = JSON.parse(fs.readFileSync('capacitor.config.json', 'utf8'));
-    if (config.appId) uniqueAppId = config.appId;
-    if (config.appName && (!appName || appName === 'Applet')) appName = config.appName;
-  } catch (e) {}
-} else if (fs.existsSync('capacitor.config.ts')) {
-  try {
-    const content = fs.readFileSync('capacitor.config.ts', 'utf8');
-    const matchId = content.match(/appId\s*:\s*['"]([^'"]+)['"]/);
-    if (matchId) uniqueAppId = matchId[1];
-    const matchName = content.match(/appName\s*:\s*['"]([^'"]+)['"]/);
-    if (matchName) appName = matchName[1];
-  } catch (e) {}
+if (!uniqueAppId) {
+  uniqueAppId = 'com.builder.' + (appName ? appName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'app') + '.' + Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, '0');
+  loadedFromSource = 'Generated on-the-fly';
 }
 
 const cleanAppName = appName.trim().replace(/^Applet$/i, 'My Application') || 'My Application';
@@ -82,6 +100,9 @@ const uniqueAppLabel = cleanAppName;
 console.log("Verified Project Name: " + uniqueAppLabel);
 console.log("Verified Project Description: " + appDescription);
 console.log("Newly Generated Unique ApplicationID: " + uniqueAppId);
+console.log("Active Project Name: " + uniqueAppLabel);
+console.log("Active Project Package ID: " + uniqueAppId);
+console.log("Source file from which the package ID was loaded: " + loadedFromSource);
 
 const conflictTrackingFile = 'built_packages.txt';
 
