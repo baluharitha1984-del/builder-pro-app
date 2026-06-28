@@ -89,9 +89,21 @@ if (!appName && fs.existsSync('package.json')) {
   } catch (e) {}
 }
 
+const expectedSlug = (appName ? appName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'app');
+
 if (!uniqueAppId) {
-  uniqueAppId = 'com.builder.' + (appName ? appName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'app') + '.' + Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, '0');
+  uniqueAppId = 'com.builder.' + expectedSlug + '.' + Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, '0');
   loadedFromSource = 'Generated on-the-fly';
+} else if (uniqueAppId.startsWith('com.builder.')) {
+  const parts = uniqueAppId.split('.');
+  if (parts.length >= 4) {
+    const currentSlugInId = parts[2];
+    if (currentSlugInId !== expectedSlug) {
+      console.log('[SLUG CORRECTION] Stale slug "' + currentSlugInId + '" detected in uniqueAppId. Correcting to match current app name slug "' + expectedSlug + '".');
+      const suffix = parts[3];
+      uniqueAppId = 'com.builder.' + expectedSlug + '.' + suffix;
+    }
+  }
 }
 
 const cleanAppName = appName.trim().replace(/^Applet$/i, 'My Application') || 'My Application';
