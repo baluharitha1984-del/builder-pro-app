@@ -1,894 +1,657 @@
-/**
- * LEXIQUEST - Elegant Web-Synthesized Interactive English Words Game
- */
-
-// Dynamic client-side Rich Vocabulary Database
-const WORD_DATABASE = [
-  {
-    word: "EFFERVESCENT",
-    clue: "Vivacious, enthusiastic, or bubbling with excitement",
-    synonyms: ["Bubbly", "Dull", "Heavy", "Sluggish"],
-    correctSynonym: "Bubbly",
-    subwords: ["VECT", "TEEN", "SEVER", "EVER", "RESET", "FEVER", "FREE"]
-  },
-  {
-    word: "COGNIZANT",
-    clue: "Having knowledge or being fully aware of something",
-    synonyms: ["Aware", "Oblivious", "Ignorant", "Asleep"],
-    correctSynonym: "Aware",
-    subwords: ["COIN", "GONG", "COZ", "RAIN", "OAT", "AGO", "ZINC"]
-  },
-  {
-    word: "ZEPHYR",
-    clue: "A gentle, mild, or light breeze from the west",
-    synonyms: ["Breeze", "Hurricane", "Torrent", "Blizzard"],
-    correctSynonym: "Breeze",
-    subwords: ["PRY", "PREY", "HER", "YEZ", "HEP"]
-  },
-  {
-    word: "EPHEMERAL",
-    clue: "Lasting for a very short, transient time",
-    synonyms: ["Fleeting", "Eternal", "Timeless", "Durable"],
-    correctSynonym: "Fleeting",
-    subwords: ["PEAL", "PALE", "HEAL", "MEAL", "HAMP", "RAMP", "PEER"]
-  },
-  {
-    word: "LUMINOUS",
-    clue: "Full of or shedding bright glowing light",
-    synonyms: ["Radiant", "Dim", "Obscure", "Opaque"],
-    correctSynonym: "Radiant",
-    subwords: ["ION", "SOUL", "MINU", "SUN", "NIL", "SUM"]
-  },
-  {
-    word: "QUIRKY",
-    clue: "Characterized by peculiar, eccentric, or unconventional habits",
-    synonyms: ["Eccentric", "Ordinary", "Normal", "Standard"],
-    correctSynonym: "Eccentric",
-    subwords: ["YIRK", "QUIP", "YIP", "YRK", "RUY"]
-  },
-  {
-    word: "WANDERLUST",
-    clue: "A strong, innate desire to travel and explore the world",
-    synonyms: ["Roam", "Stagnancy", "Settle", "Homebound"],
-    correctSynonym: "Roam",
-    subwords: ["WAND", "LUST", "WEST", "LAND", "DUST", "RUST", "LUTE", "SUNT"]
-  },
-  {
-    word: "SAGACIOUS",
-    clue: "Having or showing keen mental discernment and good judgment",
-    synonyms: ["Wise", "Foolish", "Immature", "Naive"],
-    correctSynonym: "Wise",
-    subwords: ["SAGO", "SAGA", "COUS", "GAS", "SUG"]
-  },
-  {
-    word: "NEBULOUS",
-    clue: "Hazy, vague, indistinct, or cloud-like",
-    synonyms: ["Cloudy", "Clear", "Distinct", "Precise"],
-    correctSynonym: "Cloudy",
-    subwords: ["BLUE", "LOBE", "SLOB", "BONE", "SOLE"]
-  },
-  {
-    word: "MELLIFLUOUS",
-    clue: "Sweet or musical, pleasant and smooth to hear",
-    synonyms: ["Dulcet", "Harsh", "Shrill", "Noisy"],
-    correctSynonym: "Dulcet",
-    subwords: ["FILL", "MILL", "FLOW", "SOUL", "LIFE", "LIME", "SLIM"]
-  },
-  {
-    word: "CACOPHONY",
-    clue: "A harsh, discordant mixture of sounds",
-    synonyms: ["Noise", "Harmony", "Melody", "Silence"],
-    correctSynonym: "Noise",
-    subwords: ["PONY", "COCO", "CYAN", "COAX", "COP"]
-  },
-  {
-    word: "CAPRICIOUS",
-    clue: "Given to sudden and unaccountable changes of mood or behavior",
-    synonyms: ["Fickle", "Stable", "Reliable", "Constant"],
-    correctSynonym: "Fickle",
-    subwords: ["CAP", "RICE", "SOUP", "PACE", "SOUR"]
-  }
-];
-
-// Audio Synthesis Engine using browser Web Audio API
-class AudioEngine {
-  constructor() {
-    this.enabled = true;
-    this.ctx = null;
-  }
-
-  init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-  }
-
-  playTone(freq, type, duration, vol = 0.1) {
-    if (!this.enabled) return;
-    try {
-      this.init();
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      
-      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-      
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      
-      osc.start();
-      osc.stop(this.ctx.currentTime + duration);
-    } catch (e) {
-      console.warn("Web Audio API not supported/permitted yet.");
-    }
-  }
-
-  correct() {
-    this.playTone(523.25, 'triangle', 0.15, 0.15); // C5
-    setTimeout(() => this.playTone(659.25, 'triangle', 0.25, 0.15), 100); // E5
-  }
-
-  wrong() {
-    this.playTone(220, 'sawtooth', 0.3, 0.15); // A3
-  }
-
-  click() {
-    this.playTone(800, 'sine', 0.05, 0.08);
-  }
-
-  levelUp() {
-    const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
-    notes.forEach((freq, idx) => {
-      setTimeout(() => {
-        this.playTone(freq, 'sine', 0.2, 0.15);
-      }, idx * 100);
-    });
-  }
-}
-
-const audio = new AudioEngine();
-
-// Global Game State
-const state = {
-  level: 1,
-  xp: 0,
-  xpToNextLevel: 100,
-  score: 0,
-  streak: 0,
-  maxStreak: 0,
-  totalAnswers: 0,
-  correctAnswers: 0,
-  discoveredWords: 0,
-  currentMode: "scramble", // scramble, synonym, builder
-  
-  // Game 1: Scramble
-  scrambleIndex: 0,
-  scrambleOriginalWord: "",
-  scrambleShuffledWord: "",
-
-  // Game 2: Synonym
-  synonymIndex: 0,
-  synonymTimerVal: 15,
-  synonymTimerInterval: null,
-
-  // Game 3: Builder
-  builderCoreLetter: "",
-  builderRingLetters: [],
-  builderCurrentDraft: "",
-  builderPoolIndex: 0,
-  builderFoundList: [],
-
-  // Logs & Achievements
-  questJournal: []
+// Real Telugu Dictionary / Vocabulary for Alphabet
+const varnamalaData = {
+  achulu: [
+    { letter: "అ", roman: "a", word: "అమ్మ", englishWord: "Amma", meaning: "Mother" },
+    { letter: "ఆ", roman: "ā", word: "ఆవు", englishWord: "Āvu", meaning: "Cow" },
+    { letter: "ఇ", roman: "i", word: "ఇల్లు", englishWord: "Illu", meaning: "House" },
+    { letter: "ఈ", roman: "ī", word: "ఈక", englishWord: "Īka", meaning: "Feather" },
+    { letter: "ఉ", roman: "u", word: "ఉడుత", englishWord: "Uduta", meaning: "Squirrel" },
+    { letter: "ఊ", roman: "ū", word: "ఊయల", englishWord: "Ūyala", meaning: "Swing" },
+    { letter: "ఋ", roman: "ṛ", word: "ఋషి", englishWord: "Ṛṣi", meaning: "Sage" },
+    { letter: "ఎ", roman: "e", word: "ఎలుక", englishWord: "Eluka", meaning: "Rat" },
+    { letter: "ఏ", roman: "ē", word: "ఏనుగు", englishWord: "Ēnugu", meaning: "Elephant" },
+    { letter: "ఐ", roman: "ai", word: "ఐదు", englishWord: "Aidu", meaning: "Five" },
+    { letter: "ఒ", roman: "o", word: "ఒంటె", englishWord: "Onṭe", meaning: "Camel" },
+    { letter: "ఓ", roman: "ō", word: "ఓడ", englishWord: "Ōḍa", meaning: "Ship" },
+    { letter: "ఔ", roman: "au", word: "ఔషధం", englishWord: "Auṣadhaṁ", meaning: "Medicine" },
+    { letter: "అం", roman: "aṁ", word: "అంగడి", englishWord: "Angaḍi", meaning: "Market / Shop" },
+    { letter: "అః", roman: "aḥ", word: "అంతఃపురం", englishWord: "Antaḥpuraṁ", meaning: "Royal Palace" }
+  ],
+  hallulu: [
+    { letter: "క", roman: "ka", word: "కలము", englishWord: "Kalamu", meaning: "Pen" },
+    { letter: "ఖ", roman: "kha", word: "ఖడ్గము", englishWord: "Khaḍgamu", meaning: "Sword" },
+    { letter: "గ", roman: "ga", word: "గంట", englishWord: "Ganta", meaning: "Bell" },
+    { letter: "ఘ", roman: "gha", word: "ఘటము", englishWord: "Ghatamu", meaning: "Pot" },
+    { letter: "చ", roman: "ca", word: "చక్రము", englishWord: "Cakramu", meaning: "Wheel" },
+    { letter: "ఛ", roman: "cha", word: "ఛత్రము", englishWord: "Chatramu", meaning: "Umbrella" },
+    { letter: "జ", roman: "ja", word: "జడ", englishWord: "Jaḍa", meaning: "Plait / Hair braid" },
+    { letter: "ఝ", roman: "jha", word: "ఝషము", englishWord: "Jhaṣamu", meaning: "Fish" },
+    { letter: "ట", roman: "ṭa", word: "టమాటా", englishWord: "Ṭamāṭā", meaning: "Tomato" },
+    { letter: "ఠ", roman: "ṭha", word: "కంఠము", englishWord: "Kanthamu", meaning: "Neck" },
+    { letter: "డ", roman: "ḍa", word: "డబ్బా", englishWord: "Ḍabbā", meaning: "Box" },
+    { letter: "ఢ", roman: "ḍha", word: "ఢంకా", englishWord: "Ḍhaṅkā", meaning: "Large Drum" },
+    { letter: "త", roman: "ta", word: "తబలా", englishWord: "Tabalā", meaning: "Tabla Drums" },
+    { letter: "థ", roman: "tha", word: "రథము", englishWord: "Rathamu", meaning: "Chariot" },
+    { letter: "ద", roman: "da", word: "దండ", englishWord: "Danḍa", meaning: "Garland" },
+    { letter: "ధ", roman: "dha", word: "ధనస్సు", englishWord: "Dhanassu", meaning: "Bow" },
+    { letter: "న", roman: "na", word: "నగ", englishWord: "Naga", meaning: "Ornament" },
+    { letter: "ప", roman: "pa", word: "పలక", englishWord: "Palaka", meaning: "Slate" },
+    { letter: "ఫ", roman: "pha", word: "ఫలము", englishWord: "Phalamu", meaning: "Fruit" },
+    { letter: "బ", roman: "ba", word: "బంతి", englishWord: "Banti", meaning: "Ball" },
+    { letter: "భ", roman: "bha", word: "భల్లూకము", englishWord: "Bhallūkamu", meaning: "Bear" },
+    { letter: "మ", roman: "ma", word: "మంచం", englishWord: "Manchaṁ", meaning: "Cot / Bed" },
+    { letter: "య", roman: "ya", word: "యంత్రము", englishWord: "Yantramu", meaning: "Machine" },
+    { letter: "ర", roman: "ra", word: "రవి", englishWord: "Ravi", meaning: "Sun" },
+    { letter: "ల", roman: "la", word: "లత", englishWord: "Lata", meaning: "Creeper Plant" },
+    { letter: "వ", roman: "va", word: "వల", englishWord: "Vala", meaning: "Net" },
+    { letter: "శ", roman: "śa", word: "శంఖము", englishWord: "Śaṅkhamu", meaning: "Conch shell" },
+    { letter: "ష", roman: "ṣa", word: "షట్కోణము", englishWord: "Ṣaṭkōṇamu", meaning: "Hexagon" },
+    { letter: "స", roman: "sa", word: "సంచి", englishWord: "Sanchi", meaning: "Bag" },
+    { letter: "హ", roman: "ha", word: "హంస", englishWord: "Hamsa", meaning: "Swan" },
+    { letter: "ళ", roman: "ḷa", word: "తాళము", englishWord: "Tāḷamu", meaning: "Lock" },
+    { letter: "ఱ", roman: "ṟa", word: "ఱంపము", englishWord: "Rampamu", meaning: "Saw tool" }
+  ]
 };
 
-// Initialize App on DOM Loaded
-document.addEventListener("DOMContentLoaded", () => {
-  loadLocalStorage();
-  setupMenuTabs();
-  setupScrambleGame();
-  setupSynonymGame();
-  setupBuilderGame();
-  setupGlobalEventListeners();
-  renderStats();
-  updateDailyWordWidget();
-  showToast("Welcome to LexiQuest! Choose your arena mode and spell your way to glory.", "⚡", "success");
+const proverbsData = [
+  { telugu: "అతి వినయం ధూర్త లక్షణం", roman: "Ati vinayaṁ dhūrta lakṣaṇaṁ", meaning: "Too much humility or flattery is a sure sign of a cunning person." },
+  { telugu: "గోరంతను కొండంత చేయుట", roman: "Gōrantanu konḍanta cēyuṭa", meaning: "To make a mountain out of a molehill." },
+  { telugu: "కుండ బద్దలు కొట్టినట్లు", roman: "Kunḍa baddalu koṭṭinaṭlu", meaning: "Speaking absolutely straightforwardly and bluntly (like breaking a pot)." },
+  { telugu: "ఇంటి దొంగను ఈశ్వరుడైనా పట్టలేడు", roman: "Inṭi doṅganu īśvaruḍainā paṭṭalēḍu", meaning: "Even God cannot catch an inside thief (betrayal from within)." },
+  { telugu: "కుక్క తోక పట్టి గోదావరి ఈదినట్లు", roman: "Kukka tōka paṭṭi gōdāvari īdinaṭlu", meaning: "Like trying to cross a mighty river by holding a dog's tail (unreliable support)." },
+  { telugu: "నిండు కుండ తొణకదు", roman: "Ninḍu kunḍa toṇakadu", meaning: "A full pot never spills or splashes. Wise people remain composed and humble." }
+];
+
+const vocabQuizData = [
+  { telugu: "అమ్మ (Amma)", english: "Mother" },
+  { telugu: "స్నేహం (Sneham)", english: "Friendship" },
+  { telugu: "సూర్యుడు (Suryudu)", english: "Sun" },
+  { telugu: "నీరు (Neeru)", english: "Water" },
+  { telugu: "పుస్తకం (Pustakam)", english: "Book" },
+  { telugu: "ఆకాశం (Aakasam)", english: "Sky" }
+];
+
+const subhashitams = [
+  { text: "\"దేశభాషలందు తెలుగు లెస్స\"", author: "- శ్రీ కృష్ణదేవరాయలు" },
+  { text: "\"నిండు కుండ తొణకదు\"", author: "- తెలుగు సామెత" },
+  { text: "\"సజ్జనుల మైత్రి మేలిమి బంగారము\"", author: "- చాటువు" },
+  { text: "\"విద్య లేని వాడు వింత పశువు\"", author: "- భర్తృహరి" }
+];
+
+// Selected alphabet item tracked for details & speech converter
+let selectedLetterObj = varnamalaData.achulu[0];
+let currentFilter = 'achulu';
+
+// Game variables
+let selectedGameTelugu = null;
+let selectedGameEnglish = null;
+let gameScore = 0;
+let gameStreak = 0;
+
+// Transliteration helper Map
+const simpleTranslitMap = {
+  "a": "అ", "aa": "ఆ", "i": "ఇ", "ee": "ఈ", "u": "ఉ", "oo": "ఊ", "e": "ఎ", "ae": "ఏ", "ai": "ఐ",
+  "o": "ఒ", "oo": "ఓ", "au": "ఔ", "am": "అం", "aha": "అః",
+  "ka": "క", "kha": "ఖ", "ga": "గ", "gha": "ఘ", "ca": "చ", "cha": "ఛ", "ja": "జ", "jha": "ఝ",
+  "ta": "త", "tha": "థ", "da": "ద", "dha": "ధ", "na": "న", "pa": "ప", "pha": "ఫ",
+  "ba": "బ", "bha": "భ", "ma": "మ", "ya": "య", "ra": "ర", "la": "ల", "va": "వ",
+  "sa": "స", "ha": "హ", "namaste": "నమస్తే", "telugu": "తెలుగు", "amma": "అమ్మ", "sneham": "స్నేహం"
+};
+
+// Setup Canvas & Interactivity
+let canvas, ctx;
+let isDrawing = false;
+let drawColor = '#991b1b';
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Load elements dynamically
+  renderVarnamalaGrid();
+  initCanvas();
+  renderProverbs();
+  initWordGame();
+  initTranslitPad();
+  randomizeSubhashitam();
 });
 
-// LocalStorage helpers
-function saveLocalStorage() {
-  const dataToSave = {
-    level: state.level,
-    xp: state.xp,
-    score: state.score,
-    streak: state.streak,
-    maxStreak: state.maxStreak,
-    totalAnswers: state.totalAnswers,
-    correctAnswers: state.correctAnswers,
-    discoveredWords: state.discoveredWords,
-    questJournal: state.questJournal
+// Randomize the daily wisdom header
+function randomizeSubhashitam() {
+  const quoteObj = subhashitams[Math.floor(Math.random() * subhashitams.length)];
+  const textEl = document.getElementById('subhashitam-text');
+  if (textEl) {
+    textEl.innerHTML = quoteObj.text;
+  }
+}
+
+// Switching Primary Tabs
+function switchTab(tabId) {
+  // Hide all sections
+  const sections = document.querySelectorAll('.tab-content');
+  sections.forEach(sec => sec.classList.add('hidden'));
+
+  // Remove active styling on all tab buttons
+  const tabButtons = ['varnamala', 'padyalu', 'khela', 'trans'];
+  tabButtons.forEach(btnKey => {
+    const btn = document.getElementById(`tab-btn-${btnKey}`);
+    if (btn) {
+      btn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold text-stone-600 hover:text-amber-800 hover:bg-amber-50 transition-all duration-300 flex items-center justify-center gap-2";
+    }
+  });
+
+  // Show selected section
+  const activeSec = document.getElementById(`tab-section-${tabId}`);
+  if (activeSec) {
+    activeSec.classList.remove('hidden');
+    activeSec.classList.add('active-tab');
+  }
+
+  // Active button styling
+  const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+  if (activeBtn) {
+    activeBtn.className = "flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md transform scale-105";
+  }
+
+  // Canvas refresh helper if switching to Varnamala
+  if (tabId === 'varnamala') {
+    setTimeout(initCanvas, 100);
+  }
+}
+
+// Subtab Switching (Poems vs Proverbs)
+function switchSubTab(subtabId) {
+  const vemanaContent = document.getElementById('subtab-content-vemana');
+  const samethaluContent = document.getElementById('subtab-content-samethalu');
+  const btnVemana = document.getElementById('btn-subtab-vemana');
+  const btnSamethalu = document.getElementById('btn-subtab-samethalu');
+
+  if (subtabId === 'vemana') {
+    vemanaContent.classList.remove('hidden');
+    samethaluContent.classList.add('hidden');
+    btnVemana.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-white text-stone-800 shadow-sm";
+    btnSamethalu.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-stone-600 hover:text-stone-900";
+  } else {
+    vemanaContent.classList.add('hidden');
+    samethaluContent.classList.remove('hidden');
+    btnVemana.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-stone-600 hover:text-stone-900";
+    btnSamethalu.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-white text-stone-800 shadow-sm";
+  }
+}
+
+// Alphabet Grid Generation
+function renderVarnamalaGrid() {
+  const container = document.getElementById('letter-grid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const letters = varnamalaData[currentFilter];
+
+  letters.forEach((item, index) => {
+    const div = document.createElement('div');
+    // Check if currently selected
+    const isSelected = selectedLetterObj.letter === item.letter;
+    div.className = `p-4 rounded-xl border text-center cursor-pointer transition-all duration-150 transform hover:-translate-y-1 ${
+      isSelected 
+        ? 'border-amber-600 bg-amber-100 text-amber-950 font-black shadow-md ring-2 ring-amber-500/20' 
+        : 'border-stone-200 bg-stone-50 text-stone-800 hover:bg-amber-50 hover:border-amber-300'
+    }`;
+    div.onclick = () => selectLetter(item);
+    div.innerHTML = `
+      <span class="block text-2xl font-bold mb-1">${item.letter}</span>
+      <span class="block text-[10px] text-stone-500 tracking-wider uppercase font-semibold">${item.roman}</span>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Filter Varnamala list
+function filterVarnamala(filterType) {
+  currentFilter = filterType;
+  selectedLetterObj = varnamalaData[filterType][0];
+  
+  // Update toggle buttons design
+  const btnAchulu = document.getElementById('btn-filter-achulu');
+  const btnHallulu = document.getElementById('btn-filter-hallulu');
+  const sectionTitle = document.getElementById('varnamala-section-title');
+
+  if (filterType === 'achulu') {
+    btnAchulu.className = "w-full text-left py-3 px-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 font-bold transition-all duration-200 flex justify-between items-center";
+    btnHallulu.className = "w-full text-left py-3 px-4 rounded-xl border border-transparent hover:border-amber-300 hover:bg-stone-50 text-stone-700 font-bold transition-all duration-200 flex justify-between items-center";
+    sectionTitle.innerText = "అచ్చులు (Vowels)";
+  } else {
+    btnHallulu.className = "w-full text-left py-3 px-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 font-bold transition-all duration-200 flex justify-between items-center";
+    btnAchulu.className = "w-full text-left py-3 px-4 rounded-xl border border-transparent hover:border-amber-300 hover:bg-stone-50 text-stone-700 font-bold transition-all duration-200 flex justify-between items-center";
+    sectionTitle.innerText = "హల్లులు (Consonants)";
+  }
+
+  renderVarnamalaGrid();
+  updatePreviewBox();
+}
+
+// Select a particular letter to inspect
+function selectLetter(letterItem) {
+  selectedLetterObj = letterItem;
+  renderVarnamalaGrid();
+  updatePreviewBox();
+  
+  // Auto draw/preview watermarked background letter on practice pad
+  const padWatermark = document.getElementById('canvas-background-letter');
+  if (padWatermark) {
+    padWatermark.innerText = letterItem.letter;
+  }
+}
+
+// Update detailed card info for alphabet sound learning
+function updatePreviewBox() {
+  document.getElementById('preview-letter').innerText = selectedLetterObj.letter;
+  document.getElementById('preview-category').innerText = currentFilter === 'achulu' ? 'Vowel (అచ్చు)' : 'Consonant (హల్లు)';
+  document.getElementById('preview-roman').innerText = selectedLetterObj.roman.toUpperCase();
+  document.getElementById('preview-example-telugu').innerText = selectedLetterObj.word;
+  document.getElementById('preview-example-roman').innerText = selectedLetterObj.englishWord;
+  document.getElementById('preview-meaning').innerText = selectedLetterObj.meaning;
+}
+
+// Sound / Synthesis handler
+function speakCurrentLetter() {
+  const textToSpeak = selectedLetterObj.letter;
+  
+  // Check standard web speech synthesiser
+  if ('speechSynthesis' in window) {
+    // Telugu code tag is 'te-IN'
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = 'te-IN';
+    utterance.rate = 0.85; // slightly slower for language learners
+    window.speechSynthesis.speak(utterance);
+  } else {
+    alert("Speech Synthesis is not supported in this browser environment.");
+  }
+}
+
+// Practice Pad Canvas Engine
+function initCanvas() {
+  canvas = document.getElementById('practice-canvas');
+  if (!canvas) return;
+  ctx = canvas.getContext('2d');
+
+  // Set scaling quality parameters
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = rect.height;
+
+  // Touch/Mouse event handlers
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('mouseleave', stopDrawing);
+
+  canvas.addEventListener('touchstart', (e) => {
+    const t = e.touches[0];
+    const mouseEvent = new MouseEvent("mousedown", {
+      clientX: t.clientX,
+      clientY: t.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+  }, {passive: true});
+
+  canvas.addEventListener('touchmove', (e) => {
+    const t = e.touches[0];
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: t.clientX,
+      clientY: t.clientY
+    });
+    canvas.dispatchEvent(mouseEvent);
+  }, {passive: true});
+
+  canvas.addEventListener('touchend', () => {
+    const mouseEvent = new MouseEvent("mouseup", {});
+    canvas.dispatchEvent(mouseEvent);
+  }, {passive: true});
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  ctx.beginPath();
+  const coords = getCanvasCoords(e);
+  ctx.moveTo(coords.x, coords.y);
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  const coords = getCanvasCoords(e);
+  ctx.lineTo(coords.x, coords.y);
+  ctx.strokeStyle = drawColor;
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+}
+
+function stopDrawing() {
+  isDrawing = false;
+  ctx.closePath();
+}
+
+function getCanvasCoords(e) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
   };
-  localStorage.setItem("lexiquest_save_v1", JSON.stringify(dataToSave));
 }
 
-function loadLocalStorage() {
-  try {
-    const saved = localStorage.getItem("lexiquest_save_v1");
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state.level = parsed.level || 1;
-      state.xp = parsed.xp || 0;
-      state.score = parsed.score || 0;
-      state.streak = parsed.streak || 0;
-      state.maxStreak = parsed.maxStreak || 0;
-      state.totalAnswers = parsed.totalAnswers || 0;
-      state.correctAnswers = parsed.correctAnswers || 0;
-      state.discoveredWords = parsed.discoveredWords || 0;
-      state.questJournal = parsed.questJournal || [];
-    }
-  } catch (e) {
-    console.error("Failed reading local storage state", e);
+function clearCanvas() {
+  if (ctx && canvas) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 }
 
-// Mode Tab Switcher
-function setupMenuTabs() {
-  const tabScramble = document.getElementById("tab-scramble");
-  const tabSynonym = document.getElementById("tab-synonym");
-  const tabBuilder = document.getElementById("tab-builder");
-
-  const viewScramble = document.getElementById("game-view-scramble");
-  const viewSynonym = document.getElementById("game-view-synonym");
-  const viewBuilder = document.getElementById("game-view-builder");
-
-  function selectTab(mode) {
-    audio.click();
-    state.currentMode = mode;
-    
-    // Clear intervals if applicable
-    if (state.synonymTimerInterval) {
-      clearInterval(state.synonymTimerInterval);
-    }
-
-    // Reset buttons styles
-    [tabScramble, tabSynonym, tabBuilder].forEach(btn => {
-      btn.classList.remove("bg-indigo-600/20", "text-indigo-200", "border-indigo-500/50", "bg-purple-600/20", "text-purple-200", "border-purple-500/50", "bg-pink-600/20", "text-pink-200", "border-pink-500/50");
-      btn.classList.add("hover:bg-slate-800", "text-slate-300");
-      // Remove indicator ping
-      const ping = btn.querySelector("span.animate-ping");
-      if (ping) ping.classList.add("hidden");
-    });
-
-    // Hide all view screens
-    viewScramble.classList.add("hidden");
-    viewSynonym.classList.add("hidden");
-    viewBuilder.classList.add("hidden");
-
-    if (mode === "scramble") {
-      tabScramble.classList.add("bg-indigo-600/20", "text-indigo-200", "border-indigo-500/50");
-      tabScramble.classList.remove("hover:bg-slate-800");
-      viewScramble.classList.remove("hidden");
-      setupScrambleGame();
-    } else if (mode === "synonym") {
-      tabSynonym.classList.add("bg-purple-600/20", "text-purple-200", "border-purple-500/50");
-      tabSynonym.classList.remove("hover:bg-slate-800");
-      viewSynonym.classList.remove("hidden");
-      startSynonymGame();
-    } else if (mode === "builder") {
-      tabBuilder.classList.add("bg-pink-600/20", "text-pink-200", "border-pink-500/50");
-      tabBuilder.classList.remove("hover:bg-slate-800");
-      viewBuilder.classList.remove("hidden");
-      setupBuilderGame();
-    }
-  }
-
-  tabScramble.addEventListener("click", () => selectTab("scramble"));
-  tabSynonym.addEventListener("click", () => selectTab("synonym"));
-  tabBuilder.addEventListener("click", () => selectTab("builder"));
+function changeCanvasColor(colorStr) {
+  drawColor = colorStr;
 }
 
-// --- GAME 1: SCRAMBLE LOGIC ---
-function setupScrambleGame() {
-  // Load current index word
-  const entry = WORD_DATABASE[state.scrambleIndex];
-  state.scrambleOriginalWord = entry.word;
-  
-  // Suffle word helper
-  state.scrambleShuffledWord = shuffleString(entry.word);
-  // Ensure they are not exactly identical
-  while (state.scrambleShuffledWord === state.scrambleOriginalWord && entry.word.length > 2) {
-    state.scrambleShuffledWord = shuffleString(entry.word);
-  }
+// Render Proverbs (Samethalu) & Filter
+function renderProverbs() {
+  const listContainer = document.getElementById('proverbs-list');
+  if (!listContainer) return;
+  listContainer.innerHTML = '';
 
-  // Render letter tiles
-  const container = document.getElementById("scramble-letters-container");
-  container.innerHTML = "";
-  
-  state.scrambleShuffledWord.split("").forEach((char, index) => {
-    const btn = document.createElement("button");
-    btn.className = "h-12 w-12 bg-slate-800 hover:bg-slate-700 text-slate-100 font-extrabold text-lg rounded-xl transition-all active:scale-95 shadow border border-slate-700 hover:border-indigo-500";
-    btn.textContent = char;
-    btn.addEventListener("click", () => {
-      audio.click();
-      const inputField = document.getElementById("scramble-input");
-      inputField.value += char;
-      // visually disable/scale down selected button momentarily to act as pool
-      btn.classList.add("opacity-40", "scale-90");
-      setTimeout(() => {
-        btn.classList.remove("opacity-40", "scale-90");
-      }, 300);
-    });
-    container.appendChild(btn);
+  const searchTerm = document.getElementById('search-samethalu') ? document.getElementById('search-samethalu').value.toLowerCase() : '';
+
+  const filtered = proverbsData.filter(item => {
+    return item.telugu.includes(searchTerm) || 
+           item.roman.toLowerCase().includes(searchTerm) || 
+           item.meaning.toLowerCase().includes(searchTerm);
   });
 
-  // Set clue text
-  document.getElementById("scramble-clue-text").textContent = entry.clue;
-  document.getElementById("scramble-input").value = "";
-}
-
-// Helper to shuffle strings
-function shuffleString(str) {
-  let arr = str.split("");
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr.join("");
-}
-
-// Check Scramble Guess
-function submitScramble() {
-  const inputVal = document.getElementById("scramble-input").value.trim().toUpperCase();
-  const entry = WORD_DATABASE[state.scrambleIndex];
-
-  if (!inputVal) {
-    showToast("Please enter/click letters to make a word guess first!", "⚠️", "error");
-    shakeContainer("scramble-input");
-    return;
-  }
-
-  state.totalAnswers++;
-  if (inputVal === entry.word) {
-    // Success!
-    audio.correct();
-    const gainXP = 30 + (state.streak * 5);
-    awardXP(gainXP);
-    state.score += 50;
-    state.streak++;
-    if (state.streak > state.maxStreak) state.maxStreak = state.streak;
-    state.correctAnswers++;
-    state.discoveredWords++;
-
-    addJournalEntry(entry.word, "Scramble Mastered", "Correct");
-    showToast(`Perfect! "${entry.word}" is correct. (+${gainXP} XP)`, "🎉", "success");
-
-    // Proceed to next word
-    state.scrambleIndex = (state.scrambleIndex + 1) % WORD_DATABASE.length;
-    setTimeout(setupScrambleGame, 800);
-  } else {
-    // Failed
-    audio.wrong();
-    state.streak = 0;
-    showToast("Incorrect spelling! Try checking the clue definition again.", "❌", "error");
-    shakeContainer("scramble-input");
-  }
-  renderStats();
-  saveLocalStorage();
-}
-
-// --- GAME 2: SYNONYM LOGIC ---
-function startSynonymGame() {
-  const entry = WORD_DATABASE[state.synonymIndex];
-  document.getElementById("synonym-target-word").textContent = entry.word;
-  document.getElementById("synonym-hint-def").textContent = "Definition: " + entry.clue;
-
-  // Mix synonyms options
-  const options = [...entry.synonyms];
-  // Shuffle options so correct answer is at variable spot
-  options.sort(() => Math.random() - 0.5);
-
-  const container = document.getElementById("synonym-options-container");
-  container.innerHTML = "";
-
-  options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.className = "p-4 bg-slate-800 hover:bg-slate-700 hover:border-purple-500 rounded-2xl border border-slate-700/80 text-sm font-black text-slate-100 transition-all text-center tracking-wide uppercase active:scale-95";
-    btn.textContent = option;
-    btn.addEventListener("click", () => {
-      checkSynonym(option, entry.correctSynonym);
-    });
-    container.appendChild(btn);
-  });
-
-  // Start speedrun timer
-  state.synonymTimerVal = 15;
-  document.getElementById("synonym-timer").textContent = state.synonymTimerVal + "s";
-  document.getElementById("synonym-timer").className = "text-sm font-bold text-emerald-400";
-
-  if (state.synonymTimerInterval) clearInterval(state.synonymTimerInterval);
-  state.synonymTimerInterval = setInterval(() => {
-    state.synonymTimerVal--;
-    const timerEl = document.getElementById("synonym-timer");
-    timerEl.textContent = state.synonymTimerVal + "s";
-    
-    if (state.synonymTimerVal <= 5) {
-      timerEl.className = "text-sm font-bold text-red-500 animate-pulse";
-    } else {
-      timerEl.className = "text-sm font-bold text-amber-400";
-    }
-
-    if (state.synonymTimerVal <= 0) {
-      clearInterval(state.synonymTimerInterval);
-      handleSynonymTimeout();
-    }
-  }, 1000);
-}
-
-function checkSynonym(selected, correct) {
-  if (state.synonymTimerInterval) clearInterval(state.synonymTimerInterval);
-  state.totalAnswers++;
-
-  if (selected === correct) {
-    audio.correct();
-    // Multiplier for speed
-    const speedBonus = Math.max(0, state.synonymTimerVal * 2);
-    const finalXP = 20 + speedBonus;
-    awardXP(finalXP);
-    state.score += 40;
-    state.streak++;
-    if (state.streak > state.maxStreak) state.maxStreak = state.streak;
-    state.correctAnswers++;
-    state.discoveredWords++;
-
-    addJournalEntry(correct, "Synonym matched fast!", "Correct");
-    showToast(`Superb! "${correct}" synonym linked correctly. (+${finalXP} XP)`, "🔥", "success");
-    
-    state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
-    setTimeout(startSynonymGame, 1000);
-  } else {
-    audio.wrong();
-    state.streak = 0;
-    showToast(`Mistake! The true synonym was "${correct}"`, "❌", "error");
-    shakeContainer("synonym-options-container");
-    
-    state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
-    setTimeout(startSynonymGame, 1500);
-  }
-  renderStats();
-  saveLocalStorage();
-}
-
-function handleSynonymTimeout() {
-  state.totalAnswers++;
-  state.streak = 0;
-  audio.wrong();
-  const correctAns = WORD_DATABASE[state.synonymIndex].correctSynonym;
-  showToast(`Time ran out! The correct synonym was "${correctAns}"`, "⏰", "error");
-  shakeContainer("synonym-target-word");
-  
-  state.synonymIndex = (state.synonymIndex + 1) % WORD_DATABASE.length;
-  setTimeout(startSynonymGame, 1500);
-  renderStats();
-  saveLocalStorage();
-}
-
-
-// --- GAME 3: WORD BUILDER LOGIC ---
-function setupBuilderGame() {
-  const entry = WORD_DATABASE[state.builderPoolIndex];
-  
-  // Extract unique core letters from database entries
-  const chars = Array.from(new Set(entry.word.split("")));
-  if (chars.length < 4) {
-    // backup letters just in case
-    chars.push("A","E","R","S");
-  }
-
-  // Select center mandatory letter
-  state.builderCoreLetter = chars[0];
-  // Outer ring characters
-  state.builderRingLetters = chars.slice(1, 7); // max 6 surrounding characters
-  
-  // Render dynamic values
-  document.getElementById("builder-center-letter").textContent = state.builderCoreLetter;
-  document.getElementById("builder-found-count").textContent = `0/${entry.subwords.length}`;
-  state.builderFoundList = [];
-  state.builderCurrentDraft = "";
-  document.getElementById("builder-current-draft").textContent = "";
-
-  // Render outer ring absolutely positioned circles
-  const ringContainer = document.getElementById("builder-ring-letters-container");
-  ringContainer.innerHTML = "";
-
-  const radius = 64; // px distance from center
-  const count = state.builderRingLetters.length;
-
-  state.builderRingLetters.forEach((char, idx) => {
-    const angle = (idx * 2 * Math.PI) / count;
-    const x = Math.round(radius * Math.cos(angle)) + 88 - 19; // 88 is half of 176 (44rem equivalent)
-    const y = Math.round(radius * Math.sin(angle)) + 88 - 19;
-
-    const item = document.createElement("div");
-    item.className = "hive-letter";
-    item.style.left = `${x}px`;
-    item.style.top = `${y}px`;
-    item.textContent = char;
-    
-    item.addEventListener("click", () => {
-      audio.click();
-      state.builderCurrentDraft += char;
-      updateBuilderDraftUI();
-    });
-    
-    ringContainer.appendChild(item);
-  });
-
-  // Center core click action
-  const centerCore = document.getElementById("builder-center-letter");
-  // clear existing clones to avoid duplicate event bounds
-  const newCenter = centerCore.cloneNode(true);
-  centerCore.parentNode.replaceChild(newCenter, centerCore);
-  newCenter.addEventListener("click", () => {
-    audio.click();
-    state.builderCurrentDraft += state.builderCoreLetter;
-    updateBuilderDraftUI();
-  });
-
-  // Redraw empty found list
-  renderDiscoveredSubwords();
-}
-
-function updateBuilderDraftUI() {
-  document.getElementById("builder-current-draft").textContent = state.builderCurrentDraft;
-}
-
-function renderDiscoveredSubwords() {
-  const tagContainer = document.getElementById("builder-discovered-tags");
-  if (state.builderFoundList.length === 0) {
-    tagContainer.innerHTML = `<span class="text-xs text-slate-500 italic">None yet. Click the letters above to construct!</span>`;
-  } else {
-    tagContainer.innerHTML = state.builderFoundList.map(word => 
-      `<span class="bg-pink-500/10 text-pink-300 px-2.5 py-1 rounded-md text-xs font-bold border border-pink-500/20 uppercase tracking-wider animate-bounce">${word}</span>`
-    ).join("");
-  }
-}
-
-function checkBuilderWord() {
-  const draft = state.builderCurrentDraft.trim().toUpperCase();
-  const entry = WORD_DATABASE[state.builderPoolIndex];
-
-  if (!draft) {
-    showToast("Click letters above to form a word first!", "⚠️", "error");
-    shakeContainer("builder-current-draft");
-    return;
-  }
-
-  // Must contain center mandatory letter
-  if (!draft.includes(state.builderCoreLetter)) {
-    audio.wrong();
-    showToast(`Missing core letter! Form word with center core "${state.builderCoreLetter}"`, "⚠️", "error");
-    shakeContainer("builder-center-letter");
-    return;
-  }
-
-  if (state.builderFoundList.includes(draft)) {
-    showToast(`Already discovered "${draft}"! Find another combination.`, "💡", "error");
-    shakeContainer("builder-current-draft");
-    return;
-  }
-
-  // Check validation in custom database words array list
-  if (entry.subwords.includes(draft) || draft === entry.word) {
-    audio.correct();
-    state.builderFoundList.push(draft);
-    state.discoveredWords++;
-    state.correctAnswers++;
-    state.score += 30;
-    awardXP(25);
-
-    addJournalEntry(draft, `Discovered inside ${entry.word}`, "Success");
-    showToast(`Discovered word "${draft}"! (+25 XP)`, "✨", "success");
-
-    document.getElementById("builder-found-count").textContent = `${state.builderFoundList.length}/${entry.subwords.length}`;
-    renderDiscoveredSubwords();
-    state.builderCurrentDraft = "";
-    updateBuilderDraftUI();
-
-    // Complete whole level bonus if found more than 3
-    if (state.builderFoundList.length >= entry.subwords.length) {
-      showToast(`Sensational! Completed the entire list of words in this pool!`, "🏆", "success");
-      awardXP(100);
-      state.builderPoolIndex = (state.builderPoolIndex + 1) % WORD_DATABASE.length;
-      setTimeout(setupBuilderGame, 2000);
-    }
-  } else {
-    audio.wrong();
-    showToast(`"${draft}" is not in the subwords dictionary pool. Try again!`, "❌", "error");
-    shakeContainer("builder-current-draft");
-  }
-  renderStats();
-  saveLocalStorage();
-}
-
-
-// --- GLOBAL CORE HELPERS & UI UPDATES ---
-
-function awardXP(amount) {
-  state.xp += amount;
-  if (state.xp >= state.xpToNextLevel) {
-    state.xp -= state.xpToNextLevel;
-    state.level++;
-    audio.levelUp();
-    showToast(`LEVEL UP! You reached Rank level ${state.level}!`, "👑", "success");
-  }
-  renderStats();
-}
-
-function renderStats() {
-  // Header levels
-  document.getElementById("user-level-val").textContent = state.level;
-  document.getElementById("xp-ratio-text").textContent = `${state.xp}/${state.xpToNextLevel} XP`;
-  
-  const progressPercent = Math.min(100, Math.floor((state.xp / state.xpToNextLevel) * 100));
-  document.getElementById("xp-progress-bar").style.width = `${progressPercent}%`;
-
-  // Global sidebar state values
-  document.getElementById("streak-val").textContent = state.streak;
-  document.getElementById("score-val").textContent = state.score;
-  document.getElementById("stats-total-answers").textContent = state.totalAnswers;
-  document.getElementById("stats-correct-answers").textContent = state.correctAnswers;
-  document.getElementById("stats-discovered").textContent = state.discoveredWords;
-  document.getElementById("stats-max-streak").textContent = state.maxStreak;
-
-  // Vocabulary Title Ranking mapper
-  let rankName = "Neophyte Novice";
-  if (state.score > 100) rankName = "Word apprentice";
-  if (state.score > 300) rankName = "Lexicon Explorer";
-  if (state.score > 600) rankName = "Elite Grammarian";
-  if (state.score > 1000) rankName = "Phonetic Wizard";
-  if (state.score > 2000) rankName = "Grand LexiQuest Lord";
-  
-  document.getElementById("rank-title").textContent = rankName;
-
-  // Journal Count
-  document.getElementById("journal-count").textContent = state.questJournal.length;
-  renderJournalHTML();
-}
-
-// Sound Toggle Controller
-const btnSound = document.getElementById("btn-toggle-sound");
-btnSound.addEventListener("click", () => {
-  audio.enabled = !audio.enabled;
-  if (audio.enabled) {
-    document.getElementById("sound-on-icon").classList.remove("hidden");
-    document.getElementById("sound-off-icon").classList.add("hidden");
-    audio.click();
-  } else {
-    document.getElementById("sound-on-icon").classList.add("hidden");
-    document.getElementById("sound-off-icon").classList.remove("hidden");
-  }
-});
-
-// Toast Alert Engine
-function showToast(message, emoji = "🔔", type = "success") {
-  const feedbackEl = document.getElementById("game-feedback");
-  const emojiEl = document.getElementById("feedback-emoji");
-  const titleEl = document.getElementById("feedback-title");
-  const bodyEl = document.getElementById("feedback-body");
-
-  emojiEl.textContent = emoji;
-  bodyEl.textContent = message;
-
-  if (type === "success") {
-    feedbackEl.className = "flex items-center justify-between p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-950/40 text-emerald-200 transition-all duration-300";
-    titleEl.textContent = "Perfect Move!";
-  } else {
-    feedbackEl.className = "flex items-center justify-between p-3.5 rounded-xl border border-red-500/30 bg-red-950/40 text-red-200 transition-all duration-300";
-    titleEl.textContent = "Incorrect / Warning";
-  }
-  feedbackEl.classList.remove("hidden");
-}
-
-// Hide Toast event
-document.getElementById("btn-dismiss-feedback").addEventListener("click", () => {
-  document.getElementById("game-feedback").classList.add("hidden");
-});
-
-// Shake effect helper
-function shakeContainer(elementId) {
-  const target = document.getElementById(elementId);
-  if (target) {
-    target.classList.add("shake-wrong");
-    setTimeout(() => {
-      target.classList.remove("shake-wrong");
-    }, 450);
-  }
-}
-
-// Journal Storage log appends
-function addJournalEntry(word, gameModeText, status) {
-  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  state.questJournal.unshift({
-    word,
-    mode: gameModeText,
-    status,
-    time: timestamp
-  });
-  // limit to 30 history entries
-  if (state.questJournal.length > 30) {
-    state.questJournal.pop();
-  }
-}
-
-function renderJournalHTML() {
-  const container = document.getElementById("journal-list");
-  if (state.questJournal.length === 0) {
-    container.innerHTML = `
-      <div class="text-center py-8 text-slate-500 text-xs italic">
-        No word completions logged yet. Start playing either mode!
+  if (filtered.length === 0) {
+    listContainer.innerHTML = `
+      <div class="col-span-full py-8 text-center text-stone-500 text-sm">
+        No matching Telugu proverbs found. Try searching another keyword!
       </div>
     `;
     return;
   }
 
-  container.innerHTML = state.questJournal.map(item => `
-    <div class="p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all">
-      <div>
-        <p class="text-xs font-bold text-slate-200 uppercase tracking-wide">${item.word}</p>
-        <p class="text-[10px] text-slate-500">${item.mode} • ${item.time}</p>
-      </div>
-      <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded-md font-bold">
-        +XP
-      </span>
-    </div>
-  `).join("");
+  filtered.forEach(item => {
+    const div = document.createElement('div');
+    div.className = "p-5 rounded-2xl bg-white border border-amber-200/50 shadow-sm hover:shadow transition-shadow";
+    div.innerHTML = `
+      <h5 class="text-lg font-bold text-red-900 mb-2">${item.telugu}</h5>
+      <p class="text-xs text-stone-500 italic mb-3">${item.roman}</p>
+      <p class="text-sm text-stone-700 bg-amber-50/40 p-3 rounded-lg border border-amber-100"><strong>Explanation:</strong> ${item.meaning}</p>
+    `;
+    listContainer.appendChild(div);
+  });
 }
 
-// Reset Quest Game State
-document.getElementById("btn-reset-stats").addEventListener("click", () => {
-  if (confirm("Are you sure you want to completely reset all your LexiQuest score, XP, and words levels?")) {
-    localStorage.removeItem("lexiquest_save_v1");
-    state.level = 1;
-    state.xp = 0;
-    state.score = 0;
-    state.streak = 0;
-    state.maxStreak = 0;
-    state.totalAnswers = 0;
-    state.correctAnswers = 0;
-    state.discoveredWords = 0;
-    state.questJournal = [];
-    
-    renderStats();
-    showToast("All quest progress data successfully wiped clean.", "🔄", "success");
+function searchProverbs() {
+  renderProverbs();
+}
+
+// Word Matching Game logic
+function initWordGame() {
+  const teluguList = document.getElementById('game-telugu-list');
+  const englishList = document.getElementById('game-english-list');
+  if (!teluguList || !englishList) return;
+
+  teluguList.innerHTML = '';
+  englishList.innerHTML = '';
+  selectedGameTelugu = null;
+  selectedGameEnglish = null;
+  updateGameStatusLog("Click on a Telugu term first, then click its English translation!");
+
+  // Shuffle elements helper
+  const shuffledTelugu = [...vocabQuizData].sort(() => Math.random() - 0.5);
+  const shuffledEnglish = [...vocabQuizData].sort(() => Math.random() - 0.5);
+
+  shuffledTelugu.forEach(item => {
+    const btn = document.createElement('button');
+    btn.id = `game-te-${encodeURIComponent(item.telugu)}`;
+    btn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 hover:border-amber-400 text-stone-800 text-sm font-bold transition-all duration-150 flex justify-between items-center";
+    btn.onclick = () => selectGameTeluguWord(item.telugu, btn.id);
+    btn.innerHTML = `<span>${item.telugu}</span> <span class="text-stone-300">→</span>`;
+    teluguList.appendChild(btn);
+  });
+
+  shuffledEnglish.forEach(item => {
+    const btn = document.createElement('button');
+    btn.id = `game-en-${encodeURIComponent(item.english)}`;
+    btn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 hover:border-amber-400 text-stone-800 text-sm font-bold transition-all duration-150 flex justify-between items-center";
+    btn.onclick = () => selectGameEnglishWord(item.english, btn.id);
+    btn.innerHTML = `<span>${item.english}</span> <span class="text-stone-300">←</span>`;
+    englishList.appendChild(btn);
+  });
+}
+
+function selectGameTeluguWord(teluguWord, elementId) {
+  // Reset other Telugu visual selections
+  const allTeButtons = document.querySelectorAll('[id^="game-te-"]');
+  allTeButtons.forEach(btn => {
+    if (!btn.disabled) {
+      btn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 text-stone-800 text-sm font-bold transition-all";
+    }
+  });
+
+  selectedGameTelugu = teluguWord;
+  const targetBtn = document.getElementById(elementId);
+  if (targetBtn) {
+    targetBtn.className = "w-full py-3.5 px-4 text-left rounded-xl border-2 border-amber-600 bg-amber-100 text-amber-950 text-sm font-extrabold shadow-sm transition-all";
   }
-});
 
-// Daily Word of the day logic
-function updateDailyWordWidget() {
-  const index = new Date().getDate() % WORD_DATABASE.length;
-  const dailyItem = WORD_DATABASE[index];
+  checkGameMatch();
+}
+
+function selectGameEnglishWord(englishMeaning, elementId) {
+  // Reset other English visual selections
+  const allEnButtons = document.querySelectorAll('[id^="game-en-"]');
+  allEnButtons.forEach(btn => {
+    if (!btn.disabled) {
+      btn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 text-stone-800 text-sm font-bold transition-all";
+    }
+  });
+
+  selectedGameEnglish = englishMeaning;
+  const targetBtn = document.getElementById(elementId);
+  if (targetBtn) {
+    targetBtn.className = "w-full py-3.5 px-4 text-left rounded-xl border-2 border-amber-600 bg-amber-100 text-amber-950 text-sm font-extrabold shadow-sm transition-all";
+  }
+
+  checkGameMatch();
+}
+
+function checkGameMatch() {
+  if (!selectedGameTelugu || !selectedGameEnglish) return;
+
+  // Check if they are pairs in vocabQuizData
+  const matchFound = vocabQuizData.find(item => item.telugu === selectedGameTelugu && item.english === selectedGameEnglish);
+
+  if (matchFound) {
+    // Correct pairing
+    gameScore += 10;
+    gameStreak += 1;
+    updateGameStatusLog(`✅ Perfect Match! "${selectedGameTelugu}" is indeed "${selectedGameEnglish}"!`);
+    
+    // Disable buttons
+    const teBtn = document.getElementById(`game-te-${encodeURIComponent(selectedGameTelugu)}`);
+    const enBtn = document.getElementById(`game-en-${encodeURIComponent(selectedGameEnglish)}`);
+    
+    if (teBtn) {
+      teBtn.disabled = true;
+      teBtn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 text-sm font-medium line-through opacity-60 cursor-not-allowed";
+    }
+    if (enBtn) {
+      enBtn.disabled = true;
+      enBtn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 text-sm font-medium line-through opacity-60 cursor-not-allowed";
+    }
+
+    // Reset active selections
+    selectedGameTelugu = null;
+    selectedGameEnglish = null;
+    updateScoreUI();
+    
+    // Check if game completely finished
+    checkGameCompletion();
+  } else {
+    // Wrong pairing
+    gameStreak = 0;
+    updateGameStatusLog(`❌ Try again! That pairing doesn't match.`);
+    
+    // Reset visual state of selected elements slightly delayed so user notices
+    const tempTe = selectedGameTelugu;
+    const tempEn = selectedGameEnglish;
+    selectedGameTelugu = null;
+    selectedGameEnglish = null;
+
+    setTimeout(() => {
+      const teBtn = document.getElementById(`game-te-${encodeURIComponent(tempTe)}`);
+      const enBtn = document.getElementById(`game-en-${encodeURIComponent(tempEn)}`);
+      if (teBtn && !teBtn.disabled) teBtn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 text-stone-800 text-sm font-bold transition-all";
+      if (enBtn && !enBtn.disabled) enBtn.className = "w-full py-3.5 px-4 text-left rounded-xl border border-stone-200 bg-stone-50 hover:bg-amber-50 text-stone-800 text-sm font-bold transition-all";
+    }, 800);
+
+    updateScoreUI();
+  }
+}
+
+function checkGameCompletion() {
+  const allTeButtons = Array.from(document.querySelectorAll('[id^="game-te-"]'));
+  const allDisabled = allTeButtons.every(btn => btn.disabled);
+  if (allDisabled) {
+    updateGameStatusLog("🎉 Awesome! You have matched all Telugu words correctly! Keep it up!");
+  }
+}
+
+function updateScoreUI() {
+  document.getElementById('game-score').innerText = gameScore;
+  document.getElementById('game-streak').innerText = `${gameStreak} 🔥`;
+}
+
+function updateGameStatusLog(msg) {
+  document.getElementById('game-status-log').innerText = msg;
+}
+
+function resetWordGame() {
+  initWordGame();
+}
+
+// Transliteration Realtime System
+function onTranslitInputChange() {
+  const inputVal = document.getElementById('translit-input').value.toLowerCase().trim();
+  const outputEl = document.getElementById('translit-output');
   
-  document.getElementById("daily-word-title").textContent = dailyItem.word;
-  document.getElementById("daily-word-meaning").textContent = dailyItem.clue;
+  if (!inputVal) {
+    outputEl.innerText = "నమస్తే";
+    return;
+  }
 
-  document.getElementById("btn-learn-word").addEventListener("click", () => {
-    audio.click();
-    showToast(`Learning: ${dailyItem.word} is defined as ${dailyItem.clue}`, "📖", "success");
+  // Perform map lookups or progressive substitution converter
+  if (simpleTranslitMap[inputVal]) {
+    outputEl.innerText = simpleTranslitMap[inputVal];
+  } else {
+    // Fallback phonetic syllable assembly approximation
+    let converted = inputVal;
+    
+    // Simple replace rules ordered by descending string length to protect complex syllables
+    const replaceRules = [
+      { eng: "namaste", tel: "నమస్తే" },
+      { eng: "sneham", tel: "స్నేహం" },
+      { eng: "telugu", tel: "తెలుగు" },
+      { eng: "amma", tel: "అమ్మ" },
+      { eng: "bha", tel: "భ" },
+      { eng: "gha", tel: "ఘ" },
+      { eng: "dha", tel: "ధ" },
+      { eng: "tha", tel: "థ" },
+      { eng: "kha", tel: "ఖ" },
+      { eng: "cha", tel: "ఛ" },
+      { eng: "jha", tel: "ఝ" },
+      { eng: "dha", tel: "ఢ" },
+      { eng: "tha", tel: "ఠ" },
+      { eng: "sh", tel: "శ" },
+      { eng: "ka", tel: "క" },
+      { eng: "ga", tel: "గ" },
+      { eng: "ca", tel: "చ" },
+      { eng: "ja", tel: "జ" },
+      { eng: "ta", tel: "త" },
+      { eng: "da", tel: "ద" },
+      { eng: "na", tel: "న" },
+      { eng: "pa", tel: "ప" },
+      { eng: "fa", tel: "ఫ" },
+      { eng: "ba", tel: "బ" },
+      { eng: "ma", tel: "మ" },
+      { eng: "ya", tel: "య" },
+      { eng: "ra", tel: "ర" },
+      { eng: "la", tel: "ల" },
+      { eng: "va", tel: "వ" },
+      { eng: "sa", tel: "స" },
+      { eng: "ha", tel: "హ" },
+      { eng: "aa", tel: "ఆ" },
+      { eng: "ee", tel: "ఈ" },
+      { eng: "oo", tel: "ఊ" },
+      { eng: "ai", tel: "ఐ" },
+      { eng: "au", tel: "ఔ" },
+      { eng: "am", tel: "అం" },
+      { eng: "a", tel: "అ" },
+      { eng: "i", tel: "ఇ" },
+      { eng: "u", tel: "ఉ" },
+      { eng: "e", tel: "ఎ" },
+      { eng: "o", tel: "ఒ" }
+    ];
+
+    replaceRules.forEach(rule => {
+      const regex = new RegExp(rule.eng, 'g');
+      converted = converted.replace(regex, rule.tel);
+    });
+
+    outputEl.innerText = converted;
+  }
+}
+
+// Init Quick keyboard layout for tablet users on Transliteration tab
+function initTranslitPad() {
+  const container = document.getElementById('quick-symbol-buttons');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const symbols = [
+    { key: "Amma", val: "amma" },
+    { key: "Namaste", val: "namaste" },
+    { key: "Telugu", val: "telugu" },
+    { key: "Sneham", val: "sneham" },
+    { key: "Ka", val: "ka" },
+    { key: "Ma", val: "ma" },
+    { key: "Ra", val: "ra" },
+    { key: "Va", val: "va" },
+    { key: "Sa", val: "sa" },
+    { key: "Na", val: "na" }
+  ];
+
+  symbols.forEach(symbol => {
+    const btn = document.createElement('button');
+    btn.className = "bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-900 border border-stone-200 hover:border-amber-300 rounded-lg py-1.5 text-xs font-bold transition-all text-center";
+    btn.onclick = () => {
+      const input = document.getElementById('translit-input');
+      if (input) {
+        input.value = symbol.val;
+        onTranslitInputChange();
+      }
+    };
+    btn.innerText = symbol.key;
+    container.appendChild(btn);
   });
 }
 
-// Click event triggers on Buttons inside individual views
-function setupGlobalEventListeners() {
-  // SCRAMBLE Buttons
-  document.getElementById("btn-scramble-submit").addEventListener("click", () => {
-    submitScramble();
-  });
-
-  document.getElementById("scramble-input").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      submitScramble();
+// Copy Text Helper
+function copyOutputText() {
+  const txt = document.getElementById('translit-output').innerText;
+  navigator.clipboard.writeText(txt).then(() => {
+    const toast = document.getElementById('copy-toast-msg');
+    if (toast) {
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2500);
     }
-  });
-
-  document.getElementById("btn-scramble-clear").addEventListener("click", () => {
-    audio.click();
-    document.getElementById("scramble-input").value = "";
-  });
-
-  document.getElementById("btn-scramble-shuffle").addEventListener("click", () => {
-    audio.click();
-    state.scrambleShuffledWord = shuffleString(state.scrambleOriginalWord);
-    // Re-render
-    const container = document.getElementById("scramble-letters-container");
-    container.innerHTML = "";
-    state.scrambleShuffledWord.split("").forEach((char) => {
-      const btn = document.createElement("button");
-      btn.className = "h-12 w-12 bg-slate-800 hover:bg-slate-700 text-slate-100 font-extrabold text-lg rounded-xl transition-all active:scale-95 shadow border border-slate-700";
-      btn.textContent = char;
-      btn.addEventListener("click", () => {
-        audio.click();
-        document.getElementById("scramble-input").value += char;
-      });
-      container.appendChild(btn);
-    });
-    showToast("Reshuffled spelling board letters!", "🔀", "success");
-  });
-
-  document.getElementById("scramble-hint-btn").addEventListener("click", () => {
-    if (state.xp >= 15) {
-      state.xp -= 15;
-      renderStats();
-      const entry = WORD_DATABASE[state.scrambleIndex];
-      // Provide a letter clue
-      const correctWord = entry.word;
-      const hintChar = correctWord.slice(0, 2);
-      showToast(`Hint letter clues: Starts with "${hintChar}"`, "💡", "success");
-    } else {
-      showToast(`Not enough XP to trade for a hint! Requires 15 XP.`, "❌", "error");
-    }
-  });
-
-  document.getElementById("btn-scramble-skip").addEventListener("click", () => {
-    audio.click();
-    state.streak = 0;
-    state.scrambleIndex = (state.scrambleIndex + 1) % WORD_DATABASE.length;
-    setupScrambleGame();
-    showToast("Word skipped. New scrambled word loaded!", "⏭️", "success");
-    renderStats();
-  });
-
-  // BUILDER Buttons
-  document.getElementById("btn-builder-delete").addEventListener("click", () => {
-    audio.click();
-    state.builderCurrentDraft = state.builderCurrentDraft.slice(0, -1);
-    updateBuilderDraftUI();
-  });
-
-  document.getElementById("btn-builder-clear").addEventListener("click", () => {
-    audio.click();
-    state.builderCurrentDraft = "";
-    updateBuilderDraftUI();
-  });
-
-  document.getElementById("btn-builder-shuffle").addEventListener("click", () => {
-    audio.click();
-    state.builderRingLetters.sort(() => Math.random() - 0.5);
-    
-    // Redraw circles
-    const ringContainer = document.getElementById("builder-ring-letters-container");
-    ringContainer.innerHTML = "";
-    const radius = 64;
-    const count = state.builderRingLetters.length;
-    state.builderRingLetters.forEach((char, idx) => {
-      const angle = (idx * 2 * Math.PI) / count;
-      const x = Math.round(radius * Math.cos(angle)) + 88 - 19;
-      const y = Math.round(radius * Math.sin(angle)) + 88 - 19;
-
-      const item = document.createElement("div");
-      item.className = "hive-letter";
-      item.style.left = `${x}px`;
-      item.style.top = `${y}px`;
-      item.textContent = char;
-      item.addEventListener("click", () => {
-        audio.click();
-        state.builderCurrentDraft += char;
-        updateBuilderDraftUI();
-      });
-      ringContainer.appendChild(item);
-    });
-  });
-
-  document.getElementById("btn-builder-reroll").addEventListener("click", () => {
-    audio.click();
-    state.builderPoolIndex = (state.builderPoolIndex + 1) % WORD_DATABASE.length;
-    setupBuilderGame();
-    showToast("Loaded a brand new Spelling Builder letter challenge!", "🔄", "success");
-  });
-
-  document.getElementById("btn-builder-submit").addEventListener("click", () => {
-    checkBuilderWord();
+  }).catch(err => {
+    console.error("Unable to copy to clipboard", err);
   });
 }
