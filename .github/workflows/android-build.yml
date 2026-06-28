@@ -110,14 +110,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: TeluguTypingDesk-debug-apk
+          name: DoodlePadKids-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: TeluguTypingDesk-release-aab
+          name: DoodlePadKids-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
