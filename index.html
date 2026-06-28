@@ -3,342 +3,403 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LexiQuest</title>
+  <title>Telugu Vani - Cultural & Learning Hub</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-  <!-- Header Navigation -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  <div class="min-h-screen bg-amber-50 text-stone-950 font-sans flex flex-col selection:bg-amber-200 selection:text-amber-900">
+  <!-- Top Elegant Heritage Header -->
+  <header class="bg-gradient-to-r from-red-800 via-amber-700 to-red-800 text-white shadow-xl relative overflow-hidden border-b-4 border-amber-500">
+    <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between relative z-10 gap-4">
+      <div class="flex items-center space-x-4">
+        <!-- Traditional Mandala-Style SVG Logo -->
+        <div class="bg-amber-400 p-3 rounded-full shadow-lg border-2 border-white animate-spin-slow">
+          <svg class="w-10 h-10 text-red-900" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm1 14.5a1.5 1.5 0 11-3 0V11h3zm-1.5-6a1.75 1.75 0 110-3.5 1.75 1.75 0 010 3.5z"/>
+            <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4"/>
           </svg>
         </div>
         <div>
-          <h1 class="text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">LEXIQUEST</h1>
-          <p class="text-xs text-slate-400 font-medium tracking-tight">The Ultimate English Word Mastery Arena</p>
+          <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight drop-shadow-md">
+            తెలుగు వాణి <span class="text-amber-300 font-light text-xl block md:inline md:ml-2">Telugu Vāṇi</span>
+          </h1>
+          <p class="text-amber-100 text-xs sm:text-sm mt-1">Explore the Sweetness of the "Italian of the East" — Alphabet, Poetry, and Games</p>
         </div>
       </div>
-
-      <!-- Score, XP, Streaks, Audio Toggle Panel -->
-      <div class="flex flex-wrap items-center gap-3 sm:gap-6 bg-slate-950/60 p-2 rounded-2xl border border-slate-800/80">
-        <!-- Level & XP Bar -->
-        <div class="flex flex-col min-w-[120px] sm:min-w-[160px]">
-          <div class="flex justify-between text-xs font-semibold mb-1">
-            <span class="text-indigo-400 flex items-center gap-1">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-              Level <span id="user-level-val">1</span>
-            </span>
-            <span class="text-slate-400" id="xp-ratio-text">0/100 XP</span>
-          </div>
-          <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-            <div id="xp-progress-bar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <!-- Global Stats counters -->
-        <div class="h-8 w-[1px] bg-slate-800 hidden sm:block"></div>
-        <div class="flex items-center gap-4">
-          <div class="text-center">
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Streak</p>
-            <p class="text-sm font-black text-amber-400 flex items-center justify-center gap-1">
-              🔥 <span id="streak-val">0</span>
-            </p>
-          </div>
-          <div class="text-center">
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Score</p>
-            <p id="score-val" class="text-sm font-black text-indigo-400">0</p>
-          </div>
-        </div>
-
-        <!-- Sound control -->
-        <button id="btn-toggle-sound" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-all" title="Toggle Game Audio">
-          <svg id="sound-on-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828a1 1 0 010-1.415z" clip-rule="evenodd" />
-          </svg>
-          <svg id="sound-off-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </button>
+      
+      <!-- Interactive Quick Subhashitam (Daily Wisdom) Banner -->
+      <div class="bg-red-900/40 backdrop-blur-sm border border-amber-500/30 rounded-xl p-3 max-w-sm text-center md:text-right">
+        <p class="text-xs text-amber-300 uppercase tracking-widest font-semibold">నేటి సుభాషితం / Daily Quote</p>
+        <p id="subhashitam-text" class="text-sm italic text-stone-100 mt-1">"దేశభాషలందు తెలుగు లెస్స"</p>
+        <p class="text-[10px] text-amber-200">- శ్రీ కృష్ణదేవరాయలు</p>
       </div>
     </div>
   </header>
 
-  <!-- Main App Container -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <!-- Main Content Wrapper -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-8 sm:px-6 lg:px-8">
+    
+    <!-- Tab Navigation System -->
+    <div class="bg-white rounded-2xl shadow-md p-2 mb-8 border border-amber-200/60 max-w-3xl mx-auto flex flex-wrap justify-between gap-1">
+      <button id="tab-btn-varnamala" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-md transform scale-105" onclick="switchTab('varnamala')">
+        <span>అ ఆ ఇ ఈ</span>
+        <span class="hidden sm:inline">Varnamala</span>
+      </button>
+      <button id="tab-btn-padyalu" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-stone-600 hover:text-amber-800 hover:bg-amber-50 transition-all duration-300 flex items-center justify-center gap-2" onclick="switchTab('padyalu')">
+        <span>పద్యాలు</span>
+        <span class="hidden sm:inline">Poetry & Proverbs</span>
+      </button>
+      <button id="tab-btn-khela" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-stone-600 hover:text-amber-800 hover:bg-amber-50 transition-all duration-300 flex items-center justify-center gap-2" onclick="switchTab('khela')">
+        <span>ఆటస్థలం</span>
+        <span class="hidden sm:inline">Word Match Game</span>
+      </button>
+      <button id="tab-btn-trans" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-stone-600 hover:text-amber-800 hover:bg-amber-50 transition-all duration-300 flex items-center justify-center gap-2" onclick="switchTab('trans')">
+        <span>లిపి మార్పిడి</span>
+        <span class="hidden sm:inline">Transliterate</span>
+      </button>
+    </div>
 
-    <!-- Game Sidebar / Game Selection & Stats (Left / Top) -->
-    <section class="lg:col-span-3 flex flex-col gap-4">
-      <!-- Mode selector card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Select Arena Mode</h2>
-        <div class="space-y-2 flex flex-col">
-          <!-- Mode 1: Word Scramble -->
-          <button id="tab-scramble" class="w-full flex items-center justify-between p-3 rounded-xl transition-all border border-transparent bg-indigo-600/20 text-indigo-200 border-indigo-500/50 hover:bg-indigo-600/30 text-left">
+    <!-- ================= TAB 1: VARNAMALA (ALPHABET LEARNER) ================= -->
+    <section id="tab-section-varnamala" class="tab-content active-tab transition-opacity duration-300">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Sidebar: Selection & Controls -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-amber-200/50 flex flex-col justify-between">
+          <div>
+            <h3 class="text-xl font-extrabold text-red-950 border-b pb-3 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              తెలుగు అక్షరమాల
+            </h3>
+            <p class="text-sm text-stone-600 mb-6 leading-relaxed">
+              Telugu is a phonetic Dravidian language. Click any letter to explore its sound signature, equivalent transliteration, example words, and try your hand at sketching it!
+            </p>
+
+            <!-- Category Toggles -->
+            <div class="space-y-3">
+              <button id="btn-filter-achulu" class="w-full text-left py-3 px-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 font-bold transition-all duration-200 flex justify-between items-center" onclick="filterVarnamala('achulu')">
+                <span>అచ్చులు (Vowels)</span>
+                <span class="bg-amber-200 text-amber-950 px-2 py-0.5 rounded text-xs">16 Letters</span>
+              </button>
+              <button id="btn-filter-hallulu" class="w-full text-left py-3 px-4 rounded-xl border border-transparent hover:border-amber-300 hover:bg-stone-50 text-stone-700 font-bold transition-all duration-200 flex justify-between items-center" onclick="filterVarnamala('hallulu')">
+                <span>హల్లులు (Consonants)</span>
+                <span class="bg-stone-200 text-stone-700 px-2 py-0.5 rounded text-xs">36 Letters</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Featured Interactive Pronunciation Preview Box -->
+          <div class="mt-8 bg-gradient-to-br from-amber-500/10 to-red-500/10 rounded-xl p-4 border border-amber-500/20">
             <div class="flex items-center gap-3">
-              <div class="p-2 bg-indigo-500/20 text-indigo-400 rounded-lg font-bold text-sm tracking-tight">W₁</div>
+              <div class="bg-white rounded-lg p-2 border border-amber-300 text-3xl font-bold text-red-900 shadow-sm" id="preview-letter">
+                అ
+              </div>
               <div>
-                <p class="font-bold text-sm">Word Scramble</p>
-                <p class="text-xs text-indigo-300/80">Unravel tangled words</p>
+                <div class="text-xs uppercase tracking-wider text-amber-800 font-bold" id="preview-category">Vowel (అచ్చు)</div>
+                <div class="text-lg font-bold text-stone-800" id="preview-roman">A</div>
               </div>
             </div>
-            <span class="h-2.5 w-2.5 rounded-full bg-indigo-400 animate-ping"></span>
-          </button>
-
-          <!-- Mode 2: Synonym Match -->
-          <button id="tab-synonym" class="w-full flex items-center justify-between p-3 rounded-xl transition-all border border-transparent hover:bg-slate-800 text-slate-300 hover:text-white text-left">
-            <div class="flex items-center gap-3">
-              <div class="p-2 bg-purple-500/10 text-purple-400 rounded-lg font-bold text-sm tracking-tight">S₂</div>
-              <div>
-                <p class="font-bold text-sm">Synonym Matcher</p>
-                <p class="text-xs text-slate-400">Race to link matching words</p>
-              </div>
+            <div class="mt-4 text-sm text-stone-700 space-y-2">
+              <p><strong>Example Word:</strong> <span class="text-red-900 font-bold" id="preview-example-telugu">అమ్మ</span> (<span id="preview-example-roman">Amma</span>)</p>
+              <p><strong>Meaning:</strong> <span id="preview-meaning" class="italic text-stone-600">Mother</span></p>
             </div>
-            <span class="text-xs bg-purple-500/20 text-purple-300 py-0.5 px-1.5 rounded-full font-semibold">Speed</span>
-          </button>
-
-          <!-- Mode 3: Word Ascent -->
-          <button id="tab-builder" class="w-full flex items-center justify-between p-3 rounded-xl transition-all border border-transparent hover:bg-slate-800 text-slate-300 hover:text-white text-left">
-            <div class="flex items-center gap-3">
-              <div class="p-2 bg-pink-500/10 text-pink-400 rounded-lg font-bold text-sm tracking-tight">B₃</div>
-              <div>
-                <p class="font-bold text-sm">Word Builder</p>
-                <p class="text-xs text-slate-400">Form sub-words from letters</p>
-              </div>
+            <div class="mt-4 flex gap-2">
+              <button onclick="speakCurrentLetter()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-2 px-3 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z"></path></svg>
+                Listen Pronunciation
+              </button>
             </div>
-            <span class="text-xs bg-pink-500/20 text-pink-300 py-0.5 px-1.5 rounded-full font-semibold">Brain</span>
-          </button>
+          </div>
         </div>
-      </div>
 
-      <!-- Personal Stats Card -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Vocabulary Rank</h2>
-        <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 mb-3 text-center">
-          <p class="text-xs text-slate-400">Current Title</p>
-          <p id="rank-title" class="text-lg font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 bg-clip-text text-transparent">Neophyte Novice</p>
-        </div>
-        <div class="space-y-2 text-xs">
-          <div class="flex justify-between py-1 border-b border-slate-800">
-            <span class="text-slate-400">Total Answers:</span>
-            <span id="stats-total-answers" class="font-bold text-slate-200">0</span>
+        <!-- Middle Grid Area: Interactive Letters -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-amber-200/50 lg:col-span-2">
+          <div class="flex justify-between items-center mb-6">
+            <h4 id="varnamala-section-title" class="text-lg font-extrabold text-stone-800">అచ్చులు (Vowels)</h4>
+            <p class="text-xs text-stone-500">Click any block to inspect and draw</p>
           </div>
-          <div class="flex justify-between py-1 border-b border-slate-800">
-            <span class="text-slate-400">Correct Answers:</span>
-            <span id="stats-correct-answers" class="font-bold text-emerald-400">0</span>
+
+          <!-- Letter Grid Container -->
+          <div id="letter-grid" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+            <!-- Dynamic content injected here by JS -->
           </div>
-          <div class="flex justify-between py-1 border-b border-slate-800">
-            <span class="text-slate-400">Words Discovered:</span>
-            <span id="stats-discovered" class="font-bold text-indigo-400">0</span>
-          </div>
-          <div class="flex justify-between py-1">
-            <span class="text-slate-400">Longest Streak:</span>
-            <span id="stats-max-streak" class="font-bold text-amber-400">0</span>
+
+          <!-- Interactive Tracing Canvas Simulator -->
+          <div class="mt-8 border-t border-amber-200/50 pt-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+              <div>
+                <h4 class="text-base font-bold text-stone-800">అక్షర లేఖనం (Draw & Practice Pad)</h4>
+                <p class="text-xs text-stone-500">Select a letter above and try drawing its curves inside the canvas!</p>
+              </div>
+              <div class="flex gap-2 w-full sm:w-auto">
+                <button onclick="clearCanvas()" class="flex-1 sm:flex-none text-xs bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold px-3 py-2 rounded-lg transition-colors">
+                  Clear Pad
+                </button>
+                <button onclick="changeCanvasColor('#991b1b')" class="w-8 h-8 rounded-full bg-red-800 border-2 border-white shadow-sm ring-1 ring-stone-300"></button>
+                <button onclick="changeCanvasColor('#065f46')" class="w-8 h-8 rounded-full bg-emerald-800 border-2 border-white shadow-sm ring-1 ring-stone-300"></button>
+                <button onclick="changeCanvasColor('#b45309')" class="w-8 h-8 rounded-full bg-amber-700 border-2 border-white shadow-sm ring-1 ring-stone-300"></button>
+              </div>
+            </div>
+
+            <!-- Sketch Canvas -->
+            <div class="relative bg-amber-50/50 border-2 border-dashed border-amber-300/80 rounded-2xl flex items-center justify-center p-2">
+              <div class="absolute pointer-events-none text-8xl font-black text-amber-200/40 select-none" id="canvas-background-letter">
+                అ
+              </div>
+              <canvas id="practice-canvas" width="600" height="220" class="w-full max-w-full h-[220px] cursor-crosshair relative z-10 touch-none"></canvas>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Main Game Play Area (Center) -->
-    <section class="lg:col-span-6 flex flex-col gap-4">
-      
-      <!-- Game Feedback / Toast banner -->
-      <div id="game-feedback" class="hidden flex items-center justify-between p-3.5 rounded-xl border transition-all duration-300">
-        <div class="flex items-center gap-3">
-          <span id="feedback-emoji" class="text-2xl">✨</span>
-          <div>
-            <p id="feedback-title" class="text-sm font-bold"></p>
-            <p id="feedback-body" class="text-xs opacity-90"></p>
-          </div>
-        </div>
-        <button id="btn-dismiss-feedback" class="text-xs opacity-60 hover:opacity-100">✕</button>
-      </div>
-
-      <!-- PLAYGROUND CARD CONTAINER -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 relative overflow-hidden flex-1 flex flex-col min-h-[480px]">
-        <!-- Decorative ambient glows inside card -->
-        <div class="absolute -top-12 -right-12 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <!-- ================== GAME MODE 1: WORD SCRAMBLE ================== -->
-        <div id="game-view-scramble" class="space-y-6 flex-1 flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full text-xs font-semibold">Word Scramble Arena</span>
-            <button id="scramble-hint-btn" class="text-xs text-slate-300 hover:text-amber-400 flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 rounded-lg hover:bg-slate-700 transition-all">
-              💡 <span>Use Hint (-15 XP)</span>
-            </button>
-          </div>
-
-          <div class="text-center space-y-4 my-auto">
-            <p class="text-xs text-slate-400 font-medium tracking-widest uppercase">Unscramble this word</p>
-            
-            <!-- Scrambled Letters Layout -->
-            <div id="scramble-letters-container" class="flex flex-wrap justify-center gap-2 sm:gap-3 py-2">
-              <!-- Generated dynamically (e.g., clickable letter chips) -->
-            </div>
-
-            <!-- Help clue box (hidden by default until hint is used or always visible for fun) -->
-            <div id="scramble-hint-box" class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 max-w-md mx-auto text-sm">
-              <span class="text-amber-400 font-bold block mb-1 text-xs uppercase tracking-wider">Clue / Meaning</span>
-              <p id="scramble-clue-text" class="text-slate-300 italic">Using letters above to match definition.</p>
-            </div>
-
-            <!-- User Input Block -->
-            <div class="max-w-md mx-auto relative pt-4">
-              <input type="text" id="scramble-input" autocomplete="off" placeholder="Type word or click letters..." 
-                class="w-full bg-slate-950/80 text-center uppercase tracking-widest text-xl font-bold py-3.5 px-4 rounded-xl border border-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 outline-none transition-all placeholder:text-slate-600 text-indigo-200">
-              <div class="flex justify-center gap-2 mt-2">
-                <button id="btn-scramble-clear" class="text-xs text-slate-400 hover:text-slate-100 px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 transition-all">Clear Input</button>
-                <button id="btn-scramble-shuffle" class="text-xs text-slate-400 hover:text-slate-100 px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 transition-all">🔀 Reshuffle</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex gap-3 pt-4 border-t border-slate-800/60">
-            <button id="btn-scramble-skip" class="flex-1 py-3 text-sm font-semibold text-slate-400 hover:text-slate-100 bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-all">Skip Word</button>
-            <button id="btn-scramble-submit" class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-xl shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/30 transition-all">Submit Answer</button>
+    <!-- ================= TAB 2: POETRY & PROVERBS (VEMANA & SAMETHALU) ================= -->
+    <section id="tab-section-padyalu" class="tab-content hidden transition-opacity duration-300">
+      <div class="max-w-4xl mx-auto space-y-8">
+        <div class="text-center max-w-xl mx-auto">
+          <h2 class="text-3xl font-extrabold text-stone-900">వేమన పద్యాలు & సామెతలు</h2>
+          <p class="text-sm text-stone-600 mt-2">Rich, rhythmic Telugu literature offering high practical values and timeless ethical lessons for life.</p>
+          
+          <!-- Sub-selection Pills -->
+          <div class="inline-flex p-1 bg-stone-200/70 rounded-xl mt-4 space-x-1">
+            <button id="btn-subtab-vemana" onclick="switchSubTab('vemana')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-white text-stone-800 shadow-sm">Vemana Poems</button>
+            <button id="btn-subtab-samethalu" onclick="switchSubTab('samethalu')" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-stone-600 hover:text-stone-900">Proverbs (సామెతలు)</button>
           </div>
         </div>
 
-        <!-- ================== GAME MODE 2: SYNONYM MATCH ================== -->
-        <div id="game-view-synonym" class="space-y-6 flex-1 flex flex-col justify-between hidden">
-          <div class="flex items-center justify-between">
-            <span class="px-3 py-1 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-full text-xs font-semibold">Synonym Matcher Speedrun</span>
-            <!-- Timer progress -->
-            <div class="flex items-center gap-2 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800">
-              <span class="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
-              <span class="text-xs text-slate-400 font-medium">Time:</span>
-              <span id="synonym-timer" class="text-sm font-bold text-red-400">15s</span>
-            </div>
-          </div>
-
-          <div class="text-center space-y-4 my-auto">
-            <p class="text-xs text-purple-400 font-bold tracking-widest uppercase">Find the closest synonym for:</p>
-            <h3 id="synonym-target-word" class="text-3xl font-black text-slate-100 tracking-wide uppercase bg-slate-950/60 inline-block py-2.5 px-6 rounded-2xl border border-slate-800">LUMINOUS</h3>
-            <p id="synonym-hint-def" class="text-xs text-slate-400 max-w-sm mx-auto italic">Clue: Emitting or reflecting light.</p>
-
-            <!-- Grid of 4 multiple choices -->
-            <div class="grid grid-cols-2 gap-3 max-w-md mx-auto pt-4" id="synonym-options-container">
-              <!-- Dynamically populated buttons -->
-              <button class="p-4 bg-slate-800 hover:bg-slate-700/80 rounded-xl border border-slate-700 text-sm font-bold text-slate-200 transition-all">Bright</button>
-              <button class="p-4 bg-slate-800 hover:bg-slate-700/80 rounded-xl border border-slate-700 text-sm font-bold text-slate-200 transition-all">Dim</button>
-              <button class="p-4 bg-slate-800 hover:bg-slate-700/80 rounded-xl border border-slate-700 text-sm font-bold text-slate-200 transition-all">Heavy</button>
-              <button class="p-4 bg-slate-800 hover:bg-slate-700/80 rounded-xl border border-slate-700 text-sm font-bold text-slate-200 transition-all">Sullen</button>
-            </div>
-          </div>
-
-          <div class="pt-4 border-t border-slate-800/60 text-center">
-            <p class="text-xs text-slate-500">Fast correct answers yield extra dynamic XP score multipliers!</p>
-          </div>
-        </div>
-
-        <!-- ================== GAME MODE 3: WORD BUILDER ================== -->
-        <div id="game-view-builder" class="space-y-6 flex-1 flex flex-col justify-between hidden">
-          <div class="flex items-center justify-between">
-            <span class="px-3 py-1 bg-pink-500/10 text-pink-400 border border-pink-500/20 rounded-full text-xs font-semibold">Word Builder (Spelling Bee)</span>
-            <div class="flex items-center gap-2 bg-slate-950/80 px-2.5 py-1 rounded-lg border border-slate-800">
-              <span class="text-xs text-slate-400">Found:</span>
-              <span id="builder-found-count" class="text-xs font-bold text-pink-400">0/5</span>
-            </div>
-          </div>
-
-          <div class="text-center space-y-4 my-auto">
-            <p class="text-xs text-slate-400 font-bold tracking-widest uppercase">Build valid subwords using the key letters below</p>
-            
-            <!-- Center Hex/Circle Hive visual letters -->
-            <div class="flex justify-center items-center py-2">
-              <div class="relative w-44 h-44 flex items-center justify-center bg-slate-950 rounded-full border border-pink-500/30 shadow-inner">
-                <!-- Center Core character (Required) -->
-                <div id="builder-center-letter" class="absolute z-10 w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center text-xl font-black text-white shadow-lg shadow-pink-500/50 cursor-pointer hover:scale-110 transition-transform">E</div>
-                <!-- Outer ring characters -->
-                <div id="builder-ring-letters-container">
-                  <!-- Dynamically absolutely positioned letters -->
+        <!-- SUBTAB CONTENT: VEMANA POEMS -->
+        <div id="subtab-content-vemana" class="space-y-6">
+          <!-- Poem Item -->
+          <div class="bg-white rounded-2xl border border-amber-200/50 shadow-sm p-6 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 text-stone-100 font-bold text-9xl pointer-events-none select-none">౧</div>
+            <div class="relative z-10">
+              <span class="bg-amber-100 text-amber-900 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">Poem 1</span>
+              <p class="text-lg md:text-xl font-bold text-red-950 mt-4 leading-relaxed whitespace-pre-line" id="poem-1-telugu">
+                ఉప్పుకప్పురంబు నొక్క పోలిక నుండు
+                చూడ చూడ రుచులు జేరు వేరు
+                పురుషులందు పుణ్యపురుషులు వేరయా
+                విశ్వదాభిరామ వినుర వేమ!
+              </p>
+              <div class="mt-6 pt-4 border-t border-stone-100 space-y-3">
+                <div>
+                  <h5 class="text-xs font-bold text-stone-500 uppercase tracking-widest">English Transliteration</h5>
+                  <p class="text-sm text-stone-700 italic mt-1">Uppu kappurambu nokka polika nundu / Chuda chuda ruchulu jera veru / Purushulandu punyapurushulu veraya / Vishvadabhirama vinura vema!</p>
+                </div>
+                <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-500/10">
+                  <h5 class="text-xs font-bold text-amber-800 uppercase tracking-widest">Meaning in English</h5>
+                  <p class="text-sm text-stone-800 mt-1">Salt and camphor look identically white, but tasting them reveals completely different values. Similarly, among human beings, noble souls stand out distinctly from the common lot.</p>
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Interactive Display Field -->
-            <div class="max-w-xs mx-auto">
-              <div class="bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-center text-lg font-bold tracking-widest text-pink-300 min-h-[48px] flex items-center justify-center uppercase" id="builder-current-draft">
-                <!-- Letter Draft output -->
-              </div>
-              <div class="flex justify-center gap-2 mt-2">
-                <button id="btn-builder-delete" class="p-1.5 rounded bg-slate-800 text-xs text-slate-300 hover:text-white hover:bg-slate-700">Delete</button>
-                <button id="btn-builder-shuffle" class="p-1.5 rounded bg-slate-800 text-xs text-slate-300 hover:text-white hover:bg-slate-700">🔀 Mix</button>
-                <button id="btn-builder-clear" class="p-1.5 rounded bg-slate-800 text-xs text-slate-300 hover:text-white hover:bg-slate-700">Clear</button>
-              </div>
-            </div>
-
-            <!-- List of valid subwords discovered so far in this level -->
-            <div class="max-w-md mx-auto bg-slate-950/50 border border-slate-800/80 rounded-xl p-3">
-              <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Discovered Subwords in this Pool:</p>
-              <div id="builder-discovered-tags" class="flex flex-wrap gap-1.5 justify-center min-h-[30px]">
-                <span class="text-xs text-slate-500 italic">None yet. Start building!</span>
+          <!-- Poem Item 2 -->
+          <div class="bg-white rounded-2xl border border-amber-200/50 shadow-sm p-6 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 text-stone-100 font-bold text-9xl pointer-events-none select-none">౨</div>
+            <div class="relative z-10">
+              <span class="bg-amber-100 text-amber-900 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">Poem 2</span>
+              <p class="text-lg md:text-xl font-bold text-red-950 mt-4 leading-relaxed whitespace-pre-line">
+                అల్పుడెపుడు పల్కు నాడంబరము గాను
+                సజ్జనుండు పల్కు చల్లగాను
+                కంచు మ్రోగునట్లు కనకంబు మ్రోగునా
+                విశ్వదాభిరామ వినుర వేమ!
+              </p>
+              <div class="mt-6 pt-4 border-t border-stone-100 space-y-3">
+                <div>
+                  <h5 class="text-xs font-bold text-stone-500 uppercase tracking-widest">English Transliteration</h5>
+                  <p class="text-sm text-stone-700 italic mt-1">Alpudepudu palku nadambaramu ganu / Sajjanundu palku challaganu / Kanchu mrogunatlu kanakambu mroguna / Vishvadabhirama vinura vema!</p>
+                </div>
+                <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-500/10">
+                  <h5 class="text-xs font-bold text-amber-800 uppercase tracking-widest">Meaning in English</h5>
+                  <p class="text-sm text-stone-800 mt-1">A mean, ignorant person always speaks with immense noise and showiness, whereas a noble person speaks with calm and gentle wisdom. Gold never rings loudly, unlike bronze vessels which make high noise.</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="flex gap-3 pt-4 border-t border-slate-800/60">
-            <button id="btn-builder-reroll" class="flex-1 py-3 text-sm font-semibold text-slate-400 hover:text-slate-100 bg-slate-800/50 hover:bg-slate-800 rounded-xl transition-all">New Pool</button>
-            <button id="btn-builder-submit" class="flex-1 py-3 text-sm font-bold text-white bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 rounded-xl shadow-lg shadow-pink-600/20 hover:shadow-pink-500/30 transition-all">Validate Word</button>
+          <!-- Poem Item 3 -->
+          <div class="bg-white rounded-2xl border border-amber-200/50 shadow-sm p-6 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 text-stone-100 font-bold text-9xl pointer-events-none select-none">౩</div>
+            <div class="relative z-10">
+              <span class="bg-amber-100 text-amber-900 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">Poem 3</span>
+              <p class="text-lg md:text-xl font-bold text-red-950 mt-4 leading-relaxed whitespace-pre-line">
+                గంగగోవు పాలు గరిటెడైనను చాలు
+                కడివెడైన నేమి ఖరము పాలు
+                భక్తి గలుగు కూడు పట్టెడైనను చాలు
+                విశ్వదాభిరామ వినుర వేమ!
+              </p>
+              <div class="mt-6 pt-4 border-t border-stone-100 space-y-3">
+                <div>
+                  <h5 class="text-xs font-bold text-stone-500 uppercase tracking-widest">English Transliteration</h5>
+                  <p class="text-sm text-stone-700 italic mt-1">Gangagovu palu garitedainanu chalu / Kadivedaina nemi kharamu palu / Bhakti galugu kudu pattedainanu chalu / Vishvadabhirama vinura vema!</p>
+                </div>
+                <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-500/10">
+                  <h5 class="text-xs font-bold text-amber-800 uppercase tracking-widest">Meaning in English</h5>
+                  <p class="text-sm text-stone-800 mt-1">Even a single spoonful of milk from a sacred cow is precious and pure, while a bucket of donkey's milk is useless. Similarly, even a single morsel of food given with true love and devotion is immensely satisfying.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
+        <!-- SUBTAB CONTENT: SAMETHALU (PROVERBS) -->
+        <div id="subtab-content-samethalu" class="hidden space-y-4">
+          <!-- Search Box for Proverbs -->
+          <div class="bg-stone-100 p-4 rounded-xl flex items-center gap-3">
+            <svg class="w-5 h-5 text-stone-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" id="search-samethalu" oninput="searchProverbs()" placeholder="Search proverbs or key words..." class="bg-transparent focus:outline-none w-full text-stone-800 text-sm" />
+          </div>
+
+          <div id="proverbs-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- dynamic javascript injection -->
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Right Column Panel: History & Leaderboards & Word-of-the-day -->
-    <section class="lg:col-span-3 flex flex-col gap-4">
-      
-      <!-- Daily Word Widget -->
-      <div class="bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-900/40 rounded-2xl p-4">
-        <div class="flex items-center gap-2 mb-2">
-          <span class="text-amber-400 text-sm">🏆</span>
-          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-widest">Word of the Day</h3>
-        </div>
-        <p class="text-base font-extrabold text-indigo-300 tracking-wide uppercase" id="daily-word-title">Ebullient</p>
-        <p class="text-xs text-slate-400 mt-1" id="daily-word-meaning">Cheerful and full of energy.</p>
-        <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-          <span>Synonym: Exuberant</span>
-          <button id="btn-learn-word" class="text-indigo-400 hover:underline">Learn Word</button>
-        </div>
-      </div>
-
-      <!-- Discovered/Recent Answer Logs -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex-1 flex flex-col">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">My Quest Journal</h3>
-          <span id="journal-count" class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded-full font-bold">0</span>
-        </div>
-        
-        <div class="flex-1 overflow-y-auto max-h-[220px] lg:max-h-none space-y-2 pr-1" id="journal-list">
-          <!-- Dynamic logs -->
-          <div class="text-center py-8 text-slate-500 text-xs italic">
-            No word completions logged yet. Start playing either mode!
+    <!-- ================= TAB 3: WORD MATCH GAME (ఆటస్థలం) ================= -->
+    <section id="tab-section-khela" class="tab-content hidden transition-opacity duration-300">
+      <div class="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-amber-200/50">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-amber-200/50 pb-6 mb-6 gap-4">
+          <div>
+            <span class="bg-red-100 text-red-900 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">Samskruti Quiz</span>
+            <h2 class="text-2xl font-black text-stone-900 mt-2">తెలుగు పదాల ఆట (Telugu Word Matcher)</h2>
+            <p class="text-xs text-stone-500 mt-1">Match the sweet Telugu terms with their respective meanings!</p>
+          </div>
+          <div class="flex items-center gap-4 bg-amber-50 px-4 py-2 rounded-xl border border-amber-200">
+            <div class="text-center">
+              <p class="text-[10px] text-stone-500 font-bold uppercase">Current Score</p>
+              <p id="game-score" class="text-2xl font-black text-amber-700">0</p>
+            </div>
+            <div class="h-8 w-px bg-amber-200"></div>
+            <div class="text-center">
+              <p class="text-[10px] text-stone-500 font-bold uppercase">Streak</p>
+              <p id="game-streak" class="text-2xl font-black text-red-800">0 🔥</p>
+            </div>
           </div>
         </div>
 
-        <!-- Reset Stats Button -->
-        <div class="pt-3 mt-3 border-t border-slate-800">
-          <button id="btn-reset-stats" class="w-full text-center text-xs text-red-400 hover:text-red-300 hover:underline py-1">
-            Reset all quest data
+        <!-- Interactive Play Area -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Left Column: Word Selection Cards -->
+          <div>
+            <h4 class="text-sm font-bold text-amber-900 uppercase tracking-widest mb-4">1. Select a Telugu Word</h4>
+            <div id="game-telugu-list" class="space-y-3">
+              <!-- dynamic injection of buttons -->
+            </div>
+          </div>
+
+          <!-- Right Column: English Meaning Cards -->
+          <div>
+            <h4 class="text-sm font-bold text-amber-900 uppercase tracking-widest mb-4">2. Select Matching English Meaning</h4>
+            <div id="game-english-list" class="space-y-3">
+              <!-- dynamic injection of buttons -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Game Result Status / Controls -->
+        <div class="mt-8 pt-6 border-t border-amber-200/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div id="game-status-log" class="text-sm font-semibold text-stone-600 italic">
+            Select a word in the left column first to begin!
+          </div>
+          <button onclick="resetWordGame()" class="bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15.113m-15.356-10.113l-.074-.13M4 11H1v3h3v-3z"></path></svg>
+            Shuffle & New Game
           </button>
         </div>
       </div>
     </section>
+
+    <!-- ================= TAB 4: TRANSLITERATION / PHONETIC KEYBOARD (లిపి పరివర్తకం) ================= -->
+    <section id="tab-section-trans" class="tab-content hidden transition-opacity duration-300">
+      <div class="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Guide Card -->
+        <div class="bg-white p-6 rounded-2xl border border-amber-200/50 shadow-sm">
+          <h3 class="text-lg font-bold text-red-950 mb-3">Transliteration Rules</h3>
+          <p class="text-xs text-stone-600 leading-relaxed mb-4">
+            Transliteration lets you write Telugu using Latin letters phonetically. Our real-time engine maps basic syllables. Try experimenting with the keyboard pad to build letters instantly!
+          </p>
+          <div class="space-y-2 bg-amber-50/50 p-3 rounded-lg border border-amber-100 text-xs text-stone-700">
+            <div class="flex justify-between border-b border-amber-200/20 pb-1">
+              <span class="font-mono font-semibold">amma</span>
+              <span>→ అమ్మ</span>
+            </div>
+            <div class="flex justify-between border-b border-amber-200/20 pb-1">
+              <span class="font-mono font-semibold">namaste</span>
+              <span>→ నమస్తే</span>
+            </div>
+            <div class="flex justify-between border-b border-amber-200/20 pb-1">
+              <span class="font-mono font-semibold">sneham</span>
+              <span>→ స్నేహం</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="font-mono font-semibold">telugu</span>
+              <span>→ తెలుగు</span>
+            </div>
+          </div>
+
+          <!-- Interactive Quick Pad Keys -->
+          <div class="mt-6">
+            <h4 class="text-xs font-bold text-stone-800 uppercase tracking-widest mb-3">Quick Symbol Injector</h4>
+            <div class="grid grid-cols-5 gap-1.5" id="quick-symbol-buttons">
+              <!-- dynamic keyboard buttons -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle/Right Workspace Area -->
+        <div class="bg-white p-6 rounded-2xl border border-amber-200/50 shadow-sm lg:col-span-2 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold text-stone-900">Phonetic Interactive Input</h3>
+              <span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full">Real-time Translit</span>
+            </div>
+
+            <!-- Input block -->
+            <div class="mb-6">
+              <label for="translit-input" class="block text-xs font-bold text-stone-500 uppercase mb-2">Type in English phonetic (like "namaste" / "telugu"):</label>
+              <input type="text" id="translit-input" oninput="onTranslitInputChange()" placeholder="e.g. namaste" class="w-full bg-stone-50 border-2 border-stone-200 rounded-xl py-3 px-4 text-stone-800 font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all" />
+            </div>
+
+            <!-- Live Output Display -->
+            <div class="bg-stone-50 rounded-2xl p-6 border border-stone-200 text-center relative">
+              <span class="absolute top-3 left-3 text-[10px] uppercase font-bold text-stone-400 tracking-wider">Telugu Script Output</span>
+              <div id="translit-output" class="text-3xl md:text-4xl font-black text-red-900 py-6 select-all cursor-pointer hover:bg-stone-100/60 rounded-xl transition-all" title="Click to Copy">
+                నమస్తే
+              </div>
+              <p class="text-[10px] text-stone-400 mt-2">Click the script output text anytime to copy it directly to your clipboard.</p>
+            </div>
+          </div>
+
+          <!-- Clipboard Toast Alert and Action -->
+          <div class="mt-6 pt-6 border-t border-stone-100 flex items-center justify-between">
+            <span id="copy-toast-msg" class="text-xs font-bold text-emerald-700 opacity-0 transition-opacity duration-300 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+              Successfully copied to clipboard!
+            </span>
+            <button onclick="copyOutputText()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-colors">
+              Copy Output
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Footer with subtle design credits -->
-  <footer class="py-4 px-6 border-t border-slate-800 bg-slate-950 text-slate-500 text-center text-xs">
-    <p>© LexiQuest Web Gaming Platform. Driven by real-time Web Synthesizer Audio & client-side dictionaries.</p>
+  <!-- Footer with cultural respect signature -->
+  <footer class="bg-stone-900 text-stone-400 border-t border-stone-800 mt-16">
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+      <div class="text-center sm:text-left">
+        <p class="text-sm text-stone-300 font-bold mb-1">తెలుగు భాషా దినోత్సవం &amp; సంస్కృతి విజ్ఞానం</p>
+        <p>© Telugu Vani. Built with love to preserve, protect and learn one of India's richest languages.</p>
+      </div>
+      <div class="flex gap-4">
+        <span class="bg-stone-800 text-amber-400 px-3 py-1.5 rounded-lg border border-stone-700 font-mono">Ammalara, Kshemama?</span>
+      </div>
+    </div>
   </footer>
 </div>
   
