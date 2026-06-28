@@ -1,61 +1,36 @@
-/* Glowing and utility styles for the English Words Game */
-
-/* Game Shake Animation for wrong answers */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-6px); }
-  40%, 80% { transform: translateX(6px); }
+/* Extra CSS decorations for Telugu Vani */
+.animate-spin-slow {
+  animation: spin 20s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.shake-wrong {
-  animation: shake 0.4s ease-in-out;
+/* Interactive Tab Visual Styling fallback if tailwind delayed */
+.active-tab {
+  display: block !important;
+}
+.tab-content {
+  animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Subtle pulsation highlight */
-@keyframes highlight-pulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
-  50% { box-shadow: 0 0 12px 4px rgba(99, 102, 241, 0.6); }
-}
-
-.pulse-highlight {
-  animation: highlight-pulse 1.5s infinite;
-}
-
-/* Custom scrollbars for the side list */
-#journal-list::-webkit-scrollbar {
+/* Custom scrollbar optimization for the letter grid */
+.custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
-#journal-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-#journal-list::-webkit-scrollbar-thumb {
-  background: #334155;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #fdfaf2;
   border-radius: 4px;
 }
-#journal-list::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d97706;
+  border-radius: 4px;
 }
-
-/* Hive word letters arrangement classes */
-.hive-letter {
-  position: absolute;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #1e293b;
-  color: #f1f5f9;
-  font-weight: 800;
-  border-radius: 50%;
-  border: 1px solid #475569;
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.2s ease;
-}
-.hive-letter:hover {
-  background-color: #db2777;
-  border-color: #f472b6;
-  transform: scale(1.15);
-  box-shadow: 0 0 10px rgba(219, 39, 119, 0.5);
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #b45309;
 }
