@@ -1,44 +1,63 @@
-/* 3D Card Flip Perspective and Utilities */
-.perspective {
-  perspective: 1200px;
-}
-
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-.backface-hidden {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
-
-/* Interactive log scrollbar aesthetics */
+/* Custom Scrollbar for dynamic logs */
 .custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
   background: rgba(15, 23, 42, 0.4);
-  border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.4);
-  border-radius: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.8);
+  background-color: rgba(71, 85, 105, 0.5);
+  border-radius: 3px;
 }
 
-/* Subtle glowing and state styling */
-.card-glowing-glow {
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+/* Slowly rotating gradient rings */
+.animate-spin-slow {
+  animation: spin 12s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Glassmorphism gradient styling for matched cards */
-.matched-card-effect {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
-  border-color: rgba(16, 185, 129, 0.4) !important;
+/* Tab transitions & indicators */
+.tab-btn {
+  position: relative;
+  background: transparent;
+  color: #94a3b8;
+}
+.tab-btn.active {
+  background: rgba(30, 41, 59, 0.8);
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.15), inset 0 0 0 1px rgba(99, 102, 241, 0.3);
+}
+
+/* Custom game level-up indicator animations */
+.level-pop {
+  animation: levelPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes levelPop {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Range input modern overrides for fine-grained slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 9999px;
+  background: #0f172a;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.3);
 }
