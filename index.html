@@ -3,13 +3,241 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chronos Stopwatch</title>
+  <title>NeuroMatch Core</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-900 flex items-center justify-center p-6"><div class="bg-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-700 text-center"><h1 class="text-4xl font-light text-slate-100 mb-8 tracking-widest uppercase">Chronos</h1><div id="display" class="text-7xl font-mono text-white mb-10 tabular-nums">00:00.00</div><div class="flex justify-center gap-4"><button id="startBtn" class="bg-emerald-600 hover:bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/20">Start</button><button id="stopBtn" class="bg-rose-600 hover:bg-rose-500 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-rose-900/20">Stop</button><button id="resetBtn" class="bg-slate-600 hover:bg-slate-500 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-slate-900/20">Reset</button></div><div id="laps" class="mt-8 pt-6 border-t border-slate-700 overflow-y-auto max-h-40"><h3 class="text-slate-400 text-sm uppercase mb-2">Lap Times</h3><ul id="lapList" class="space-y-2 text-slate-300"></ul></div></div></div>
+  <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+  <!-- Header Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <span class="font-black text-xl text-white">M</span>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">NEUROMATCH</h1>
+          <p class="text-xs text-slate-400">Cognitive Memory Enhancement Grid</p>
+        </div>
+      </div>
+
+      <!-- Top Dashboard Info -->
+      <div class="flex flex-wrap items-center gap-4 text-sm">
+        <div class="bg-slate-900/90 border border-slate-800 px-3 py-1.5 rounded-lg flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>High Score: <strong id="stat-best-score" class="text-indigo-400">0</strong></span>
+        </div>
+        <button id="btn-sound-toggle" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all" title="Toggle Sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+        <button id="btn-reset-record" class="text-xs text-slate-400 hover:text-rose-400 transition-colors underline cursor-pointer">
+          Reset Records
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Sidebar / Control Panel -->
+    <aside class="lg:col-span-4 flex flex-col gap-6">
+      
+      <!-- Game Customizer Card -->
+      <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-sm shadow-xl flex flex-col gap-4">
+        <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2 border-b border-slate-800 pb-3">
+          <span>⚙️</span> Game Matrix Configuration
+        </h2>
+
+        <!-- Grid Size Selection -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Grid Dimensions</label>
+          <div class="grid grid-cols-3 gap-2" id="grid-size-container">
+            <button data-size="4" class="size-btn py-2 px-3 rounded-xl border border-indigo-500 bg-indigo-500/10 text-indigo-300 text-sm font-bold transition-all focus:outline-none hover:bg-indigo-500/20">
+              4 x 4
+              <span class="block text-[10px] font-normal text-slate-400">16 Cards</span>
+            </button>
+            <button data-size="6" class="size-btn py-2 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 text-sm font-bold transition-all focus:outline-none hover:border-slate-700 hover:text-slate-300">
+              6 x 6
+              <span class="block text-[10px] font-normal text-slate-400">36 Cards</span>
+            </button>
+            <button data-size="8" class="size-btn py-2 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 text-sm font-bold transition-all focus:outline-none hover:border-slate-700 hover:text-slate-300">
+              8 x 8
+              <span class="block text-[10px] font-normal text-slate-400">64 Cards</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card Deck Motif -->
+        <div>
+          <label for="deck-selector" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Card Deck Motif</label>
+          <select id="deck-selector" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+            <option value="emojis">🔮 Galactic Emojis</option>
+            <option value="symbols">🧬 Cyber Symbols (Σ, Ω, Δ)</option>
+            <option value="colors">🎨 Solid Holograms (Color Swatches)</option>
+            <option value="animals">🦁 Neon Bestiary</option>
+          </select>
+        </div>
+
+        <!-- Game Mode Selection -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Game System Mode</label>
+          <div class="flex flex-col gap-2">
+            <label class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-900 transition-colors cursor-pointer">
+              <input type="radio" name="game-mode" value="standard" checked class="accent-indigo-500">
+              <div>
+                <span class="text-sm font-bold text-slate-300 block">Standard Simulation</span>
+                <span class="text-xs text-slate-500">No time pressure, clean training focus.</span>
+              </div>
+            </label>
+            <label class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-900 transition-colors cursor-pointer">
+              <input type="radio" name="game-mode" value="timeAttack" class="accent-indigo-500">
+              <div>
+                <span class="text-sm font-bold text-rose-400 block">Time Attack Probe</span>
+                <span class="text-xs text-rose-500/80">60s initial. Match adds time, miss deducts.</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Controls Row -->
+        <div class="grid grid-cols-2 gap-3 mt-2">
+          <button id="btn-start-game" class="col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-900/40 hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-2 transform active:scale-[0.98]">
+            <span>⚡</span> INIT NEW GRID
+          </button>
+          <button id="btn-peek-powerup" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2 px-3 rounded-lg border border-slate-700 transition-colors flex items-center justify-center gap-1.5" title="Temporarily reveal all cards at a score cost">
+            👁️ Scan Matrix
+          </button>
+          <button id="btn-reset-stats" class="bg-slate-800/40 hover:bg-rose-950/30 hover:text-rose-400 text-slate-400 text-xs font-semibold py-2 px-3 rounded-lg border border-slate-800 hover:border-rose-900/50 transition-colors">
+            Reset Board
+          </button>
+        </div>
+      </div>
+
+      <!-- Score & Status Console Card -->
+      <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-6 backdrop-blur-sm flex flex-col gap-4">
+        <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2 border-b border-slate-800 pb-3">
+          <span>📊</span> Real-Time Analytics
+        </h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+            <p class="text-slate-500 text-xs uppercase tracking-wider font-semibold">Current Score</p>
+            <p class="text-2xl font-black text-indigo-400" id="stat-score">0000</p>
+          </div>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+            <p class="text-slate-500 text-xs uppercase tracking-wider font-semibold">Total Moves</p>
+            <p class="text-2xl font-black text-purple-400" id="stat-moves">00</p>
+          </div>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+            <p class="text-slate-500 text-xs uppercase tracking-wider font-semibold">Combo Multiplier</p>
+            <p class="text-2xl font-black text-amber-400 flex items-center gap-1">
+              x<span id="stat-combo">1</span>
+            </p>
+          </div>
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+            <p class="text-slate-500 text-xs uppercase tracking-wider font-semibold">Accuracy Rate</p>
+            <p class="text-2xl font-black text-emerald-400" id="stat-accuracy">0%</p>
+          </div>
+        </div>
+
+        <!-- Live Timer/Progress bar -->
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Chronometer</span>
+            <span class="text-sm font-mono font-bold text-pink-500" id="display-timer">00:00</span>
+          </div>
+          <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+            <div id="progress-timer-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-300 w-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Log Console -->
+      <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-4 backdrop-blur-sm flex-1 flex flex-col min-h-[160px] max-h-[250px]">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+            Neural Network Stream
+          </span>
+          <span class="text-[10px] text-slate-600 font-mono">SYS_UPTIME</span>
+        </div>
+        <div id="console-log-stream" class="flex-1 overflow-y-auto text-xs font-mono space-y-1 pr-1 text-slate-400 custom-scrollbar">
+          <div class="text-slate-500">[System] NeuroMatch core initialized.</div>
+          <div class="text-indigo-400">[Config] Awaiting matrix initialization sequence.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Interactive Game Matrix Arena -->
+    <section class="lg:col-span-8 flex flex-col gap-4 relative min-h-[500px]">
+      <!-- Active Info alert banner -->
+      <div id="game-status-banner" class="bg-indigo-950/40 border border-indigo-900/60 text-indigo-300 rounded-xl px-4 py-3 flex items-center justify-between text-sm shadow-md">
+        <div class="flex items-center gap-2">
+          <span class="text-base">💡</span>
+          <span id="status-banner-text">Ready to initialize. Select grid dimensions and click <strong>INIT NEW GRID</strong>.</span>
+        </div>
+        <div class="text-xs font-semibold text-indigo-400 bg-indigo-950/80 border border-indigo-800/80 px-2 py-0.5 rounded">
+          SYSTEM READY
+        </div>
+      </div>
+
+      <!-- Game Board Frame wrapper -->
+      <div class="flex-1 bg-slate-900/30 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl relative flex items-center justify-center overflow-hidden min-h-[450px]">
+        <!-- Grid Overlay Canvas for win particle feedback -->
+        <canvas id="confetti-overlay" class="absolute inset-0 pointer-events-none z-10 w-full h-full"></canvas>
+
+        <!-- Game Over / Win Fullscreen Overlay (initially hidden) -->
+        <div id="game-overlay-state" class="hidden absolute inset-0 bg-slate-950/95 backdrop-blur-md z-20 flex flex-col items-center justify-center p-6 text-center transition-all">
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-500 to-pink-500 flex items-center justify-center shadow-2xl mb-6 transform scale-95 hover:scale-100 transition-all">
+            <span id="overlay-icon" class="text-4xl">🏆</span>
+          </div>
+          <h3 id="overlay-title" class="text-3xl font-black tracking-wider text-slate-100 uppercase mb-2">Simulation Finished</h3>
+          <p id="overlay-subtitle" class="text-slate-400 text-sm max-w-md mb-6">You have successfully completed the matrix alignment inside standard cognitive limitations.</p>
+          
+          <!-- Summary Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-lg w-full mb-8 bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+            <div>
+              <span class="text-slate-500 text-xs block uppercase font-semibold">Final Score</span>
+              <strong id="over-score" class="text-xl text-indigo-400">0000</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block uppercase font-semibold">Time Spent</span>
+              <strong id="over-time" class="text-xl text-purple-400">00:00</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block uppercase font-semibold">Moves Total</span>
+              <strong id="over-moves" class="text-xl text-pink-400">0</strong>
+            </div>
+            <div>
+              <span class="text-slate-500 text-xs block uppercase font-semibold">Accuracy</span>
+              <strong id="over-accuracy" class="text-xl text-emerald-400">0%</strong>
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <button id="btn-overlay-action" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transform active:scale-[0.97]">
+            Deploy Another Module
+          </button>
+        </div>
+
+        <!-- Dynamic Puzzle Grid Container -->
+        <div id="puzzle-matrix-grid" class="grid gap-3 sm:gap-4 w-full max-w-3xl transition-all duration-300">
+          <!-- Dynamic Cards will be rendered here via javascript -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Interactive Quick Help Guide -->
+  <footer class="bg-slate-900/20 border-t border-slate-900 py-6 px-4 lg:px-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <p>🎮 <strong>Tip:</strong> Maintain a Match streak to boost your score multiplier combo up to 5x.</p>
+      <p>© NeuroMatch Cognitive Core, sandbox enabled.</p>
+    </div>
+  </footer>
+</div>
   
   <script src="script.js"></script>
 </body>
