@@ -1,739 +1,630 @@
-/**
- * NeuroMatch Advanced Memory game matrix simulation
- * Features Dynamic Grids, custom Decks, customizable Modes, synthesized Web Audio FX, particle confetti simulations
- */
+(function() {
+  // Web Audio Synth for custom retroactive procedural sound effects
+  let audioCtx = null;
+  let soundEnabled = true;
 
-// Deck configuration lists
-const DECK_RESOURCES = {
-  emojis: [
-    '🔮', '🛸', '👾', '🚀', '🧠', '💎', '🍕', '🎸', 
-    '🦊', '🎃', '👑', '🎈', '🍟', '🦖', '🦩', '🍣', 
-    '🎡', '🔮', '🔑', '💣', '🧸', '🔋', '🎙️', '🍿', 
-    '⚽', '🎨', '🧪', '🧬', '🏆', '🧿', '🍀', '💡'
-  ],
-  symbols: [
-    'Σ', 'Ω', 'Δ', 'Ψ', 'Φ', 'λ', 'π', '∞', 
-    '√', '∫', '≈', '≠', '⊻', '⊗', '⊕', '⊠', 
-    '⚛', '☸', '☯', '⚓', '⚡', '⚡', '⚙', '⚖', 
-    '✂', '✈', '✉', '⏰', '⌛', '✒', '☕', '⭐'
-  ],
-  colors: [
-    '#EF4444', '#10B981', '#3B82F6', '#F59E0B', 
-    '#8B5CF6', '#EC4899', '#06B6D4', '#14B8A6', 
-    '#F97316', '#84CC16', '#6366F1', '#A855F7', 
-    '#059669', '#DC2626', '#2563EB', '#D97706'
-  ],
-  animals: [
-    '🦁', '🐯', '🐼', '🦊', '🐨', '🐸', '🐙', '🦖', 
-    '🦄', '🦩', '🦋', '🐝', '🦉', '🐋', '🐬', '🦞', 
-    '🐵', '🐧', '🦅', '🦆', '🕷️', '🦀', '🦁', '🦖', 
-    '🐗', '🐴', '🐑', '🐪', '🐘', '🐁', '🐓', '🦓'
-  ]
-};
-
-// Primary game state object
-const state = {
-  gridSize: 4, // default 4x4 (16 cards)
-  motif: 'emojis',
-  gameMode: 'standard',
-  cards: [],
-  flippedIndices: [],
-  moves: 0,
-  matchesCount: 0,
-  score: 0,
-  combo: 1,
-  timerSeconds: 0,
-  timeLeft: 60,
-  isPlaying: false,
-  soundOn: true,
-  highScores: {
-    '4-standard': 0,
-    '4-timeAttack': 0,
-    '6-standard': 0,
-    '6-timeAttack': 0,
-    '8-standard': 0,
-    '8-timeAttack': 0,
-  }
-};
-
-// Timer reference variable
-let mainTimerInterval = null;
-
-// Web Audio API Synthesis wrapper for immersive synth alerts without external file assets
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx = null;
-
-function playSynthSound(type) {
-  if (!state.soundOn) return;
-  try {
+  function initAudio() {
     if (!audioCtx) {
-      audioCtx = new AudioCtx();
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
     if (audioCtx.state === 'suspended') {
       audioCtx.resume();
     }
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    const now = audioCtx.currentTime;
-
-    if (type === 'flip') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(320, now);
-      osc.frequency.exponentialRampToValueAtTime(540, now + 0.15);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
-      osc.start(now);
-      osc.stop(now + 0.18);
-    } else if (type === 'match') {
-      osc.type = 'sine';
-      // Play chord effect via frequency jump
-      osc.frequency.setValueAtTime(523.25, now); // C5
-      osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
-      osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.02, now + 0.35);
-      osc.start(now);
-      osc.stop(now + 0.35);
-    } else if (type === 'miss') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(220, now);
-      osc.frequency.linearRampToValueAtTime(120, now + 0.25);
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
-      osc.start(now);
-      osc.stop(now + 0.28);
-    } else if (type === 'win') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(523.25, now); 
-      osc.frequency.setValueAtTime(659.25, now + 0.1);
-      osc.frequency.setValueAtTime(783.99, now + 0.2);
-      osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-      osc.start(now);
-      osc.stop(now + 0.6);
-    } else if (type === 'over') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(180, now);
-      osc.frequency.linearRampToValueAtTime(80, now + 0.5);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-      osc.start(now);
-      osc.stop(now + 0.6);
-    } else if (type === 'scan') {
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(800, now);
-      osc.frequency.exponentialRampToValueAtTime(1600, now + 0.4);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-      osc.start(now);
-      osc.stop(now + 0.4);
-    }
-  } catch (e) {
-    console.warn('Audio Synthesis not fully supported or blocked by user gesture interaction.', e);
   }
-}
 
-// Local Storage utility to read/write persistent score records
-function loadRecords() {
-  const saved = localStorage.getItem('neuromatch_highscores');
-  if (saved) {
+  function playTone(freq, type, duration) {
+    if (!soundEnabled) return;
     try {
-      state.highScores = JSON.parse(saved);
+      initAudio();
+      const osc = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      
+      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      
+      osc.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
     } catch (e) {
-      console.error(e);
+      console.warn("Audio synthesis delayed until user interaction.");
     }
   }
-  updateHighScoreDisplay();
-}
 
-function saveRecord(score) {
-  const key = `${state.gridSize}-${state.gameMode}`;
-  if (!state.highScores[key] || score > state.highScores[key]) {
-    state.highScores[key] = score;
-    localStorage.setItem('neuromatch_highscores', JSON.stringify(state.highScores));
-    updateHighScoreDisplay();
-    appendLogStream(`[NEW HIGH SCORE] Reached ${score} in ${key.toUpperCase()}!`, 'text-amber-400');
+  function playSuccess() {
+    playTone(523.25, 'triangle', 0.15); // C5
+    setTimeout(() => playTone(659.25, 'triangle', 0.15), 80); // E5
   }
-}
 
-function updateHighScoreDisplay() {
-  const key = `${state.gridSize}-${state.gameMode}`;
-  const topVal = state.highScores[key] || 0;
-  document.getElementById('stat-best-score').textContent = topVal;
-}
-
-// Canvas Confetti effect generator when matching correctly
-const canvas = document.getElementById('confetti-overlay');
-const ctx = canvas?.getContext('2d');
-let particles = [];
-
-function resizeCanvas() {
-  if (canvas) {
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight;
+  function playFailure() {
+    playTone(220, 'sawtooth', 0.25); // A3
+    setTimeout(() => playTone(164.81, 'sawtooth', 0.25), 100); // E3
   }
-}
-window.addEventListener('resize', resizeCanvas);
-setTimeout(resizeCanvas, 300);
 
-function emitParticles(x, y, colorCode, count = 20) {
-  for (let i = 0; i < count; i++) {
-    particles.push({
-      x: x,
-      y: y,
-      vx: (Math.random() - 0.5) * 8,
-      vy: (Math.random() - 0.5) * 8 - 3,
-      size: Math.random() * 6 + 4,
-      color: colorCode || `hsl(${Math.random() * 360}, 80%, 60%)`,
-      alpha: 1,
-      life: 1
-    });
+  function playLevelUp() {
+    playTone(523.25, 'sine', 0.1);
+    setTimeout(() => playTone(659.25, 'sine', 0.1), 70);
+    setTimeout(() => playTone(783.99, 'sine', 0.1), 140);
+    setTimeout(() => playTone(1046.50, 'sine', 0.3), 210);
   }
-}
 
-function updateAndDrawParticles() {
-  if (!ctx || !canvas) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.12; // simulated low gravity
-    p.alpha -= 0.025;
-    
-    if (p.alpha <= 0) {
-      particles.splice(i, 1);
-      continue;
+  // Game state representation
+  const STATE = {
+    activeTab: 'chroma', // chroma, stroop, blend
+    currentScore: 0,
+    highScores: {
+      chroma: 0,
+      stroop: 0,
+      blend: 0
+    },
+    gameInProgress: false,
+    timeLeft: 30, // seconds
+    maxTime: 30,
+    timerInterval: null,
+    streak: 0,
+
+    // Game specific trackers
+    chroma: {
+      level: 1,
+      size: 2,
+      baseColor: null,
+      oddColor: null,
+      correctIndex: null
+    },
+    stroop: {
+      currentWord: '',
+      currentColor: '',
+      isMatching: false
+    },
+    blend: {
+      targetRGB: { r: 0, g: 0, b: 0 },
+      currentRGB: { r: 128, g: 128, b: 128 }
     }
-    
-    ctx.save();
-    ctx.globalAlpha = p.alpha;
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-  
-  requestAnimationFrame(updateAndDrawParticles);
-}
-requestAnimationFrame(updateAndDrawParticles);
+  };
 
-// Stream log utility inside control container
-function appendLogStream(msg, textStyleClass = 'text-slate-400') {
-  const stream = document.getElementById('console-log-stream');
-  if (stream) {
-    const entry = document.createElement('div');
+  // Color lists for Stroop Game Mode
+  const STROOP_COLORS = [
+    { name: 'Red', hex: '#ef4444' },
+    { name: 'Green', hex: '#10b981' },
+    { name: 'Blue', hex: '#3b82f6' },
+    { name: 'Yellow', hex: '#eab308' },
+    { name: 'Purple', hex: '#a855f7' },
+    { name: 'Orange', hex: '#f97316' },
+    { name: 'Pink', hex: '#ec4899' },
+    { name: 'Cyan', hex: '#06b6d4' }
+  ];
+
+  // Retrieve High Scores from localStorage if available
+  try {
+    const saved = localStorage.getItem('chromaquest_highscores');
+    if (saved) {
+      STATE.highScores = JSON.parse(saved);
+    }
+  } catch(e) {}
+
+  // DOM Element Selections
+  const elCurrentScore = document.getElementById('current-score');
+  const elHighScore = document.getElementById('high-score');
+  const elSoundToggle = document.getElementById('sound-toggle');
+  const elSoundIconOn = document.getElementById('sound-icon-on');
+  const elSoundIconOff = document.getElementById('sound-icon-off');
+
+  const tabChroma = document.getElementById('tab-chroma');
+  const tabStroop = document.getElementById('tab-stroop');
+  const tabBlend = document.getElementById('tab-blend');
+
+  const elTimerBar = document.getElementById('timer-bar');
+  const elTimerContainer = document.getElementById('timer-container');
+  const elGameOverScreen = document.getElementById('game-over-screen');
+  const elGoScore = document.getElementById('go-score');
+  const elGoStreak = document.getElementById('go-streak');
+  const elRestartBtn = document.getElementById('restart-btn');
+
+  const elStartPane = document.getElementById('start-pane');
+  const elStartIconContainer = document.getElementById('start-icon-container');
+  const elStartTitle = document.getElementById('start-title');
+  const elStartDesc = document.getElementById('start-desc');
+  const elStartGameBtn = document.getElementById('start-game-btn');
+
+  const elGameChroma = document.getElementById('game-chroma');
+  const elChromaGrid = document.getElementById('chroma-grid');
+  const elChromaLevel = document.getElementById('chroma-level');
+
+  const elGameStroop = document.getElementById('game-stroop');
+  const elStroopWord = document.getElementById('stroop-word');
+  const elStroopFeedback = document.getElementById('stroop-feedback');
+  const elStroopBtnFalse = document.getElementById('stroop-btn-false');
+  const elStroopBtnTrue = document.getElementById('stroop-btn-true');
+
+  const elGameBlend = document.getElementById('game-blend');
+  const elBlendTarget = document.getElementById('blend-target');
+  const elBlendCurrent = document.getElementById('blend-current');
+  const elSlideRed = document.getElementById('slide-red');
+  const elSlideGreen = document.getElementById('slide-green');
+  const elSlideBlue = document.getElementById('slide-blue');
+  const elValRed = document.getElementById('val-red');
+  const elValGreen = document.getElementById('val-green');
+  const elValBlue = document.getElementById('val-blue');
+  const elBlendMatchPct = document.getElementById('blend-match-pct');
+  const elBlendSubmitBtn = document.getElementById('blend-submit-btn');
+
+  const elLogFeed = document.getElementById('log-feed');
+  const elClearLog = document.getElementById('clear-log');
+
+  // Add message to Feed Logger
+  function logMessage(msg) {
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    entry.className = `leading-relaxed border-l-2 border-slate-800 pl-2 py-0.5 ${textStyleClass}`;
-    entry.innerHTML = `<span class="text-slate-600">[${timestamp}]</span> ${msg}`;
-    stream.appendChild(entry);
-    stream.scrollTop = stream.scrollHeight;
-  }
-}
-
-// Build Deck Array based on selection and requested grid count
-function generateDecks(size, motifName) {
-  const pairCount = (size * size) / 2;
-  const srcList = DECK_RESOURCES[motifName] || DECK_RESOURCES.emojis;
-  
-  // Get unique candidates
-  let candidates = [...srcList];
-  // Shuffle candidates to avoid choosing same top symbols each game
-  candidates.sort(() => Math.random() - 0.5);
-
-  // Extract exact count needed
-  const selected = candidates.slice(0, pairCount);
-  
-  // Duplicate to make matches
-  const merged = [...selected, ...selected];
-  
-  // Fisher-Yates shuffle formula
-  for (let i = merged.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [merged[i], merged[j]] = [merged[j], merged[i]];
-  }
-  
-  return merged.map((symbol, idx) => ({
-    id: idx,
-    symbol: symbol,
-    isMatched: false,
-    isFlipped: false
-  }));
-}
-
-// Update live counters displayed in analytical metrics card
-function updateInterfaceStats() {
-  const totalAttempts = state.moves;
-  const accurateMatchCount = state.matchesCount;
-  let accuracy = 0;
-  if (totalAttempts > 0) {
-    accuracy = Math.round((accurateMatchCount / totalAttempts) * 100);
-  }
-
-  document.getElementById('stat-score').textContent = String(state.score).padStart(4, '0');
-  document.getElementById('stat-moves').textContent = String(totalAttempts).padStart(2, '0');
-  document.getElementById('stat-combo').textContent = state.combo;
-  document.getElementById('stat-accuracy').textContent = `${accuracy}%`;
-}
-
-// Setup live countdown/countup clock timer based on game mode selection
-function configureTimer(action) {
-  clearInterval(mainTimerInterval);
-  if (action === 'stop') return;
-
-  const timeDisplay = document.getElementById('display-timer');
-  const progressBar = document.getElementById('progress-timer-bar');
-
-  if (state.gameMode === 'timeAttack') {
-    state.timeLeft = 60; 
-    progressBar.style.width = '100%';
-    progressBar.className = 'h-full bg-gradient-to-r from-rose-500 to-pink-500 transition-all duration-300';
+    const logDiv = document.createElement('div');
+    logDiv.innerHTML = `<span class="text-slate-500">[${timestamp}]</span> ${msg}`;
+    elLogFeed.appendChild(logDiv);
+    elLogFeed.scrollTop = elLogFeed.scrollHeight;
     
-    mainTimerInterval = setInterval(() => {
-      state.timeLeft--;
-      if (state.timeLeft <= 0) {
-        state.timeLeft = 0;
-        timeDisplay.textContent = "00:00";
-        progressBar.style.width = '0%';
-        clearInterval(mainTimerInterval);
-        triggerGameOver(false); // Time limit defeat
+    // Retain max 50 logs
+    while (elLogFeed.childNodes.length > 50) {
+      elLogFeed.removeChild(elLogFeed.firstChild);
+    }
+  }
+
+  // Clear log history
+  elClearLog.addEventListener('click', () => {
+    elLogFeed.innerHTML = '<div>System: Log cleared. Ready for incoming actions.</div>';
+    playTone(600, 'sine', 0.05);
+  });
+
+  // Sound Toggle
+  elSoundToggle.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    if (soundEnabled) {
+      elSoundIconOn.classList.remove('hidden');
+      elSoundIconOff.classList.add('hidden');
+      initAudio();
+      playTone(440, 'sine', 0.1);
+      logMessage("Sound effects enabled.");
+    } else {
+      elSoundIconOn.classList.add('hidden');
+      elSoundIconOff.classList.remove('hidden');
+      logMessage("Sound effects muted.");
+    }
+  });
+
+  // Helper to sync scores onto HUD
+  function updateScoreHUD() {
+    elCurrentScore.textContent = STATE.currentScore;
+    elHighScore.textContent = STATE.highScores[STATE.activeTab] || 0;
+  }
+
+  // Tab Selection Controller
+  function setTab(mode) {
+    STATE.activeTab = mode;
+    [tabChroma, tabStroop, tabBlend].forEach(btn => btn.classList.remove('active'));
+    
+    if (mode === 'chroma') {
+      tabChroma.classList.add('active');
+    } else if (mode === 'stroop') {
+      tabStroop.classList.add('active');
+    } else if (mode === 'blend') {
+      tabBlend.classList.add('active');
+    }
+    
+    endGame(false); // Cancel any running games without recording penalties
+    showStartPane();
+    updateScoreHUD();
+    logMessage(`Switched category: ${mode.toUpperCase()} challenge configured.`);
+  }
+
+  tabChroma.addEventListener('click', () => setTab('chroma'));
+  tabStroop.addEventListener('click', () => setTab('stroop'));
+  tabBlend.addEventListener('click', () => setTab('blend'));
+
+  // Handle dynamic metadata for Start Screen info injection
+  function showStartPane() {
+    elStartPane.classList.remove('hidden');
+    elGameChroma.classList.add('hidden');
+    elGameStroop.classList.add('hidden');
+    elGameBlend.classList.add('hidden');
+    elTimerContainer.classList.add('opacity-40');
+
+    if (STATE.activeTab === 'chroma') {
+      elStartIconContainer.innerHTML = `
+        <svg class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+        </svg>`;
+      elStartTitle.textContent = "Chroma Finder";
+      elStartDesc.textContent = "Test your chromatic sensitivity. Spot the solitary block painted in a slightly different hue value before the clock runs out!";
+    } else if (STATE.activeTab === 'stroop') {
+      elStartIconContainer.innerHTML = `
+        <svg class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>`;
+      elStartTitle.textContent = "Stroop Clash";
+      elStartDesc.textContent = "Your brain will try to deceive you! Fast-click Match if the written text's meaning equals the physical paint style. Otherwise hit Clash!";
+    } else {
+      elStartIconContainer.innerHTML = `
+        <svg class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>`;
+      elStartTitle.textContent = "Hue Blender";
+      elStartDesc.textContent = "No hard timer here! Relax and manipulate the precise R, G, B sliders to match the random target color swatch. Push lock to score target proximity accuracy!";
+    }
+  }
+
+  // Setup / Start Game Entry point
+  function startGame() {
+    initAudio();
+    STATE.gameInProgress = true;
+    STATE.currentScore = 0;
+    STATE.streak = 0;
+    updateScoreHUD();
+
+    elStartPane.classList.add('hidden');
+    elGameOverScreen.classList.add('opacity-0', 'pointer-events-none');
+    elTimerContainer.classList.remove('opacity-40');
+
+    if (STATE.activeTab === 'chroma') {
+      elGameChroma.classList.remove('hidden');
+      STATE.timeLeft = 25; 
+      STATE.maxTime = 25;
+      STATE.chroma.level = 1;
+      STATE.chroma.size = 2;
+      setupChromaLevel();
+      startGlobalTimer();
+      logMessage("Chroma Finder session initiated!");
+    } else if (STATE.activeTab === 'stroop') {
+      elGameStroop.classList.remove('hidden');
+      STATE.timeLeft = 20;
+      STATE.maxTime = 20;
+      setupStroopQuestion();
+      startGlobalTimer();
+      logMessage("Stroop Clash challenge began. Think fast!");
+    } else if (STATE.activeTab === 'blend') {
+      elGameBlend.classList.remove('hidden');
+      // Blender doesn't have an intense timer, hide it dynamically
+      elTimerContainer.classList.add('opacity-40');
+      setupBlendChallenge();
+      logMessage("Hue Blender mode initialized. Slide to match target.");
+    }
+
+    playTone(330, 'sine', 0.1);
+    setTimeout(() => playTone(440, 'sine', 0.15), 100);
+  }
+
+  elStartGameBtn.addEventListener('click', startGame);
+  elRestartBtn.addEventListener('click', startGame);
+
+  // Timer Operations
+  function startGlobalTimer() {
+    clearInterval(STATE.timerInterval);
+    updateTimerVisual();
+    
+    STATE.timerInterval = setInterval(() => {
+      STATE.timeLeft -= 0.1;
+      if (STATE.timeLeft <= 0) {
+        STATE.timeLeft = 0;
+        updateTimerVisual();
+        endGame(true);
       } else {
-        const mins = String(Math.floor(state.timeLeft / 60)).padStart(2, '0');
-        const secs = String(state.timeLeft % 60).padStart(2, '0');
-        timeDisplay.textContent = `${mins}:${secs}`;
-        
-        const percentage = (state.timeLeft / 60) * 100;
-        progressBar.style.width = `${Math.min(100, percentage)}%`;
+        updateTimerVisual();
       }
-    }, 1000);
-
-  } else {
-    // Standard practice stopwatch chronometer
-    state.timerSeconds = 0;
-    progressBar.style.width = '100%';
-    progressBar.className = 'h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-300';
-    
-    mainTimerInterval = setInterval(() => {
-      state.timerSeconds++;
-      const mins = String(Math.floor(state.timerSeconds / 60)).padStart(2, '0');
-      const secs = String(state.timerSeconds % 60).padStart(2, '0');
-      timeDisplay.textContent = `${mins}:${secs}`;
-    }, 1000);
+    }, 100);
   }
-}
 
-// Render Cards onto physical CSS grid based on size selection
-function drawMatrixBoard() {
-  const container = document.getElementById('puzzle-matrix-grid');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  // Set responsive dynamic columns directly via inline styles to support grid system robustly
-  const dimension = state.gridSize;
-  container.style.gridTemplateColumns = `repeat(${dimension}, minmax(0, 1fr))`;
-
-  state.cards.forEach((card, index) => {
-    const cardBox = document.createElement('div');
-    cardBox.className = 'perspective aspect-square w-full cursor-pointer group';
-    cardBox.id = `card-slot-${index}`;
-    cardBox.setAttribute('data-card-index', index);
-
-    // Visual scaling adjust based on density
-    let symbolTextSize = 'text-xl sm:text-2xl';
-    if (dimension === 6) symbolTextSize = 'text-lg sm:text-xl';
-    if (dimension === 8) symbolTextSize = 'text-sm sm:text-base';
-
-    // Handle custom solid colors versus text symbols representation styling
-    let symbolInnerMarkup = '';
-    if (state.motif === 'colors') {
-      symbolInnerMarkup = `<div class="w-10 h-10 sm:w-14 sm:h-14 rounded-full shadow-inner border border-white/20" style="background-color: ${card.symbol};"></div>`;
+  function updateTimerVisual() {
+    const percentage = Math.max(0, Math.min(100, (STATE.timeLeft / STATE.maxTime) * 100));
+    elTimerBar.style.width = `${percentage}%`;
+    
+    // Change colors of the progress bar visually based on pressure
+    if (percentage > 50) {
+      elTimerBar.className = "h-full bg-gradient-to-r from-emerald-500 to-teal-400 w-full transition-all duration-100 ease-linear";
+    } else if (percentage > 20) {
+      elTimerBar.className = "h-full bg-gradient-to-r from-amber-500 to-yellow-400 w-full transition-all duration-100 ease-linear";
     } else {
-      symbolInnerMarkup = `<span class="font-black select-none tracking-tight ${symbolTextSize}">${card.symbol}</span>`;
-    }
-
-    // Structure supporting 3D flip effect and sleek rounded card design
-    cardBox.innerHTML = `
-      <div class="card-inner relative w-full h-full transform-style-3d transition-transform duration-500 rounded-xl sm:rounded-2xl ${card.isFlipped ? 'rotate-y-180' : ''}" style="height: 100%;">
-        
-        <!-- Card Front Face (Target visible representation) -->
-        <div class="card-front absolute inset-0 backface-hidden flex items-center justify-center bg-slate-900 border-2 border-indigo-500/80 rounded-xl sm:rounded-2xl shadow-xl rotate-y-180 ${card.isMatched ? 'matched-card-effect' : 'card-glowing-glow'}">
-          ${symbolInnerMarkup}
-        </div>
-
-        <!-- Card Back Face (Hidden mystery screen state) -->
-        <div class="card-back absolute inset-0 backface-hidden flex flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950/80 to-slate-950 border border-slate-800 hover:border-indigo-500/50 rounded-xl sm:rounded-2xl shadow-md transition-all duration-300">
-          <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-slate-900/90 border border-slate-800 flex items-center justify-center text-[10px] text-indigo-400 group-hover:scale-110 transition-transform duration-300">
-            ⚡
-          </div>
-        </div>
-
-      </div>
-    `;
-
-    // Attach mouse event listener to each custom memory matrix card
-    cardBox.addEventListener('click', () => {
-      handleCardSelection(index);
-    });
-
-    container.appendChild(cardBox);
-  });
-}
-
-// Handle flip and logic matching
-function handleCardSelection(index) {
-  if (!state.isPlaying) {
-    appendLogStream('[Status] Matrix is inactive. Please click "INIT NEW GRID" to start.', 'text-rose-400');
-    return;
-  }
-
-  const card = state.cards[index];
-
-  // Prevent flipping matched or already flipped elements, or exceeding pair limit actions
-  if (card.isMatched || card.isFlipped || state.flippedIndices.length >= 2) {
-    return;
-  }
-
-  // Perform actual Flip transition sequence
-  card.isFlipped = true;
-  state.flippedIndices.push(index);
-  
-  // Interactive sound feedback triggering
-  playSynthSound('flip');
-  
-  // Redraw matrix display representing flipped states
-  const cardContainer = document.getElementById(`card-slot-${index}`);
-  if (cardContainer) {
-    const innerElement = cardContainer.querySelector('.card-inner');
-    if (innerElement) {
-      innerElement.classList.add('rotate-y-180');
+      elTimerBar.className = "h-full bg-gradient-to-r from-red-600 to-rose-500 w-full transition-all duration-100 ease-linear";
     }
   }
 
-  // Check matched state if two elements have been revealed
-  if (state.flippedIndices.length === 2) {
-    state.moves++;
-    const [firstIndex, secondIndex] = state.flippedIndices;
-    const cardA = state.cards[firstIndex];
-    const cardB = state.cards[secondIndex];
-
-    if (cardA.symbol === cardB.symbol) {
-      // Symmetrical Match detected!
-      cardA.isMatched = true;
-      cardB.isMatched = true;
-      state.matchesCount++;
+  // End Session Clean up
+  function endGame(timeExpired) {
+    clearInterval(STATE.timerInterval);
+    STATE.gameInProgress = false;
+    
+    if (timeExpired) {
+      playFailure();
+      logMessage(`Time's up! Game finished with score: ${STATE.currentScore}`);
       
-      // Increment score calculating combo multipliers bonus
-      const baseGain = 100;
-      const comboBonus = baseGain * state.combo;
-      state.score += comboBonus;
-      
-      // Generate log entry feedback
-      appendLogStream(`[Match] Symmetrical Pair resolved! +${comboBonus}pts (Combo x${state.combo})`, 'text-emerald-400');
-      playSynthSound('match');
-
-      // Add matching color sparks/particles onto the board layout
-      setTimeout(() => {
-        const firstBox = document.getElementById(`card-slot-${firstIndex}`);
-        const secondBox = document.getElementById(`card-slot-${secondIndex}`);
-        if (firstBox && secondBox) {
-          const rectA = firstBox.getBoundingClientRect();
-          const rectContainer = document.getElementById('puzzle-matrix-grid').getBoundingClientRect();
-          const xA = rectA.left + rectA.width/2 - rectContainer.left;
-          const yA = rectA.top + rectA.height/2 - rectContainer.top;
-          emitParticles(xA, yA, state.motif === 'colors' ? cardA.symbol : '#818CF8', 12);
-        }
-      }, 200);
-
-      // Apply visual match glow border on success
-      setTimeout(() => {
-        [firstIndex, secondIndex].forEach(idx => {
-          const frontFace = document.querySelector(`#card-slot-${idx} .card-front`);
-          if (frontFace) {
-            frontFace.classList.add('matched-card-effect');
-          }
-        });
-      }, 300);
-
-      // Increase dynamic Time attack bonus seconds if active mode is set
-      if (state.gameMode === 'timeAttack') {
-        state.timeLeft = Math.min(120, state.timeLeft + 6); // Cap max dynamic bonus time
-        appendLogStream(`[Time Bonus] +6s dynamic time incentive added.`, 'text-indigo-400');
+      // Check and persist personal High Score
+      if (STATE.currentScore > (STATE.highScores[STATE.activeTab] || 0)) {
+        STATE.highScores[STATE.activeTab] = STATE.currentScore;
+        try {
+          localStorage.setItem('chromaquest_highscores', JSON.stringify(STATE.highScores));
+        } catch(e) {}
+        logMessage(`🎉 New personal high score for ${STATE.activeTab}: ${STATE.currentScore}!`);
+        playLevelUp();
       }
-
-      // Trigger Combo increment
-      state.combo = Math.min(5, state.combo + 1);
-      state.flippedIndices = [];
       
-      // Refresh analytical indicators layout
-      updateInterfaceStats();
-
-      // Check global victory matrix resolution success
-      const totalPairs = (state.gridSize * state.gridSize) / 2;
-      if (state.matchesCount === totalPairs) {
-        triggerGameOver(true);
-      }
+      // Show game over overlay panel
+      elGoScore.textContent = STATE.currentScore;
+      elGoStreak.textContent = STATE.streak;
+      
+      elGameOverScreen.classList.remove('pointer-events-none');
+      elGameOverScreen.classList.add('opacity-100');
+      updateScoreHUD();
     } else {
-      // Mismatch consequence loop
-      playSynthSound('miss');
-      state.combo = 1; // Break streak multiplier
+      // Hard cancel simply switches back to options state
+      elGameOverScreen.classList.add('opacity-0', 'pointer-events-none');
+    }
+  }
 
-      if (state.gameMode === 'timeAttack') {
-        state.timeLeft = Math.max(3, state.timeLeft - 3);
-        appendLogStream(`[Time Penalty] -3s deducted for synchronization error.`, 'text-rose-500');
-      }
 
-      appendLogStream(`[Mismatch] Identity conflict detected. Resetting target modules.`, 'text-slate-500');
+  /* GAME 1: CHROMA FINDER CORE ROUTINES */
+  function setupChromaLevel() {
+    elChromaLevel.textContent = STATE.chroma.level;
+    elChromaGrid.innerHTML = '';
+    
+    // Determine Grid size based on level progression
+    if (STATE.chroma.level === 1) {
+      STATE.chroma.size = 2;
+    } else if (STATE.chroma.level < 4) {
+      STATE.chroma.size = 3;
+    } else if (STATE.chroma.level < 8) {
+      STATE.chroma.size = 4;
+    } else if (STATE.chroma.level < 14) {
+      STATE.chroma.size = 5;
+    } else if (STATE.chroma.level < 20) {
+      STATE.chroma.size = 6;
+    } else {
+      STATE.chroma.size = 7;
+    }
+
+    const totalTiles = STATE.chroma.size * STATE.chroma.size;
+    elChromaGrid.style.gridTemplateColumns = `repeat(${STATE.chroma.size}, minmax(0, 1fr))`;
+
+    // Generate dynamic HSL colors representing subtle brightness adjustments
+    const h = Math.floor(Math.random() * 360);
+    const s = Math.floor(Math.random() * 40) + 50; // 50% - 90%
+    const l = Math.floor(Math.random() * 50) + 25; // 25% - 75%
+    
+    // Difficulty factor decreases gap difference as score/level raises
+    const baseGap = Math.max(1.5, 20 - (STATE.chroma.level * 0.8));
+    const isBrighter = l < 50;
+    const oddL = isBrighter ? (l + baseGap) : (l - baseGap);
+    
+    STATE.chroma.baseColor = `hsl(${h}, ${s}%, ${l}%)`;
+    STATE.chroma.oddColor = `hsl(${h}, ${s}%, ${oddL}%)`;
+    STATE.chroma.correctIndex = Math.floor(Math.random() * totalTiles);
+
+    for (let i = 0; i < totalTiles; i++) {
+      const tile = document.createElement('button');
+      tile.className = "w-full h-full rounded-xl transition-transform active:scale-95 duration-75 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400";
+      tile.style.backgroundColor = (i === STATE.chroma.correctIndex) ? STATE.chroma.oddColor : STATE.chroma.baseColor;
       
-      // Delay reset execution back to face down view
-      setTimeout(() => {
-        cardA.isFlipped = false;
-        cardB.isFlipped = false;
-        
-        // Animate flip back to state
-        [firstIndex, secondIndex].forEach(idx => {
-          const innerElement = document.querySelector(`#card-slot-${idx} .card-inner`);
-          if (innerElement) {
-            innerElement.classList.remove('rotate-y-180');
-          }
-        });
-
-        state.flippedIndices = [];
-        updateInterfaceStats();
-      }, 1000);
-    }
-  }
-}
-
-// Cheat Powerup Mechanism: Revelations scanner grid loop
-function executeCheatScanner() {
-  if (!state.isPlaying || state.cards.length === 0) {
-    appendLogStream('[Warning] Initialize active simulation board first.', 'text-amber-400');
-    return;
-  }
-
-  // Deduct score penalty for applying powerup scan
-  const penaltyValue = 250;
-  state.score = Math.max(0, state.score - penaltyValue);
-  appendLogStream(`[Scanner Powered] Scanning entire matrix. Deducted ${penaltyValue}pts from core.`, 'text-amber-400');
-  
-  playSynthSound('scan');
-  updateInterfaceStats();
-
-  // Flip all non-matched items briefly
-  state.cards.forEach((card, idx) => {
-    if (!card.isMatched) {
-      card.isFlipped = true;
-      const cardInner = document.querySelector(`#card-slot-${idx} .card-inner`);
-      if (cardInner) {
-        cardInner.classList.add('rotate-y-180');
-      }
-    }
-  });
-
-  // Revert back down state transition cooldown
-  setTimeout(() => {
-    if (!state.isPlaying) return; // Prevent interference with clean board reloads
-    state.cards.forEach((card, idx) => {
-      if (!card.isMatched && !state.flippedIndices.includes(idx)) {
-        card.isFlipped = false;
-        const cardInner = document.querySelector(`#card-slot-${idx} .card-inner`);
-        if (cardInner) {
-          cardInner.classList.remove('rotate-y-180');
+      tile.addEventListener('click', () => {
+        if (!STATE.gameInProgress) return;
+        if (i === STATE.chroma.correctIndex) {
+          // Correct choice
+          playSuccess();
+          STATE.currentScore += 10;
+          STATE.streak += 1;
+          STATE.chroma.level += 1;
+          // Bonus time
+          STATE.timeLeft = Math.min(STATE.maxTime, STATE.timeLeft + 2.5);
+          updateScoreHUD();
+          
+          // Visual level-up scale effect on level badge
+          elChromaLevel.classList.add('level-pop');
+          setTimeout(() => elChromaLevel.classList.remove('level-pop'), 400);
+          
+          setupChromaLevel();
+        } else {
+          // Wrong choice
+          playTone(180, 'sawtooth', 0.2);
+          STATE.timeLeft = Math.max(0, STATE.timeLeft - 3.5);
+          STATE.streak = 0;
+          logMessage("Incorrect tile! Lose 3.5 seconds penalty.");
+          updateTimerVisual();
         }
-      }
-    });
-  }, 1600);
-}
-
-// End simulation loop outcome UI updates
-function triggerGameOver(isWin) {
-  state.isPlaying = false;
-  configureTimer('stop');
-  
-  const overlay = document.getElementById('game-overlay-state');
-  const overlayIcon = document.getElementById('overlay-icon');
-  const overlayTitle = document.getElementById('overlay-title');
-  const overlaySubtitle = document.getElementById('overlay-subtitle');
-  
-  // Calculate final performance percentage
-  const accuracy = state.moves > 0 ? Math.round((state.matchesCount / state.moves) * 100) : 0;
-  
-  // Assign values to summary interface cards
-  document.getElementById('over-score').textContent = String(state.score).padStart(4, '0');
-  
-  let timeStr = '00:00';
-  if (state.gameMode === 'timeAttack') {
-    const elapsed = 60 - state.timeLeft;
-    timeStr = `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
-  } else {
-    timeStr = `${String(Math.floor(state.timerSeconds / 60)).padStart(2, '0')}:${String(state.timerSeconds % 60).padStart(2, '0')}`;
-  }
-  
-  document.getElementById('over-time').textContent = timeStr;
-  document.getElementById('over-moves').textContent = state.moves;
-  document.getElementById('over-accuracy').textContent = `${accuracy}%`;
-
-  if (isWin) {
-    playSynthSound('win');
-    overlayIcon.textContent = '🏆';
-    overlayTitle.textContent = "Sim Completed!";
-    overlaySubtitle.textContent = "Superb! You achieved critical resonance and successfully aligned the memory matrix network.";
-    appendLogStream(`[Resolved] Symmetrical alignment secured in ${timeStr}. Score: ${state.score}`, 'text-emerald-400');
-    
-    // Save record to storage if qualifying
-    saveRecord(state.score);
-    
-    // Big particle burst
-    if (canvas) {
-      for (let i = 0; i < 4; i++) {
-        setTimeout(() => {
-          emitParticles(Math.random() * canvas.width, Math.random() * canvas.height, null, 30);
-        }, i * 200);
-      }
-    }
-  } else {
-    playSynthSound('over');
-    overlayIcon.textContent = '💀';
-    overlayTitle.textContent = "Probe De-synced";
-    overlaySubtitle.textContent = "Time budget depleted before total matrix matching was acquired. Re-arm the grids and retry.";
-    appendLogStream('[Defeat] Chronometer exhausted. Memory matching incomplete.', 'text-rose-500');
-  }
-
-  // Unhide victory element overlay modal panel container
-  if (overlay) {
-    overlay.classList.remove('hidden');
-  }
-}
-
-// Initialize/Reset State and trigger new grid generation
-function initGameSimulation() {
-  // Stop active timer loops
-  configureTimer('stop');
-
-  // Clear overlay view elements
-  const overlay = document.getElementById('game-overlay-state');
-  if (overlay) {
-    overlay.classList.add('hidden');
-  }
-
-  // Re-read selected custom attributes setup configurations
-  const selectedSizeBtn = document.querySelector('.size-btn.border-indigo-500');
-  state.gridSize = selectedSizeBtn ? parseInt(selectedSizeBtn.getAttribute('data-size'), 10) : 4;
-  state.motif = document.getElementById('deck-selector').value;
-  
-  const activeModeRadio = document.querySelector('input[name="game-mode"]:checked');
-  state.gameMode = activeModeRadio ? activeModeRadio.value : 'standard';
-
-  // Reset state values variables
-  state.moves = 0;
-  state.matchesCount = 0;
-  state.score = 0;
-  state.combo = 1;
-  state.flippedIndices = [];
-  state.isPlaying = true;
-
-  // Populate cards resource mapping
-  state.cards = generateDecks(state.gridSize, state.motif);
-
-  // Synchronize interface widgets
-  updateInterfaceStats();
-  updateHighScoreDisplay();
-  
-  // Render Grid layout onto physical DOM representation
-  drawMatrixBoard();
-  
-  // Start stopwatch timers tracker
-  configureTimer('start');
-
-  // Log setup sequence
-  appendLogStream(`[Sim] Init ${state.gridSize}x${state.gridSize} matrix (${state.motif} deck). Mode: ${state.gameMode.toUpperCase()}`, 'text-indigo-300');
-  
-  const statusText = document.getElementById('status-banner-text');
-  if (statusText) {
-    statusText.innerHTML = `Active Grid matches: <strong>0 / ${(state.gridSize * state.gridSize)/2}</strong>. Seek identical modules sequentially.`;
-  }
-}
-
-// Reset High Score Storage Utility
-function resetRecordStorage() {
-  if (confirm("Are you sure you want to completely erase your saved high score records?")) {
-    state.highScores = {
-      '4-standard': 0, '4-timeAttack': 0,
-      '6-standard': 0, '6-timeAttack': 0,
-      '8-standard': 0, '8-timeAttack': 0,
-    };
-    localStorage.setItem('neuromatch_highscores', JSON.stringify(state.highScores));
-    updateHighScoreDisplay();
-    appendLogStream('[Storage] High scores successfully purged.', 'text-rose-400');
-  }
-}
-
-// Setup general page UI element listeners
-function setupListeners() {
-  // Handle grid size dimension selection state modifications
-  const sizeButtons = document.querySelectorAll('.size-btn');
-  sizeButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      // Reset previous active configurations styles representation
-      sizeButtons.forEach(b => {
-        b.className = "size-btn py-2 px-3 rounded-xl border border-slate-800 bg-slate-900 text-slate-400 text-sm font-bold transition-all focus:outline-none hover:border-slate-700 hover:text-slate-300";
       });
-      // Apply new styling highlight
-      btn.className = "size-btn py-2 px-3 rounded-xl border border-indigo-500 bg-indigo-500/10 text-indigo-300 text-sm font-bold transition-all focus:outline-none hover:bg-indigo-500/20";
-      
-      // Immediately display change in logs
-      const targetSize = btn.getAttribute('data-size');
-      appendLogStream(`[Dimension Preset] Grid updated to ${targetSize}x${targetSize}. Start game to apply change.`, 'text-slate-300');
-      
-      // Live adjust high score display representation preview
-      state.gridSize = parseInt(targetSize, 10);
-      updateHighScoreDisplay();
+
+      elChromaGrid.appendChild(tile);
+    }
+  }
+
+
+  /* GAME 2: STROOP CLASH CORE ROUTINES */
+  function setupStroopQuestion() {
+    // Pick random target definitions
+    const wordItem = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)];
+    const colorItem = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)];
+    
+    // Determine matching state logically
+    const matchChance = Math.random() < 0.5;
+    
+    if (matchChance) {
+      STATE.stroop.currentWord = wordItem.name;
+      STATE.stroop.currentColor = wordItem.hex;
+      STATE.stroop.isMatching = true;
+    } else {
+      STATE.stroop.currentWord = wordItem.name;
+      // Pick helper to guarantee mismatched colors
+      let badColor = colorItem;
+      while (badColor.name === wordItem.name) {
+        badColor = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)];
+      }
+      STATE.stroop.currentColor = badColor.hex;
+      STATE.stroop.isMatching = false;
+    }
+
+    elStroopWord.textContent = STATE.stroop.currentWord.toUpperCase();
+    elStroopWord.style.color = STATE.stroop.currentColor;
+    
+    // Micro-interactivity jump anim
+    elStroopWord.style.transform = 'scale(0.8)';
+    setTimeout(() => {
+      elStroopWord.style.transform = 'scale(1.0)';
+    }, 50);
+  }
+
+  function triggerStroopAnswer(userSelection) {
+    if (!STATE.gameInProgress || STATE.activeTab !== 'stroop') return;
+    
+    const isCorrect = (userSelection === STATE.stroop.isMatching);
+    
+    if (isCorrect) {
+      playSuccess();
+      STATE.currentScore += 10;
+      STATE.streak += 1;
+      STATE.timeLeft = Math.min(STATE.maxTime, STATE.timeLeft + 1.5);
+      triggerFeedbackIndicator(true);
+      updateScoreHUD();
+      setupStroopQuestion();
+    } else {
+      playTone(180, 'sawtooth', 0.2);
+      STATE.timeLeft = Math.max(0, STATE.timeLeft - 4);
+      STATE.streak = 0;
+      triggerFeedbackIndicator(false);
+      logMessage("Clash error! 4s penalty registered.");
+      updateTimerVisual();
+      setupStroopQuestion();
+    }
+  }
+
+  function triggerFeedbackIndicator(correct) {
+    const textSpan = elStroopFeedback.querySelector('span');
+    if (correct) {
+      textSpan.textContent = "✓";
+      textSpan.className = "text-6xl font-black text-emerald-500/30";
+    } else {
+      textSpan.textContent = "✗";
+      textSpan.className = "text-6xl font-black text-rose-500/30";
+    }
+    elStroopFeedback.classList.remove('opacity-0');
+    setTimeout(() => {
+      elStroopFeedback.classList.add('opacity-0');
+    }, 200);
+  }
+
+  elStroopBtnTrue.addEventListener('click', () => triggerStroopAnswer(true));
+  elStroopBtnFalse.addEventListener('click', () => triggerStroopAnswer(false));
+
+  // Keyboard hotkeys for Stroop Match
+  window.addEventListener('keydown', (e) => {
+    if (STATE.gameInProgress && STATE.activeTab === 'stroop') {
+      if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') {
+        triggerStroopAnswer(false);
+      } else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') {
+        triggerStroopAnswer(true);
+      }
+    }
+  });
+
+
+  /* GAME 3: HUE BLENDER CORE ROUTINES */
+  function setupBlendChallenge() {
+    // Create randomized target values
+    STATE.blend.targetRGB = {
+      r: Math.floor(Math.random() * 256),
+      g: Math.floor(Math.random() * 256),
+      b: Math.floor(Math.random() * 256)
+    };
+
+    elBlendTarget.style.backgroundColor = `rgb(${STATE.blend.targetRGB.r}, ${STATE.blend.targetRGB.g}, ${STATE.blend.targetRGB.b})`;
+    
+    // Reset sliders back to midpoints
+    STATE.blend.currentRGB = { r: 128, g: 128, b: 128 };
+    elSlideRed.value = 128;
+    elSlideGreen.value = 128;
+    elSlideBlue.value = 128;
+
+    updateBlendOutputs();
+  }
+
+  function updateBlendOutputs() {
+    const r = parseInt(elSlideRed.value);
+    const g = parseInt(elSlideGreen.value);
+    const b = parseInt(elSlideBlue.value);
+
+    STATE.blend.currentRGB = { r, g, b };
+
+    elValRed.textContent = r;
+    elValGreen.textContent = g;
+    elValBlue.textContent = b;
+
+    elBlendCurrent.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+
+    // Math formula calculating similarity index mathematically
+    const diffR = STATE.blend.targetRGB.r - r;
+    const diffG = STATE.blend.targetRGB.g - g;
+    const diffB = STATE.blend.targetRGB.b - b;
+    
+    // Calculate normalized Euclidean distance vector
+    const maxDist = Math.sqrt(255*255 * 3);
+    const actualDist = Math.sqrt(diffR*diffR + diffG*diffG + diffB*diffB);
+    const similarity = Math.max(0, 100 - (actualDist / maxDist * 100));
+
+    elBlendMatchPct.textContent = `${similarity.toFixed(1)}%`;
+    
+    if (similarity > 95) {
+      elBlendMatchPct.className = "text-lg font-extrabold text-emerald-400";
+    } else if (similarity > 80) {
+      elBlendMatchPct.className = "text-lg font-extrabold text-indigo-400";
+    } else {
+      elBlendMatchPct.className = "text-lg font-extrabold text-amber-500";
+    }
+  }
+
+  // Monitor range inputs continuously
+  [elSlideRed, elSlideGreen, elSlideBlue].forEach(slider => {
+    slider.addEventListener('input', () => {
+      updateBlendOutputs();
+      if (Math.random() < 0.15) { // periodic sound ticks while sliding
+        playTone(300 + (parseInt(slider.value) * 2), 'sine', 0.04);
+      }
     });
   });
 
-  // Action buttons events registration
-  document.getElementById('btn-start-game')?.addEventListener('click', initGameSimulation);
-  document.getElementById('btn-overlay-action')?.addEventListener('click', initGameSimulation);
-  document.getElementById('btn-peek-powerup')?.addEventListener('click', executeCheatScanner);
-  
-  document.getElementById('btn-reset-stats')?.addEventListener('click', () => {
-    if (confirm("Reset the current game in progress?")) {
-      initGameSimulation();
-    }
-  });
-
-  document.getElementById('btn-reset-record')?.addEventListener('click', resetRecordStorage);
-
-  // Sound Toggle controller
-  const soundBtn = document.getElementById('btn-sound-toggle');
-  soundBtn?.addEventListener('click', () => {
-    state.soundOn = !state.soundOn;
-    const soundIcon = document.getElementById('sound-icon');
-    if (state.soundOn) {
-      soundIcon.textContent = "🔊";
-      soundBtn.className = "p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all";
-      appendLogStream('[System] Synthesis sound processor online.', 'text-indigo-400');
+  elBlendSubmitBtn.addEventListener('click', () => {
+    const matchText = elBlendMatchPct.textContent;
+    const finalSimilarity = parseFloat(matchText);
+    
+    let awardedPoints = 0;
+    if (finalSimilarity >= 98) {
+      awardedPoints = 100;
+      playLevelUp();
+      logMessage(`🎉 Flawless! ${finalSimilarity.toFixed(1)}% match. Scored massive +100 points!`);
+    } else if (finalSimilarity >= 90) {
+      awardedPoints = 50;
+      playSuccess();
+      logMessage(`Excellent alignment. ${finalSimilarity.toFixed(1)}% match, awarded +50 points.`);
+    } else if (finalSimilarity >= 75) {
+      awardedPoints = 20;
+      playTone(400, 'triangle', 0.2);
+      logMessage(`Decent. ${finalSimilarity.toFixed(1)}% match, awarded +20 points.`);
     } else {
-      soundIcon.textContent = "🔇";
-      soundBtn.className = "p-2 rounded-lg bg-red-950/40 hover:bg-red-950/60 border border-red-900/40 text-rose-400 transition-all";
-      appendLogStream('[System] Sound processor muted.', 'text-slate-500');
+      playFailure();
+      logMessage(`Weak match (${finalSimilarity.toFixed(1)}%). Need at least 75% accuracy. Try again!`);
     }
+
+    STATE.currentScore += awardedPoints;
+    if (awardedPoints > 0) {
+      STATE.streak += 1;
+    } else {
+      STATE.streak = 0;
+    }
+
+    // Blend high score check
+    if (STATE.currentScore > (STATE.highScores.blend || 0)) {
+      STATE.highScores.blend = STATE.currentScore;
+      try {
+        localStorage.setItem('chromaquest_highscores', JSON.stringify(STATE.highScores));
+      } catch(e) {}
+    }
+    
+    updateScoreHUD();
+    setupBlendChallenge();
   });
 
-  // Deck selection live logs notification
-  document.getElementById('deck-selector')?.addEventListener('change', (e) => {
-    appendLogStream(`[Motif Selected] Deck set to ${e.target.value}. Initialize to reload graphics.`, 'text-slate-300');
-  });
-}
-
-// Init overall application sequences
-setupListeners();
-loadRecords();
-initGameSimulation();
+  // Initialize default screen configuration
+  setTab('chroma');
+})();
