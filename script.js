@@ -1,630 +1,686 @@
-(function() {
-  // Web Audio Synth for custom retroactive procedural sound effects
-  let audioCtx = null;
-  let soundEnabled = true;
+/**
+ * MyNotes Hub Engine - Pure Client Side Sandbox Interactivity
+ */
 
-  function initAudio() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-  }
-
-  function playTone(freq, type, duration) {
-    if (!soundEnabled) return;
-    try {
-      initAudio();
-      const osc = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      
-      osc.type = type || 'sine';
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      
-      gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      
-      osc.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    } catch (e) {
-      console.warn("Audio synthesis delayed until user interaction.");
-    }
-  }
-
-  function playSuccess() {
-    playTone(523.25, 'triangle', 0.15); // C5
-    setTimeout(() => playTone(659.25, 'triangle', 0.15), 80); // E5
-  }
-
-  function playFailure() {
-    playTone(220, 'sawtooth', 0.25); // A3
-    setTimeout(() => playTone(164.81, 'sawtooth', 0.25), 100); // E3
-  }
-
-  function playLevelUp() {
-    playTone(523.25, 'sine', 0.1);
-    setTimeout(() => playTone(659.25, 'sine', 0.1), 70);
-    setTimeout(() => playTone(783.99, 'sine', 0.1), 140);
-    setTimeout(() => playTone(1046.50, 'sine', 0.3), 210);
-  }
-
-  // Game state representation
-  const STATE = {
-    activeTab: 'chroma', // chroma, stroop, blend
-    currentScore: 0,
-    highScores: {
-      chroma: 0,
-      stroop: 0,
-      blend: 0
+(function () {
+  // Default Starting Notes for instant showcase capability
+  const INITIAL_NOTES = [
+    {
+      id: 'demo-1',
+      title: 'Welcome to MyNotes Hub 🚀',
+      content: 'This is a premium client-side note application. You can pin essential tasks, categorize everything with customizable tags, and change colors! Try editing this note or adding checklist items below.',
+      type: 'text',
+      checklist: [],
+      tag: 'Ideas',
+      color: 'indigo',
+      pinned: true,
+      createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
     },
-    gameInProgress: false,
-    timeLeft: 30, // seconds
-    maxTime: 30,
-    timerInterval: null,
-    streak: 0,
-
-    // Game specific trackers
-    chroma: {
-      level: 1,
-      size: 2,
-      baseColor: null,
-      oddColor: null,
-      correctIndex: null
+    {
+      id: 'demo-2',
+      title: 'Project Launch Checklist 📦',
+      content: '',
+      type: 'checklist',
+      checklist: [
+        { id: 'item-1', text: 'Complete frontend responsive tests', completed: true },
+        { id: 'item-2', text: 'Optimize state persistence', completed: true },
+        { id: 'item-3', text: 'Generate beautiful colors metadata', completed: false },
+        { id: 'item-4', text: 'Export project JSON schema backups', completed: false }
+      ],
+      tag: 'Work',
+      color: 'emerald',
+      pinned: true,
+      createdAt: new Date(Date.now() - 3600000).toISOString()
     },
-    stroop: {
-      currentWord: '',
-      currentColor: '',
-      isMatching: false
-    },
-    blend: {
-      targetRGB: { r: 0, g: 0, b: 0 },
-      currentRGB: { r: 128, g: 128, b: 128 }
+    {
+      id: 'demo-3',
+      title: 'Smart Learning Resources',
+      content: 'Read up on Tailwind custom animation strategies, client-side blob generation techniques, and DOM state handling methodologies.',
+      type: 'text',
+      checklist: [],
+      tag: 'Study',
+      color: 'purple',
+      pinned: false,
+      createdAt: new Date().toISOString()
     }
-  };
-
-  // Color lists for Stroop Game Mode
-  const STROOP_COLORS = [
-    { name: 'Red', hex: '#ef4444' },
-    { name: 'Green', hex: '#10b981' },
-    { name: 'Blue', hex: '#3b82f6' },
-    { name: 'Yellow', hex: '#eab308' },
-    { name: 'Purple', hex: '#a855f7' },
-    { name: 'Orange', hex: '#f97316' },
-    { name: 'Pink', hex: '#ec4899' },
-    { name: 'Cyan', hex: '#06b6d4' }
   ];
 
-  // Retrieve High Scores from localStorage if available
-  try {
-    const saved = localStorage.getItem('chromaquest_highscores');
+  // Core States
+  let notes = [];
+  let currentFilterTag = 'All';
+  let currentSearchQuery = '';
+  let creatorNoteType = 'text'; // 'text' or 'checklist'
+  let creatorChecklistItems = []; // Array of { id, text, completed }
+
+  // Selected DOM nodes
+  const noteSearchInput = document.getElementById('noteSearchInput');
+  const btnExportData = document.getElementById('btnExportData');
+  const importFileSelector = document.getElementById('importFileSelector');
+  const btnResetData = document.getElementById('btnResetData');
+  
+  const sidebarBtnCreateNote = document.getElementById('sidebarBtnCreateNote');
+  const tagFilterContainer = document.getElementById('tagFilterContainer');
+  
+  // Stats references
+  const statTotalNotes = document.getElementById('statTotalNotes');
+  const statPinnedNotes = document.getElementById('statPinnedNotes');
+  const statChecklists = document.getElementById('statChecklists');
+  const statCompletedTasks = document.getElementById('statCompletedTasks');
+  
+  // Form/Creator elements
+  const noteCreatorSection = document.getElementById('noteCreatorSection');
+  const creatorFormTitle = document.getElementById('creatorFormTitle');
+  const btnCloseCreator = document.getElementById('btnCloseCreator');
+  const btnTypeStandard = document.getElementById('btnTypeStandard');
+  const btnTypeChecklist = document.getElementById('btnTypeChecklist');
+  const formNoteId = document.getElementById('formNoteId');
+  const noteTitleInput = document.getElementById('noteTitleInput');
+  const textInputWrapper = document.getElementById('textInputWrapper');
+  const noteContentInput = document.getElementById('noteContentInput');
+  const checklistInputWrapper = document.getElementById('checklistInputWrapper');
+  const checklistItemsContainer = document.getElementById('checklistItemsContainer');
+  const newChecklistItemInput = document.getElementById('newChecklistItemInput');
+  const btnAddChecklistItem = document.getElementById('btnAddChecklistItem');
+  const noteTagSelect = document.getElementById('noteTagSelect');
+  const noteColorInput = document.getElementById('noteColorInput');
+  const notePinInput = document.getElementById('notePinInput');
+  const btnDiscardNote = document.getElementById('btnDiscardNote');
+  const btnSaveNote = document.getElementById('btnSaveNote');
+  const btnEmptyStateCreate = document.getElementById('btnEmptyStateCreate');
+
+  // Filter and dynamic container states
+  const activeFilterBar = document.getElementById('activeFilterBar');
+  const activeFilterLabel = document.getElementById('activeFilterLabel');
+  const btnClearFilters = document.getElementById('btnClearFilters');
+  const pinnedNotesHeader = document.getElementById('pinnedNotesHeader');
+  const pinnedNotesContainer = document.getElementById('pinnedNotesContainer');
+  const allNotesContainer = document.getElementById('allNotesContainer');
+  const emptyStateView = document.getElementById('emptyStateView');
+
+  // Color Maps for UI styles
+  const colorMap = {
+    indigo: { border: 'border-indigo-500/30', header: 'bg-indigo-950/40 text-indigo-400', accent: 'bg-indigo-500', glow: 'shadow-indigo-500/5', ring: 'focus:ring-indigo-500' },
+    emerald: { border: 'border-emerald-500/30', header: 'bg-emerald-950/40 text-emerald-400', accent: 'bg-emerald-500', glow: 'shadow-emerald-500/5', ring: 'focus:ring-emerald-500' },
+    amber: { border: 'border-amber-500/30', header: 'bg-amber-950/40 text-amber-400', accent: 'bg-amber-500', glow: 'shadow-amber-500/5', ring: 'focus:ring-amber-500' },
+    rose: { border: 'border-rose-500/30', header: 'bg-rose-950/40 text-rose-400', accent: 'bg-rose-500', glow: 'shadow-rose-500/5', ring: 'focus:ring-rose-500' },
+    purple: { border: 'border-purple-500/30', header: 'bg-purple-950/40 text-purple-400', accent: 'bg-purple-500', glow: 'shadow-purple-500/5', ring: 'focus:ring-purple-500' },
+    slate: { border: 'border-slate-700', header: 'bg-slate-800/60 text-slate-300', accent: 'bg-slate-400', glow: 'shadow-slate-500/5', ring: 'focus:ring-slate-500' }
+  };
+
+  // Available tags
+  const AVAILABLE_TAGS = ['All', 'Work', 'Personal', 'Ideas', 'To-do', 'Study', 'Finance'];
+
+  // Initialize application and local storage
+  function init() {
+    const saved = localStorage.getItem('mynotes_hub_data');
     if (saved) {
-      STATE.highScores = JSON.parse(saved);
-    }
-  } catch(e) {}
-
-  // DOM Element Selections
-  const elCurrentScore = document.getElementById('current-score');
-  const elHighScore = document.getElementById('high-score');
-  const elSoundToggle = document.getElementById('sound-toggle');
-  const elSoundIconOn = document.getElementById('sound-icon-on');
-  const elSoundIconOff = document.getElementById('sound-icon-off');
-
-  const tabChroma = document.getElementById('tab-chroma');
-  const tabStroop = document.getElementById('tab-stroop');
-  const tabBlend = document.getElementById('tab-blend');
-
-  const elTimerBar = document.getElementById('timer-bar');
-  const elTimerContainer = document.getElementById('timer-container');
-  const elGameOverScreen = document.getElementById('game-over-screen');
-  const elGoScore = document.getElementById('go-score');
-  const elGoStreak = document.getElementById('go-streak');
-  const elRestartBtn = document.getElementById('restart-btn');
-
-  const elStartPane = document.getElementById('start-pane');
-  const elStartIconContainer = document.getElementById('start-icon-container');
-  const elStartTitle = document.getElementById('start-title');
-  const elStartDesc = document.getElementById('start-desc');
-  const elStartGameBtn = document.getElementById('start-game-btn');
-
-  const elGameChroma = document.getElementById('game-chroma');
-  const elChromaGrid = document.getElementById('chroma-grid');
-  const elChromaLevel = document.getElementById('chroma-level');
-
-  const elGameStroop = document.getElementById('game-stroop');
-  const elStroopWord = document.getElementById('stroop-word');
-  const elStroopFeedback = document.getElementById('stroop-feedback');
-  const elStroopBtnFalse = document.getElementById('stroop-btn-false');
-  const elStroopBtnTrue = document.getElementById('stroop-btn-true');
-
-  const elGameBlend = document.getElementById('game-blend');
-  const elBlendTarget = document.getElementById('blend-target');
-  const elBlendCurrent = document.getElementById('blend-current');
-  const elSlideRed = document.getElementById('slide-red');
-  const elSlideGreen = document.getElementById('slide-green');
-  const elSlideBlue = document.getElementById('slide-blue');
-  const elValRed = document.getElementById('val-red');
-  const elValGreen = document.getElementById('val-green');
-  const elValBlue = document.getElementById('val-blue');
-  const elBlendMatchPct = document.getElementById('blend-match-pct');
-  const elBlendSubmitBtn = document.getElementById('blend-submit-btn');
-
-  const elLogFeed = document.getElementById('log-feed');
-  const elClearLog = document.getElementById('clear-log');
-
-  // Add message to Feed Logger
-  function logMessage(msg) {
-    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const logDiv = document.createElement('div');
-    logDiv.innerHTML = `<span class="text-slate-500">[${timestamp}]</span> ${msg}`;
-    elLogFeed.appendChild(logDiv);
-    elLogFeed.scrollTop = elLogFeed.scrollHeight;
-    
-    // Retain max 50 logs
-    while (elLogFeed.childNodes.length > 50) {
-      elLogFeed.removeChild(elLogFeed.firstChild);
-    }
-  }
-
-  // Clear log history
-  elClearLog.addEventListener('click', () => {
-    elLogFeed.innerHTML = '<div>System: Log cleared. Ready for incoming actions.</div>';
-    playTone(600, 'sine', 0.05);
-  });
-
-  // Sound Toggle
-  elSoundToggle.addEventListener('click', () => {
-    soundEnabled = !soundEnabled;
-    if (soundEnabled) {
-      elSoundIconOn.classList.remove('hidden');
-      elSoundIconOff.classList.add('hidden');
-      initAudio();
-      playTone(440, 'sine', 0.1);
-      logMessage("Sound effects enabled.");
+      try {
+        notes = JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse notes storage, fallback to defaults.', e);
+        notes = [...INITIAL_NOTES];
+      }
     } else {
-      elSoundIconOn.classList.add('hidden');
-      elSoundIconOff.classList.remove('hidden');
-      logMessage("Sound effects muted.");
-    }
-  });
-
-  // Helper to sync scores onto HUD
-  function updateScoreHUD() {
-    elCurrentScore.textContent = STATE.currentScore;
-    elHighScore.textContent = STATE.highScores[STATE.activeTab] || 0;
-  }
-
-  // Tab Selection Controller
-  function setTab(mode) {
-    STATE.activeTab = mode;
-    [tabChroma, tabStroop, tabBlend].forEach(btn => btn.classList.remove('active'));
-    
-    if (mode === 'chroma') {
-      tabChroma.classList.add('active');
-    } else if (mode === 'stroop') {
-      tabStroop.classList.add('active');
-    } else if (mode === 'blend') {
-      tabBlend.classList.add('active');
-    }
-    
-    endGame(false); // Cancel any running games without recording penalties
-    showStartPane();
-    updateScoreHUD();
-    logMessage(`Switched category: ${mode.toUpperCase()} challenge configured.`);
-  }
-
-  tabChroma.addEventListener('click', () => setTab('chroma'));
-  tabStroop.addEventListener('click', () => setTab('stroop'));
-  tabBlend.addEventListener('click', () => setTab('blend'));
-
-  // Handle dynamic metadata for Start Screen info injection
-  function showStartPane() {
-    elStartPane.classList.remove('hidden');
-    elGameChroma.classList.add('hidden');
-    elGameStroop.classList.add('hidden');
-    elGameBlend.classList.add('hidden');
-    elTimerContainer.classList.add('opacity-40');
-
-    if (STATE.activeTab === 'chroma') {
-      elStartIconContainer.innerHTML = `
-        <svg class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-        </svg>`;
-      elStartTitle.textContent = "Chroma Finder";
-      elStartDesc.textContent = "Test your chromatic sensitivity. Spot the solitary block painted in a slightly different hue value before the clock runs out!";
-    } else if (STATE.activeTab === 'stroop') {
-      elStartIconContainer.innerHTML = `
-        <svg class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>`;
-      elStartTitle.textContent = "Stroop Clash";
-      elStartDesc.textContent = "Your brain will try to deceive you! Fast-click Match if the written text's meaning equals the physical paint style. Otherwise hit Clash!";
-    } else {
-      elStartIconContainer.innerHTML = `
-        <svg class="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-        </svg>`;
-      elStartTitle.textContent = "Hue Blender";
-      elStartDesc.textContent = "No hard timer here! Relax and manipulate the precise R, G, B sliders to match the random target color swatch. Push lock to score target proximity accuracy!";
-    }
-  }
-
-  // Setup / Start Game Entry point
-  function startGame() {
-    initAudio();
-    STATE.gameInProgress = true;
-    STATE.currentScore = 0;
-    STATE.streak = 0;
-    updateScoreHUD();
-
-    elStartPane.classList.add('hidden');
-    elGameOverScreen.classList.add('opacity-0', 'pointer-events-none');
-    elTimerContainer.classList.remove('opacity-40');
-
-    if (STATE.activeTab === 'chroma') {
-      elGameChroma.classList.remove('hidden');
-      STATE.timeLeft = 25; 
-      STATE.maxTime = 25;
-      STATE.chroma.level = 1;
-      STATE.chroma.size = 2;
-      setupChromaLevel();
-      startGlobalTimer();
-      logMessage("Chroma Finder session initiated!");
-    } else if (STATE.activeTab === 'stroop') {
-      elGameStroop.classList.remove('hidden');
-      STATE.timeLeft = 20;
-      STATE.maxTime = 20;
-      setupStroopQuestion();
-      startGlobalTimer();
-      logMessage("Stroop Clash challenge began. Think fast!");
-    } else if (STATE.activeTab === 'blend') {
-      elGameBlend.classList.remove('hidden');
-      // Blender doesn't have an intense timer, hide it dynamically
-      elTimerContainer.classList.add('opacity-40');
-      setupBlendChallenge();
-      logMessage("Hue Blender mode initialized. Slide to match target.");
+      notes = [...INITIAL_NOTES];
+      saveToLocalStorage();
     }
 
-    playTone(330, 'sine', 0.1);
-    setTimeout(() => playTone(440, 'sine', 0.15), 100);
+    setupEventListeners();
+    renderTagFilters();
+    renderColorSwatches();
+    renderNotesGrid();
   }
 
-  elStartGameBtn.addEventListener('click', startGame);
-  elRestartBtn.addEventListener('click', startGame);
+  function saveToLocalStorage() {
+    localStorage.setItem('mynotes_hub_data', JSON.stringify(notes));
+  }
 
-  // Timer Operations
-  function startGlobalTimer() {
-    clearInterval(STATE.timerInterval);
-    updateTimerVisual();
-    
-    STATE.timerInterval = setInterval(() => {
-      STATE.timeLeft -= 0.1;
-      if (STATE.timeLeft <= 0) {
-        STATE.timeLeft = 0;
-        updateTimerVisual();
-        endGame(true);
+  // Set active class on active color swatch
+  function renderColorSwatches() {
+    const activeColor = noteColorInput.value || 'indigo';
+    document.querySelectorAll('.color-swatch-btn').forEach(btn => {
+      const color = btn.getAttribute('data-color');
+      if (color === activeColor) {
+        btn.classList.add('active-swatch', 'ring-white/80');
       } else {
-        updateTimerVisual();
-      }
-    }, 100);
-  }
-
-  function updateTimerVisual() {
-    const percentage = Math.max(0, Math.min(100, (STATE.timeLeft / STATE.maxTime) * 100));
-    elTimerBar.style.width = `${percentage}%`;
-    
-    // Change colors of the progress bar visually based on pressure
-    if (percentage > 50) {
-      elTimerBar.className = "h-full bg-gradient-to-r from-emerald-500 to-teal-400 w-full transition-all duration-100 ease-linear";
-    } else if (percentage > 20) {
-      elTimerBar.className = "h-full bg-gradient-to-r from-amber-500 to-yellow-400 w-full transition-all duration-100 ease-linear";
-    } else {
-      elTimerBar.className = "h-full bg-gradient-to-r from-red-600 to-rose-500 w-full transition-all duration-100 ease-linear";
-    }
-  }
-
-  // End Session Clean up
-  function endGame(timeExpired) {
-    clearInterval(STATE.timerInterval);
-    STATE.gameInProgress = false;
-    
-    if (timeExpired) {
-      playFailure();
-      logMessage(`Time's up! Game finished with score: ${STATE.currentScore}`);
-      
-      // Check and persist personal High Score
-      if (STATE.currentScore > (STATE.highScores[STATE.activeTab] || 0)) {
-        STATE.highScores[STATE.activeTab] = STATE.currentScore;
-        try {
-          localStorage.setItem('chromaquest_highscores', JSON.stringify(STATE.highScores));
-        } catch(e) {}
-        logMessage(`🎉 New personal high score for ${STATE.activeTab}: ${STATE.currentScore}!`);
-        playLevelUp();
-      }
-      
-      // Show game over overlay panel
-      elGoScore.textContent = STATE.currentScore;
-      elGoStreak.textContent = STATE.streak;
-      
-      elGameOverScreen.classList.remove('pointer-events-none');
-      elGameOverScreen.classList.add('opacity-100');
-      updateScoreHUD();
-    } else {
-      // Hard cancel simply switches back to options state
-      elGameOverScreen.classList.add('opacity-0', 'pointer-events-none');
-    }
-  }
-
-
-  /* GAME 1: CHROMA FINDER CORE ROUTINES */
-  function setupChromaLevel() {
-    elChromaLevel.textContent = STATE.chroma.level;
-    elChromaGrid.innerHTML = '';
-    
-    // Determine Grid size based on level progression
-    if (STATE.chroma.level === 1) {
-      STATE.chroma.size = 2;
-    } else if (STATE.chroma.level < 4) {
-      STATE.chroma.size = 3;
-    } else if (STATE.chroma.level < 8) {
-      STATE.chroma.size = 4;
-    } else if (STATE.chroma.level < 14) {
-      STATE.chroma.size = 5;
-    } else if (STATE.chroma.level < 20) {
-      STATE.chroma.size = 6;
-    } else {
-      STATE.chroma.size = 7;
-    }
-
-    const totalTiles = STATE.chroma.size * STATE.chroma.size;
-    elChromaGrid.style.gridTemplateColumns = `repeat(${STATE.chroma.size}, minmax(0, 1fr))`;
-
-    // Generate dynamic HSL colors representing subtle brightness adjustments
-    const h = Math.floor(Math.random() * 360);
-    const s = Math.floor(Math.random() * 40) + 50; // 50% - 90%
-    const l = Math.floor(Math.random() * 50) + 25; // 25% - 75%
-    
-    // Difficulty factor decreases gap difference as score/level raises
-    const baseGap = Math.max(1.5, 20 - (STATE.chroma.level * 0.8));
-    const isBrighter = l < 50;
-    const oddL = isBrighter ? (l + baseGap) : (l - baseGap);
-    
-    STATE.chroma.baseColor = `hsl(${h}, ${s}%, ${l}%)`;
-    STATE.chroma.oddColor = `hsl(${h}, ${s}%, ${oddL}%)`;
-    STATE.chroma.correctIndex = Math.floor(Math.random() * totalTiles);
-
-    for (let i = 0; i < totalTiles; i++) {
-      const tile = document.createElement('button');
-      tile.className = "w-full h-full rounded-xl transition-transform active:scale-95 duration-75 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400";
-      tile.style.backgroundColor = (i === STATE.chroma.correctIndex) ? STATE.chroma.oddColor : STATE.chroma.baseColor;
-      
-      tile.addEventListener('click', () => {
-        if (!STATE.gameInProgress) return;
-        if (i === STATE.chroma.correctIndex) {
-          // Correct choice
-          playSuccess();
-          STATE.currentScore += 10;
-          STATE.streak += 1;
-          STATE.chroma.level += 1;
-          // Bonus time
-          STATE.timeLeft = Math.min(STATE.maxTime, STATE.timeLeft + 2.5);
-          updateScoreHUD();
-          
-          // Visual level-up scale effect on level badge
-          elChromaLevel.classList.add('level-pop');
-          setTimeout(() => elChromaLevel.classList.remove('level-pop'), 400);
-          
-          setupChromaLevel();
-        } else {
-          // Wrong choice
-          playTone(180, 'sawtooth', 0.2);
-          STATE.timeLeft = Math.max(0, STATE.timeLeft - 3.5);
-          STATE.streak = 0;
-          logMessage("Incorrect tile! Lose 3.5 seconds penalty.");
-          updateTimerVisual();
-        }
-      });
-
-      elChromaGrid.appendChild(tile);
-    }
-  }
-
-
-  /* GAME 2: STROOP CLASH CORE ROUTINES */
-  function setupStroopQuestion() {
-    // Pick random target definitions
-    const wordItem = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)];
-    const colorItem = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)];
-    
-    // Determine matching state logically
-    const matchChance = Math.random() < 0.5;
-    
-    if (matchChance) {
-      STATE.stroop.currentWord = wordItem.name;
-      STATE.stroop.currentColor = wordItem.hex;
-      STATE.stroop.isMatching = true;
-    } else {
-      STATE.stroop.currentWord = wordItem.name;
-      // Pick helper to guarantee mismatched colors
-      let badColor = colorItem;
-      while (badColor.name === wordItem.name) {
-        badColor = STROOP_COLORS[Math.floor(Math.random() * STROOP_COLORS.length)];
-      }
-      STATE.stroop.currentColor = badColor.hex;
-      STATE.stroop.isMatching = false;
-    }
-
-    elStroopWord.textContent = STATE.stroop.currentWord.toUpperCase();
-    elStroopWord.style.color = STATE.stroop.currentColor;
-    
-    // Micro-interactivity jump anim
-    elStroopWord.style.transform = 'scale(0.8)';
-    setTimeout(() => {
-      elStroopWord.style.transform = 'scale(1.0)';
-    }, 50);
-  }
-
-  function triggerStroopAnswer(userSelection) {
-    if (!STATE.gameInProgress || STATE.activeTab !== 'stroop') return;
-    
-    const isCorrect = (userSelection === STATE.stroop.isMatching);
-    
-    if (isCorrect) {
-      playSuccess();
-      STATE.currentScore += 10;
-      STATE.streak += 1;
-      STATE.timeLeft = Math.min(STATE.maxTime, STATE.timeLeft + 1.5);
-      triggerFeedbackIndicator(true);
-      updateScoreHUD();
-      setupStroopQuestion();
-    } else {
-      playTone(180, 'sawtooth', 0.2);
-      STATE.timeLeft = Math.max(0, STATE.timeLeft - 4);
-      STATE.streak = 0;
-      triggerFeedbackIndicator(false);
-      logMessage("Clash error! 4s penalty registered.");
-      updateTimerVisual();
-      setupStroopQuestion();
-    }
-  }
-
-  function triggerFeedbackIndicator(correct) {
-    const textSpan = elStroopFeedback.querySelector('span');
-    if (correct) {
-      textSpan.textContent = "✓";
-      textSpan.className = "text-6xl font-black text-emerald-500/30";
-    } else {
-      textSpan.textContent = "✗";
-      textSpan.className = "text-6xl font-black text-rose-500/30";
-    }
-    elStroopFeedback.classList.remove('opacity-0');
-    setTimeout(() => {
-      elStroopFeedback.classList.add('opacity-0');
-    }, 200);
-  }
-
-  elStroopBtnTrue.addEventListener('click', () => triggerStroopAnswer(true));
-  elStroopBtnFalse.addEventListener('click', () => triggerStroopAnswer(false));
-
-  // Keyboard hotkeys for Stroop Match
-  window.addEventListener('keydown', (e) => {
-    if (STATE.gameInProgress && STATE.activeTab === 'stroop') {
-      if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') {
-        triggerStroopAnswer(false);
-      } else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') {
-        triggerStroopAnswer(true);
-      }
-    }
-  });
-
-
-  /* GAME 3: HUE BLENDER CORE ROUTINES */
-  function setupBlendChallenge() {
-    // Create randomized target values
-    STATE.blend.targetRGB = {
-      r: Math.floor(Math.random() * 256),
-      g: Math.floor(Math.random() * 256),
-      b: Math.floor(Math.random() * 256)
-    };
-
-    elBlendTarget.style.backgroundColor = `rgb(${STATE.blend.targetRGB.r}, ${STATE.blend.targetRGB.g}, ${STATE.blend.targetRGB.b})`;
-    
-    // Reset sliders back to midpoints
-    STATE.blend.currentRGB = { r: 128, g: 128, b: 128 };
-    elSlideRed.value = 128;
-    elSlideGreen.value = 128;
-    elSlideBlue.value = 128;
-
-    updateBlendOutputs();
-  }
-
-  function updateBlendOutputs() {
-    const r = parseInt(elSlideRed.value);
-    const g = parseInt(elSlideGreen.value);
-    const b = parseInt(elSlideBlue.value);
-
-    STATE.blend.currentRGB = { r, g, b };
-
-    elValRed.textContent = r;
-    elValGreen.textContent = g;
-    elValBlue.textContent = b;
-
-    elBlendCurrent.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-
-    // Math formula calculating similarity index mathematically
-    const diffR = STATE.blend.targetRGB.r - r;
-    const diffG = STATE.blend.targetRGB.g - g;
-    const diffB = STATE.blend.targetRGB.b - b;
-    
-    // Calculate normalized Euclidean distance vector
-    const maxDist = Math.sqrt(255*255 * 3);
-    const actualDist = Math.sqrt(diffR*diffR + diffG*diffG + diffB*diffB);
-    const similarity = Math.max(0, 100 - (actualDist / maxDist * 100));
-
-    elBlendMatchPct.textContent = `${similarity.toFixed(1)}%`;
-    
-    if (similarity > 95) {
-      elBlendMatchPct.className = "text-lg font-extrabold text-emerald-400";
-    } else if (similarity > 80) {
-      elBlendMatchPct.className = "text-lg font-extrabold text-indigo-400";
-    } else {
-      elBlendMatchPct.className = "text-lg font-extrabold text-amber-500";
-    }
-  }
-
-  // Monitor range inputs continuously
-  [elSlideRed, elSlideGreen, elSlideBlue].forEach(slider => {
-    slider.addEventListener('input', () => {
-      updateBlendOutputs();
-      if (Math.random() < 0.15) { // periodic sound ticks while sliding
-        playTone(300 + (parseInt(slider.value) * 2), 'sine', 0.04);
+        btn.classList.remove('active-swatch', 'ring-white/80');
       }
     });
-  });
+  }
 
-  elBlendSubmitBtn.addEventListener('click', () => {
-    const matchText = elBlendMatchPct.textContent;
-    const finalSimilarity = parseFloat(matchText);
+  // Create Tag Buttons in sidebar
+  function renderTagFilters() {
+    tagFilterContainer.innerHTML = '';
+    AVAILABLE_TAGS.forEach(tag => {
+      const count = tag === 'All' 
+        ? notes.length 
+        : notes.filter(n => n.tag === tag).length;
+
+      const btn = document.createElement('button');
+      btn.className = `w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${currentFilterTag === tag ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900 border border-transparent'}`;
+      
+      let tagIcon = '📝';
+      if (tag === 'Work') tagIcon = '💼';
+      else if (tag === 'Personal') tagIcon = '🏠';
+      else if (tag === 'Ideas') tagIcon = '💡';
+      else if (tag === 'To-do') tagIcon = '✅';
+      else if (tag === 'Study') tagIcon = '📚';
+      else if (tag === 'Finance') tagIcon = '💰';
+      else if (tag === 'All') tagIcon = '✨';
+
+      btn.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <span>${tagIcon}</span>
+          <span>${tag}</span>
+        </div>
+        <span class="px-1.5 py-0.5 rounded-full bg-slate-950 text-[10px] text-slate-500 font-bold border border-slate-800">${count}</span>
+      `;
+      
+      btn.addEventListener('click', () => {
+        currentFilterTag = tag;
+        renderTagFilters();
+        renderNotesGrid();
+      });
+
+      tagFilterContainer.appendChild(btn);
+    });
+  }
+
+  // Update stats summary dashboard
+  function renderStats() {
+    const total = notes.length;
+    const pinned = notes.filter(n => n.pinned).length;
+    const checklists = notes.filter(n => n.type === 'checklist').length;
     
-    let awardedPoints = 0;
-    if (finalSimilarity >= 98) {
-      awardedPoints = 100;
-      playLevelUp();
-      logMessage(`🎉 Flawless! ${finalSimilarity.toFixed(1)}% match. Scored massive +100 points!`);
-    } else if (finalSimilarity >= 90) {
-      awardedPoints = 50;
-      playSuccess();
-      logMessage(`Excellent alignment. ${finalSimilarity.toFixed(1)}% match, awarded +50 points.`);
-    } else if (finalSimilarity >= 75) {
-      awardedPoints = 20;
-      playTone(400, 'triangle', 0.2);
-      logMessage(`Decent. ${finalSimilarity.toFixed(1)}% match, awarded +20 points.`);
+    let completedTasks = 0;
+    notes.forEach(n => {
+      if (n.type === 'checklist' && n.checklist) {
+        completedTasks += n.checklist.filter(c => c.completed).length;
+      }
+    });
+
+    statTotalNotes.textContent = total;
+    statPinnedNotes.textContent = pinned;
+    statChecklists.textContent = checklists;
+    statCompletedTasks.textContent = completedTasks;
+  }
+
+  // Main rendering engine for standard and pinned notes arrays
+  function renderNotesGrid() {
+    renderStats();
+
+    // Filter notes
+    let filtered = notes.filter(note => {
+      const matchesTag = currentFilterTag === 'All' || note.tag === currentFilterTag;
+      const matchesSearch = currentSearchQuery === '' 
+        || (note.title && note.title.toLowerCase().includes(currentSearchQuery))
+        || (note.content && note.content.toLowerCase().includes(currentSearchQuery));
+      return matchesTag && matchesSearch;
+    });
+
+    // Render state configurations
+    if (currentFilterTag !== 'All' || currentSearchQuery !== '') {
+      activeFilterBar.classList.remove('hidden');
+      activeFilterBar.classList.add('flex');
+      activeFilterLabel.textContent = `"${currentFilterTag}" tag ${currentSearchQuery ? `with keyword: '${currentSearchQuery}'` : ''}`;
     } else {
-      playFailure();
-      logMessage(`Weak match (${finalSimilarity.toFixed(1)}%). Need at least 75% accuracy. Try again!`);
+      activeFilterBar.classList.add('hidden');
     }
 
-    STATE.currentScore += awardedPoints;
-    if (awardedPoints > 0) {
-      STATE.streak += 1;
+    // Sort: newest created first
+    filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const pinnedNotes = filtered.filter(n => n.pinned);
+    const standardNotes = filtered.filter(n => !n.pinned);
+
+    // Check if empty state active
+    if (filtered.length === 0) {
+      pinnedNotesHeader.classList.add('hidden');
+      pinnedNotesContainer.innerHTML = '';
+      allNotesContainer.innerHTML = '';
+      emptyStateView.classList.remove('hidden');
+      return;
     } else {
-      STATE.streak = 0;
+      emptyStateView.classList.add('hidden');
     }
 
-    // Blend high score check
-    if (STATE.currentScore > (STATE.highScores.blend || 0)) {
-      STATE.highScores.blend = STATE.currentScore;
-      try {
-        localStorage.setItem('chromaquest_highscores', JSON.stringify(STATE.highScores));
-      } catch(e) {}
+    // Handle Pinned Area
+    if (pinnedNotes.length > 0) {
+      pinnedNotesHeader.classList.remove('hidden');
+      pinnedNotesContainer.innerHTML = '';
+      pinnedNotes.forEach(note => {
+        pinnedNotesContainer.appendChild(createNoteDOMElement(note));
+      });
+    } else {
+      pinnedNotesHeader.classList.add('hidden');
+      pinnedNotesContainer.innerHTML = '';
+    }
+
+    // Handle Standard Area
+    allNotesContainer.innerHTML = '';
+    if (standardNotes.length > 0) {
+      standardNotes.forEach(note => {
+        allNotesContainer.appendChild(createNoteDOMElement(note));
+      });
+    }
+  }
+
+  // Dynamic generator for beautiful single Note Card elements
+  function createNoteDOMElement(note) {
+    const card = document.createElement('div');
+    const theme = colorMap[note.color] || colorMap.indigo;
+    card.className = `note-card bg-slate-900 border ${theme.border} rounded-2xl overflow-hidden shadow-xl ${theme.glow} hover:shadow-lg flex flex-col justify-between`;
+    
+    // Formatting nice dates
+    const formattedDate = new Date(note.createdAt).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    // Build content dynamically depending on standard vs checklist type
+    let contentHTML = '';
+    if (note.type === 'checklist') {
+      const items = note.checklist || [];
+      if (items.length === 0) {
+        contentHTML = `<p class="text-xs text-slate-500 italic">Empty list</p>`;
+      } else {
+        contentHTML = `<div class="space-y-1.5 mt-2 max-h-48 overflow-y-auto pr-1">`;
+        items.forEach(item => {
+          contentHTML += `
+            <label class="flex items-start space-x-2.5 p-1 rounded hover:bg-slate-950/40 cursor-pointer text-xs">
+              <input type="checkbox" data-note-id="${note.id}" data-item-id="${item.id}" class="task-check-toggle form-checkbox rounded text-${note.color}-500 bg-slate-950 border-slate-800 w-4 h-4 mt-0.5" ${item.completed ? 'checked' : ''} />
+              <span class="${item.completed ? 'line-through text-slate-500' : 'text-slate-300'} select-none break-all">${escapeHTML(item.text)}</span>
+            </label>
+          `;
+        });
+        contentHTML += `</div>`;
+      }
+    } else {
+      contentHTML = `<p class="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap mt-1 break-words">${escapeHTML(note.content)}</p>`;
+    }
+
+    card.innerHTML = `
+      <!-- Note Header / Actions -->
+      <div class="p-4 sm:p-5 pb-3">
+        <div class="flex items-start justify-between gap-2">
+          <span class="px-2 py-0.5 bg-slate-950 border border-slate-800 rounded-full text-[10px] text-slate-400 font-bold uppercase tracking-wide">${note.tag}</span>
+          <div class="flex items-center space-x-1">
+            <button type="button" data-id="${note.id}" title="Toggle Pin" class="btn-toggle-pin-note p-1 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-950 transition-colors">
+              <svg class="w-4 h-4 ${note.pinned ? 'fill-amber-400 text-amber-400' : 'text-slate-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v1.172a2 2 0 01-.586 1.414l-2.414 2.414A3 3 0 0013 11.172V17l-2 2H9l1-2v-5.828a3 3 0 00-.828-2.172L5.586 6.586A2 2 0 015 5.172V5z"></path>
+              </svg>
+            </button>
+            <button type="button" data-id="${note.id}" title="Edit Note" class="btn-edit-note p-1 text-slate-400 hover:text-indigo-400 rounded-lg hover:bg-slate-950 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+              </svg>
+            </button>
+            <button type="button" data-id="${note.id}" title="Delete Note" class="btn-delete-note p-1 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-950 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <h4 class="text-sm font-bold text-slate-100 mt-2 tracking-tight break-words">${escapeHTML(note.title || 'Untitled Note')}</h4>
+        <div class="mt-2">
+          ${contentHTML}
+        </div>
+      </div>
+
+      <!-- Note Footer info -->
+      <div class="px-4 py-2.5 sm:px-5 bg-slate-950/50 border-t border-slate-950/80 flex items-center justify-between text-[10px] text-slate-500 font-medium">
+        <span class="capitalize flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full ${theme.accent}"></span>
+          ${note.type === 'checklist' ? 'Checklist' : 'Text Note'}
+        </span>
+        <span>${formattedDate}</span>
+      </div>
+    `;
+
+    // Event binding inside rendered note DOM element
+    card.querySelector('.btn-toggle-pin-note').addEventListener('click', () => togglePin(note.id));
+    card.querySelector('.btn-edit-note').addEventListener('click', () => editNote(note.id));
+    card.querySelector('.btn-delete-note').addEventListener('click', () => deleteNote(note.id));
+    
+    // Interactive checklist internal clicks
+    card.querySelectorAll('.task-check-toggle').forEach(input => {
+      input.addEventListener('change', (e) => {
+        const noteId = e.target.getAttribute('data-note-id');
+        const itemId = e.target.getAttribute('data-item-id');
+        toggleChecklistItem(noteId, itemId, e.target.checked);
+      });
+    });
+
+    return card;
+  }
+
+  // Utility to safe-escape HTML and prevent sandbox injection issues
+  function escapeHTML(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // Pin handler
+  function togglePin(id) {
+    notes = notes.map(note => {
+      if (note.id === id) {
+        return { ...note, pinned: !note.pinned };
+      }
+      return note;
+    });
+    saveToLocalStorage();
+    renderNotesGrid();
+  }
+
+  // Checklist completion toggler
+  function toggleChecklistItem(noteId, itemId, isCompleted) {
+    notes = notes.map(note => {
+      if (note.id === noteId) {
+        const updatedChecklist = note.checklist.map(item => {
+          if (item.id === itemId) {
+            return { ...item, completed: isCompleted };
+          }
+          return item;
+        });
+        return { ...note, checklist: updatedChecklist };
+      }
+      return note;
+    });
+    saveToLocalStorage();
+    renderNotesGrid();
+  }
+
+  // Setup event routing, state updates
+  function setupEventListeners() {
+    // Open creator empty
+    sidebarBtnCreateNote.addEventListener('click', () => openCreatorForm());
+    btnEmptyStateCreate.addEventListener('click', () => openCreatorForm());
+    btnCloseCreator.addEventListener('click', () => closeCreatorForm());
+    btnDiscardNote.addEventListener('click', () => closeCreatorForm());
+
+    // Search Input dynamic filtration
+    noteSearchInput.addEventListener('input', (e) => {
+      currentSearchQuery = e.target.value.toLowerCase().trim();
+      renderNotesGrid();
+    });
+
+    // Preset Reset action
+    btnResetData.addEventListener('click', () => {
+      if (confirm('Are you sure you want to restore original default notes? This clears custom current sessions.')) {
+        notes = [...INITIAL_NOTES];
+        saveToLocalStorage();
+        renderTagFilters();
+        renderNotesGrid();
+      }
+    });
+
+    // Export offline sandbox configuration
+    btnExportData.addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `MyNotesHub_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Import local sandbox session
+    importFileSelector.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (Array.isArray(parsed)) {
+            notes = parsed;
+            saveToLocalStorage();
+            renderTagFilters();
+            renderNotesGrid();
+            alert('Notes database backup imported successfully!');
+          } else {
+            alert('Invalid backup file format. Expected an array.');
+          }
+        } catch(err) {
+          alert('Error parsing uploaded backup config.');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Form Toggle types: Standard VS Checklist
+    btnTypeStandard.addEventListener('click', () => setCreatorType('text'));
+    btnTypeChecklist.addEventListener('click', () => setCreatorType('checklist'));
+
+    // Color swatch click binding
+    document.querySelectorAll('.color-swatch-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const colorName = btn.getAttribute('data-color');
+        noteColorInput.value = colorName;
+        renderColorSwatches();
+      });
+    });
+
+    // Add checklist items inside note creator
+    btnAddChecklistItem.addEventListener('click', addChecklistItemFromForm);
+    newChecklistItemInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addChecklistItemFromForm();
+      }
+    });
+
+    // Save form action
+    btnSaveNote.addEventListener('click', saveNoteFromForm);
+
+    // Clear filter helper
+    btnClearFilters.addEventListener('click', () => {
+      currentFilterTag = 'All';
+      currentSearchQuery = '';
+      noteSearchInput.value = '';
+      renderTagFilters();
+      renderNotesGrid();
+    });
+  }
+
+  // Opens composer
+  function openCreatorForm(noteToEdit = null) {
+    noteCreatorSection.classList.remove('hidden');
+    noteCreatorSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    if (noteToEdit) {
+      creatorFormTitle.textContent = "Edit Note Configuration";
+      formNoteId.value = noteToEdit.id;
+      noteTitleInput.value = noteToEdit.title || '';
+      noteTagSelect.value = noteToEdit.tag || 'Ideas';
+      noteColorInput.value = noteToEdit.color || 'indigo';
+      notePinInput.checked = !!noteToEdit.pinned;
+      
+      setCreatorType(noteToEdit.type || 'text');
+      
+      if (noteToEdit.type === 'checklist') {
+        creatorChecklistItems = [...(noteToEdit.checklist || [])];
+        noteContentInput.value = '';
+      } else {
+        creatorChecklistItems = [];
+        noteContentInput.value = noteToEdit.content || '';
+      }
+    } else {
+      creatorFormTitle.textContent = "Compose Note";
+      formNoteId.value = '';
+      noteTitleInput.value = '';
+      noteContentInput.value = '';
+      noteTagSelect.value = 'Ideas';
+      noteColorInput.value = 'indigo';
+      notePinInput.checked = false;
+      creatorChecklistItems = [];
+      setCreatorType('text');
     }
     
-    updateScoreHUD();
-    setupBlendChallenge();
-  });
+    renderColorSwatches();
+    renderCreatorChecklistItems();
+  }
 
-  // Initialize default screen configuration
-  setTab('chroma');
+  function closeCreatorForm() {
+    noteCreatorSection.classList.add('hidden');
+    formNoteId.value = '';
+    noteTitleInput.value = '';
+    noteContentInput.value = '';
+    creatorChecklistItems = [];
+  }
+
+  // Handle Switch logic between text editor and interactive list builder
+  function setCreatorType(type) {
+    creatorNoteType = type;
+    if (type === 'checklist') {
+      btnTypeChecklist.className = "px-4 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 text-white shadow-sm";
+      btnTypeStandard.className = "px-4 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all";
+      textInputWrapper.className = "hidden";
+      checklistInputWrapper.className = "block bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3";
+    } else {
+      btnTypeStandard.className = "px-4 py-1.5 rounded-md text-xs font-semibold bg-indigo-600 text-white shadow-sm";
+      btnTypeChecklist.className = "px-4 py-1.5 rounded-md text-xs font-semibold text-slate-400 hover:text-slate-200 transition-all";
+      textInputWrapper.className = "block";
+      checklistInputWrapper.className = "hidden";
+    }
+  }
+
+  // Checklist rendering within Creator Form
+  function renderCreatorChecklistItems() {
+    checklistItemsContainer.innerHTML = '';
+    if (creatorChecklistItems.length === 0) {
+      checklistItemsContainer.innerHTML = `<p class="text-[11px] text-slate-500 italic py-1">No check items added yet. Add below!</p>`;
+      return;
+    }
+
+    creatorChecklistItems.forEach((item, index) => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = "flex items-center justify-between bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800";
+      itemDiv.innerHTML = `
+        <div class="flex items-center space-x-2 flex-1">
+          <input type="checkbox" ${item.completed ? 'checked' : ''} class="creator-chk-toggle rounded text-indigo-600 bg-slate-950 border-slate-800 focus:ring-indigo-500 w-3.5 h-3.5" />
+          <span class="text-xs text-slate-300 break-all ${item.completed ? 'line-through text-slate-500' : ''}">${escapeHTML(item.text)}</span>
+        </div>
+        <button type="button" class="creator-chk-delete text-slate-500 hover:text-rose-400 p-0.5 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      `;
+
+      // Form item toggle completed status
+      itemDiv.querySelector('.creator-chk-toggle').addEventListener('change', (e) => {
+        creatorChecklistItems[index].completed = e.target.checked;
+        renderCreatorChecklistItems();
+      });
+
+      // Form item delete
+      itemDiv.querySelector('.creator-chk-delete').addEventListener('click', () => {
+        creatorChecklistItems.splice(index, 1);
+        renderCreatorChecklistItems();
+      });
+
+      checklistItemsContainer.appendChild(itemDiv);
+    });
+  }
+
+  function addChecklistItemFromForm() {
+    const text = newChecklistItemInput.value.trim();
+    if (!text) return;
+    creatorChecklistItems.push({
+      id: 'it-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+      text: text,
+      completed: false
+    });
+    newChecklistItemInput.value = '';
+    renderCreatorChecklistItems();
+    newChecklistItemInput.focus();
+  }
+
+  // Save Note Action handler (Update or Create standard state)
+  function saveNoteFromForm() {
+    const title = noteTitleInput.value.trim() || 'Untitled Note';
+    const content = noteContentInput.value.trim();
+    const tag = noteTagSelect.value;
+    const color = noteColorInput.value;
+    const pinned = notePinInput.checked;
+    const targetId = formNoteId.value;
+
+    if (creatorNoteType === 'text' && !content && title === 'Untitled Note') {
+      alert('Please fill out note text or set a custom title before saving.');
+      return;
+    }
+
+    if (targetId) {
+      // EDIT MODE
+      notes = notes.map(note => {
+        if (note.id === targetId) {
+          return {
+            ...note,
+            title: title,
+            content: creatorNoteType === 'text' ? content : '',
+            type: creatorNoteType,
+            checklist: creatorNoteType === 'checklist' ? creatorChecklistItems : [],
+            tag: tag,
+            color: color,
+            pinned: pinned,
+            lastModified: new Date().toISOString()
+          };
+        }
+        return note;
+      });
+    } else {
+      // NEW NOTE MODE
+      const newNote = {
+        id: 'note-' + Date.now(),
+        title: title,
+        content: creatorNoteType === 'text' ? content : '',
+        type: creatorNoteType,
+        checklist: creatorNoteType === 'checklist' ? creatorChecklistItems : [],
+        tag: tag,
+        color: color,
+        pinned: pinned,
+        createdAt: new Date().toISOString()
+      };
+      notes.push(newNote);
+    }
+
+    saveToLocalStorage();
+    closeCreatorForm();
+    renderTagFilters();
+    renderNotesGrid();
+  }
+
+  // Edit form filler
+  function editNote(id) {
+    const noteToEdit = notes.find(n => n.id === id);
+    if (noteToEdit) {
+      openCreatorForm(noteToEdit);
+    }
+  }
+
+  // Delete handler
+  function deleteNote(id) {
+    if (confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
+      notes = notes.filter(n => n.id !== id);
+      saveToLocalStorage();
+      renderTagFilters();
+      renderNotesGrid();
+    }
+  }
+
+  // Trigger launcher
+  document.addEventListener('DOMContentLoaded', init);
 })();
