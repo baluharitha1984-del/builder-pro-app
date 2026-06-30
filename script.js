@@ -1,600 +1,749 @@
-// Virtual Lab State Management
-const LAB_STATE = {
-  solvent: 'water',
-  reagent: 'none',
-  temperature: 25,
-  currentPH: 7.0,
-  solubility: 'High',
-  activePresetTitle: 'Water Sample Evaluation',
-  logs: [],
-  triviaScore: { correct: 0, total: 0 },
-  currentQuestionIndex: 0
-};
+// CartoCraft Dynamic Simulation Engine
 
-// Comprehensive scientific question database
-const TRIVIA_QUESTIONS = [
-  {
-    question: "What color does a strong acid like Hydrochloric acid typically turn a Universal Indicator?",
-    options: ["Deep Blue", "Emerald Green", "Bright Crimson / Red", "Golden Yellow"],
-    correct: 2,
-    feedback: "Yes! Highly acidic substances with pH 1-2 turn universal indicator red."
-  },
-  {
-    question: "What indicator changes from completely colorless in acidic solutions to bright hot pink in basic solutions?",
-    options: ["Litmus Paper", "Phenolphthalein", "Bromothymol Blue", "Turmeric Extract"],
-    correct: 1,
-    feedback: "Correct! Phenolphthalein is a legendary pH indicator used for strong bases."
-  },
-  {
-    question: "When baking soda (base) reacts with vinegar (acid), what gas is released in high volume?",
-    options: ["Nitrogen Dioxide", "Hydrogen Gas", "Carbon Dioxide", "Argon Gas"],
-    correct: 2,
-    feedback: "Excellent! The classic chemical fizz is created by Carbon Dioxide gas generation."
-  },
-  {
-    question: "At what temperature range does water solvent begin violent boiling/vaporization at sea level?",
-    options: ["0°C - 10°C", "50°C - 60°C", "100°C+", "200°C+"],
-    correct: 2,
-    feedback: "Perfect! Liquid water boils into steam at 100°C (212°F)."
-  },
-  {
-    question: "Which of the following describes a substance that is classified with a pH level of 13.5?",
-    options: ["Highly Acidic", "Extremely Basic / Alkaline", "Perfectly Neutral", "Inert Organic Vapor"],
-    correct: 1,
-    feedback: "Right! High pH levels above 7 indicate alkali/bases."
-  }
+// Prepopulated custom location nodes
+let waypoints = [
+  { id: "wp1", name: "Hyper-City Core", x: 400, y: 300, cat: "landmark", desc: "Highly congested metropolitan center", categoryIcon: "🏛" },
+  { id: "wp2", name: "Starlight Cargo Docks", x: 150, y: 180, cat: "port", desc: "Primary marine import facilities", categoryIcon: "⚓" },
+  { id: "wp3", name: "Titan Energy Spire", x: 650, y: 150, cat: "danger", desc: "High voltage thermonuclear complex", categoryIcon: "⚡" },
+  { id: "wp4", name: "Verdant Canopy Reserve", x: 220, y: 480, cat: "outpost", desc: "Sustainable biological research sector", categoryIcon: "⛺" },
+  { id: "wp5", name: "Subterranean Conduit Delta", x: 680, y: 420, cat: "landmark", desc: "Technological water purification grid", categoryIcon: "🏛" },
+  { id: "wp6", name: "Pinnacle Peak Outpost", x: 800, y: 250, cat: "outpost", desc: "High elevation meteorological station", categoryIcon: "⛺" }
 ];
 
-// DOM Elements mapping
-const selectSolvent = document.getElementById('select-solvent');
-const selectReagent = document.getElementById('select-reagent');
-const sliderTemp = document.getElementById('slider-temp');
-const tempSliderLabel = document.getElementById('temp-slider-label');
-const tempDigitalDisplay = document.getElementById('temp-digital-display');
-const thermometerBar = document.getElementById('thermometer-bar');
-const beakerLiquid = document.getElementById('beaker-liquid');
-const liquidBubbles = document.getElementById('liquid-bubbles');
-const steamEffect = document.getElementById('steam-effect');
-const reactionFlash = document.getElementById('reaction-flash');
-const simPHVal = document.getElementById('sim-ph-val');
-const simPHClass = document.getElementById('sim-ph-class');
-const simSolubility = document.getElementById('sim-solubility');
-const warningDisplay = document.getElementById('lab-reaction-warning');
-const warningText = document.getElementById('warning-text-content');
+// Roads dataset for simulated path rendering & map visuals
+const roads = [
+  { from: "wp1", to: "wp2" },
+  { from: "wp1", to: "wp3" },
+  { from: "wp1", to: "wp4" },
+  { from: "wp1", to: "wp5" },
+  { from: "wp3", to: "wp6" },
+  { from: "wp4", to: "wp2" },
+  { from: "wp5", to: "wp6" }
+];
 
-const formLabLog = document.getElementById('lab-log-form');
-const logTitleInput = document.getElementById('log-title');
-const logReactantInput = document.getElementById('log-reactant');
-const logColorInput = document.getElementById('log-color');
-const logNotesInput = document.getElementById('log-notes');
-const loggedEntriesBox = document.getElementById('logged-entries-box');
-const emptyLogsPlaceholder = document.getElementById('empty-logs-placeholder');
-const btnClearLogs = document.getElementById('btn-clear-logs');
-const notebookCounterBadge = document.getElementById('notebook-counter-badge');
+// Map Engine State
+let mapStyle = "cyber"; // cyber | blueprint | topo
+let zoom = 1.0;
+let panX = 0;
+let panY = 0;
+let isDragging = false;
+let startDragX = 0;
+let startDragY = 0;
+let activeRoute = null;
+let simulateTraffic = true;
+let simulateWeather = false;
+let trafficTick = 0;
+let weatherTick = 0;
+let searchFilter = "";
+let currentModalCoords = { x: 0, y: 0 };
+let selectedCategory = "landmark"; // for modal
 
-const quizQuestion = document.getElementById('quiz-question');
-const quizOptionsBox = document.getElementById('quiz-options-box');
-const quizFeedback = document.getElementById('quiz-feedback');
-const quizScoreDisplay = document.getElementById('quiz-score-display');
-const btnNextQuestion = document.getElementById('btn-next-question');
+// Setup Canvas
+const canvas = document.getElementById("map-canvas");
+const ctx = canvas.getContext("2d");
 
-// Initialization & Setup
-window.addEventListener('DOMContentLoaded', () => {
-  loadLabStateFromStorage();
-  triggerReactionCalculation(false); // Silent calculation on startup
-  loadTriviaQuestion(0);
-  setupPresetCardListeners();
-});
-
-// Handle simulation inputs
-selectSolvent.addEventListener('change', () => {
-  LAB_STATE.solvent = selectSolvent.value;
-  triggerReactionCalculation(true);
-});
-
-selectReagent.addEventListener('change', () => {
-  LAB_STATE.reagent = selectReagent.value;
-  triggerReactionCalculation(true);
-});
-
-sliderTemp.addEventListener('input', (e) => {
-  const val = parseInt(e.target.value);
-  updateTemperatureUI(val);
-});
-
-// Instant temperature snap cool
-document.getElementById('btn-quick-add-ice').addEventListener('click', () => {
-  updateTemperatureUI(5);
-  sliderTemp.value = 5;
-  createToast("Chilled to 5°C with dynamic liquid cooling matrix!", "cyan");
-  triggerReactionCalculation(true);
-});
-
-// Reset the entire lab setup
-document.getElementById('btn-reset-simulation').addEventListener('click', () => {
-  selectSolvent.value = 'water';
-  selectReagent.value = 'none';
-  sliderTemp.value = 25;
-  LAB_STATE.solvent = 'water';
-  LAB_STATE.reagent = 'none';
-  LAB_STATE.temperature = 25;
-  updateTemperatureUI(25);
-  triggerReactionCalculation(true);
+// Handle responsive sizing of map element
+function resizeCanvas() {
+  const container = canvas.parentElement;
+  canvas.width = container.clientWidth;
+  canvas.height = container.clientHeight;
   
-  // Clear preset borders
-  document.querySelectorAll('.preset-card').forEach(card => card.classList.remove('preset-card-active'));
-  createToast("Simulation core successfully calibrated to standard limits.", "indigo");
-});
+  // Center map initially if pan is 0
+  if (panX === 0 && panY === 0) {
+    panX = canvas.width / 2 - 450;
+    panY = canvas.height / 2 - 300;
+  }
+  drawMap();
+}
 
-// Manual chemical trigger
-document.getElementById('btn-trigger-mix').addEventListener('click', () => {
-  // Flash effect
-  reactionFlash.style.opacity = '0.7';
-  setTimeout(() => {
-    reactionFlash.style.opacity = '0';
-  }, 250);
-  
-  triggerReactionCalculation(true);
-  createToast("Chemical equation computed and visualized in core container!", "emerald");
-});
+// Draw full dynamic landscape, coordinates, and pins
+function drawMap() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(panX, panY);
+  ctx.scale(zoom, zoom);
 
-// Live Reaction Physics calculations and DOM transformations
-function triggerReactionCalculation(interactiveMode = true) {
-  let calculatedPH = 7.0;
-  let phName = "Neutral";
-  let chemicalLiquidColor = "rgba(71, 85, 105, 0.45)"; // Standard slate watery tint
-  let bubblesDensity = 0;
-  let showDangerWarning = false;
-  let dangerText = "";
+  // 1. Draw Map Style Specific Backgrounds & Terrain Grids
+  drawTerrain();
 
-  // Determine pH levels based on Solvent selected
-  if (LAB_STATE.solvent === 'acid-hcl') {
-    calculatedPH = 1.2;
-    phName = "Strongly Acidic";
-  } else if (LAB_STATE.solvent === 'base-naoh') {
-    calculatedPH = 13.5;
-    phName = "Highly Alkaline";
-  } else if (LAB_STATE.solvent === 'vinegar') {
-    calculatedPH = 3.0;
-    phName = "Weakly Acidic";
-  } else {
-    calculatedPH = 7.0;
-    phName = "Neutral Balance";
+  // 2. Draw Vector Roads
+  drawRoads();
+
+  // 3. Draw Active glowing Route under the pins
+  if (activeRoute) {
+    drawRoutePath();
   }
 
-  // Indicators colors combinations
-  if (LAB_STATE.reagent === 'universal') {
-    // Universal indicator scale representation
-    if (calculatedPH <= 2) {
-      chemicalLiquidColor = "rgba(239, 68, 68, 0.85)"; // Crimson Red
-    } else if (calculatedPH <= 4) {
-      chemicalLiquidColor = "rgba(249, 115, 22, 0.85)"; // Orange
-    } else if (calculatedPH <= 7.2) {
-      chemicalLiquidColor = "rgba(16, 185, 129, 0.85)"; // Emerald Green
-    } else {
-      chemicalLiquidColor = "rgba(139, 92, 246, 0.85)"; // Velvet Purple
+  // 4. Draw Traffic Elements if enabled
+  if (simulateTraffic) {
+    drawTraffic();
+  }
+
+  // 5. Draw Waypoint Nodes / Pins
+  drawWaypoints();
+
+  // 6. Draw Weather Overlays (Rendered relative to view)
+  ctx.restore();
+
+  if (simulateWeather) {
+    drawWeather();
+  }
+
+  // Update telemetry details
+  updateTelemetry();
+}
+
+// Renders stylistic grids, rivers, and areas based on current theme
+function drawTerrain() {
+  // Grid Size
+  const gridSize = 80;
+  const totalWidth = 1400;
+  const totalHeight = 900;
+
+  // Map boundary block
+  if (mapStyle === "cyber") {
+    ctx.fillStyle = "#050811";
+    ctx.fillRect(0, 0, totalWidth, totalHeight);
+    
+    // Cyan/Purple grids
+    ctx.strokeStyle = "rgba(99, 102, 241, 0.08)";
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= totalWidth; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, totalHeight);
+      ctx.stroke();
     }
-  } else if (LAB_STATE.reagent === 'phenolphthalein') {
-    // Colorless in acidic, deep hot pink in strong alkaline
-    if (calculatedPH >= 10) {
-      chemicalLiquidColor = "rgba(236, 72, 153, 0.85)"; // Vivid Pink
-    } else {
-      chemicalLiquidColor = "rgba(226, 232, 240, 0.35)"; // Colorless transparent tint
+    for (let y = 0; y <= totalHeight; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(totalWidth, y);
+      ctx.stroke();
     }
-  } else if (LAB_STATE.reagent === 'litmus-blue') {
-    // Stays blue in neutral/base, turns red in acid
-    if (calculatedPH < 7) {
-      chemicalLiquidColor = "rgba(225, 29, 72, 0.8)"; // Coral Red
-    } else {
-      chemicalLiquidColor = "rgba(59, 130, 246, 0.8)"; // Cobalt Blue
+    
+    // Draw Simulated Cyber River (Glowing dark blue channel)
+    ctx.beginPath();
+    ctx.moveTo(-50, 450);
+    ctx.bezierCurveTo(400, 420, 500, 680, 1450, 600);
+    ctx.strokeStyle = "rgba(6, 182, 212, 0.15)";
+    ctx.lineWidth = 45;
+    ctx.stroke();
+    ctx.strokeStyle = "rgba(6, 182, 212, 0.05)";
+    ctx.lineWidth = 70;
+    ctx.stroke();
+
+  } else if (mapStyle === "blueprint") {
+    ctx.fillStyle = "#021636";
+    ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+    // Fine blueprints ticks
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.15)";
+    ctx.lineWidth = 0.5;
+    for (let x = 0; x <= totalWidth; x += 40) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, totalHeight);
+      ctx.stroke();
     }
-  } else if (LAB_STATE.reagent === 'baking-soda') {
-    // Neutralizing agent, drives pH closer to 8
-    if (calculatedPH < 7) {
-      calculatedPH = parseFloat((calculatedPH + 3.2).toFixed(1));
-      phName = "Fizzy Carbonated Mix";
-      bubblesDensity = 14; 
-      chemicalLiquidColor = "rgba(203, 213, 225, 0.7)"; // Cloudy Grey-Blue
+    for (let y = 0; y <= totalHeight; y += 40) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(totalWidth, y);
+      ctx.stroke();
+    }
+    
+    // Blueprint Technical circular targets
+    ctx.beginPath();
+    ctx.arc(400, 300, 250, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.06)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+  } else {
+    // TOPO GRAY theme
+    ctx.fillStyle = "#151518";
+    ctx.fillRect(0, 0, totalWidth, totalHeight);
+
+    // Topographical rings
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+    ctx.lineWidth = 1.2;
+    for (let i = 1; i <= 6; i++) {
+      ctx.beginPath();
+      ctx.arc(400, 300, i * 110, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(800, 250, i * 75, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  // Border contour
+  ctx.strokeStyle = "rgba(99, 102, 241, 0.4)";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(0, 0, totalWidth, totalHeight);
+}
+
+// Draw structural connector lanes
+function drawRoads() {
+  ctx.save();
+  roads.forEach(road => {
+    const fromNode = waypoints.find(w => w.id === road.from);
+    const toNode = waypoints.find(w => w.id === road.to);
+    if (fromNode && toNode) {
+      ctx.beginPath();
+      ctx.moveTo(fromNode.x, fromNode.y);
+      ctx.lineTo(toNode.x, toNode.y);
       
-      if (interactiveMode) {
-        createToast("High gas discharge: CO2 synthesis triggered!", "indigo");
+      if (mapStyle === "cyber") {
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
+        ctx.lineWidth = 6;
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(99, 102, 241, 0.3)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else if (mapStyle === "blueprint") {
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.3)";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      } else {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
       }
-    } else if (calculatedPH > 8) {
-      calculatedPH = parseFloat((calculatedPH - 1.5).toFixed(1));
-      phName = "Mild Alkaline Buffering";
-      bubblesDensity = 4;
-      chemicalLiquidColor = "rgba(148, 163, 184, 0.55)";
-    } else {
-      calculatedPH = 8.1;
-      phName = "Bicarbonate Solution";
-      bubblesDensity = 2;
-      chemicalLiquidColor = "rgba(148, 163, 184, 0.55)";
     }
-  } else {
-    // No reagent. Standard clear liquid look corresponding to solvent
-    if (LAB_STATE.solvent === 'acid-hcl') {
-      chemicalLiquidColor = "rgba(14, 165, 233, 0.25)"; // Subtle blue tint
-    } else if (LAB_STATE.solvent === 'base-naoh') {
-      chemicalLiquidColor = "rgba(168, 85, 247, 0.25)"; // Subtle violet tint
-    } else if (LAB_STATE.solvent === 'vinegar') {
-      chemicalLiquidColor = "rgba(234, 179, 8, 0.15)"; // Subtle amber tint
-    } else {
-      chemicalLiquidColor = "rgba(71, 85, 105, 0.35)"; // Standard slate water
+  });
+  ctx.restore();
+}
+
+// Highlight calculated active path
+function drawRoutePath() {
+  const fromNode = waypoints.find(w => w.id === activeRoute.from);
+  const toNode = waypoints.find(w => w.id === activeRoute.to);
+  if (fromNode && toNode) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(fromNode.x, fromNode.y);
+    ctx.lineTo(toNode.x, toNode.y);
+    
+    // Glowing neon purple path
+    ctx.strokeStyle = "#c084fc";
+    ctx.lineWidth = 8;
+    ctx.shadowColor = "#a855f7";
+    ctx.shadowBlur = 15;
+    ctx.stroke();
+
+    // Fine glowing center line
+    ctx.beginPath();
+    ctx.moveTo(fromNode.x, fromNode.y);
+    ctx.lineTo(toNode.x, toNode.y);
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
+// Draw little dynamic simulated traffic signals
+function drawTraffic() {
+  trafficTick += 0.005;
+  ctx.save();
+  roads.forEach(road => {
+    const fromNode = waypoints.find(w => w.id === road.from);
+    const toNode = waypoints.find(w => w.id === road.to);
+    if (fromNode && toNode) {
+      // Interpolate positions over time
+      const steps = 3;
+      for (let i = 1; i <= steps; i++) {
+        const offset = (trafficTick + (i / steps)) % 1.0;
+        const tx = fromNode.x + (toNode.x - fromNode.x) * offset;
+        const ty = fromNode.y + (toNode.y - fromNode.y) * offset;
+
+        ctx.beginPath();
+        ctx.arc(tx, ty, 4, 0, Math.PI * 2);
+        ctx.fillStyle = (i % 2 === 0) ? "#e11d48" : "#fbbf24"; // alternating red & yellow vehicles
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = 6;
+        ctx.fill();
+      }
     }
-  }
-
-  // Compute thermodynamic states
-  if (LAB_STATE.temperature >= 75) {
-    bubblesDensity += 12; 
-    showDangerWarning = true;
-    dangerText = `Rapid Exothermic Vaporization! (${LAB_STATE.temperature}°C)`;
-    steamEffect.classList.remove('opacity-0');
-    steamEffect.classList.add('opacity-100');
-  } else {
-    steamEffect.classList.remove('opacity-100');
-    steamEffect.classList.add('opacity-0');
-  }
-
-  // Basic danger conditions
-  if (LAB_STATE.solvent === 'acid-hcl' && LAB_STATE.temperature > 85) {
-    showDangerWarning = true;
-    dangerText = "DANGER: Acid fumes localized risk! Reduce temp immediately.";
-  } else if (LAB_STATE.solvent === 'base-naoh' && LAB_STATE.temperature > 80) {
-    showDangerWarning = true;
-    dangerText = "CAUTION: Alkaline corrosion risk enhanced by heat.";
-  }
-
-  // Update Virtual elements states
-  LAB_STATE.currentPH = calculatedPH;
-  LAB_STATE.solubility = LAB_STATE.temperature > 50 ? "Very High" : (LAB_STATE.temperature < 15 ? "Minimal" : "Standard");
-  
-  // Apply styles & text to HTML
-  simPHVal.innerText = calculatedPH.toFixed(1);
-  simPHClass.innerText = phName;
-  simSolubility.innerText = LAB_STATE.solubility;
-  beakerLiquid.style.backgroundColor = chemicalLiquidColor;
-
-  // Trigger bubbles injection
-  injectBubbles(bubblesDensity);
-
-  // Danger alert component toggle
-  if (showDangerWarning) {
-    warningDisplay.classList.remove('hidden');
-    warningText.innerText = dangerText;
-  } else {
-    warningDisplay.classList.add('hidden');
-  }
-
-  // Populate Form helper suggestions dynamically
-  if (interactiveMode) {
-    logTitleInput.value = LAB_STATE.activePresetTitle;
-    logReactantInput.value = `${LAB_STATE.solvent.toUpperCase()} + ${LAB_STATE.reagent.toUpperCase()}`;
-    logColorInput.value = getApproximateColorName(chemicalLiquidColor);
-  }
-}
-
-// Update temperature levels dynamically
-function updateTemperatureUI(tempVal) {
-  LAB_STATE.temperature = tempVal;
-  tempSliderLabel.innerText = `${tempVal}°C`;
-  tempDigitalDisplay.innerText = `${tempVal}°C`;
-
-  // Height of thermometer column (5% to 100% representation scale)
-  const percentage = Math.max(5, Math.min(100, tempVal));
-  thermometerBar.style.height = `${percentage}%`;
-  
-  // Dynamically trigger changes without full screen re-render
-  triggerReactionCalculation(false);
-}
-
-// Inject dynamic bubbles animation elements into liquid
-function injectBubbles(density) {
-  liquidBubbles.innerHTML = '';
-  if (density <= 0) return;
-
-  const count = Math.min(density, 25); 
-  for (let i = 0; i < count; i++) {
-    const bubble = document.createElement('div');
-    bubble.classList.add('bubble-unit');
-    
-    // Randomized layouts
-    const size = Math.floor(Math.random() * 8) + 4;
-    const leftOffset = Math.floor(Math.random() * 95);
-    const animDuration = (Math.random() * 2) + 1;
-    const animDelay = Math.random() * 1.5;
-
-    bubble.style.width = `${size}px`;
-    bubble.style.height = `${size}px`;
-    bubble.style.left = `${leftOffset}%`;
-    bubble.style.animationDuration = `${animDuration}s`;
-    bubble.style.animationDelay = `${animDelay}s`;
-
-    liquidBubbles.appendChild(bubble);
-  }
-}
-
-// Utility function to convert liquid color states to simplified lab text format
-function getApproximateColorName(rgbaString) {
-  if (rgbaString.includes('239, 68, 68')) return "Crimson Acidic Red";
-  if (rgbaString.includes('249, 115, 22')) return "Orange Buffer Tint";
-  if (rgbaString.includes('16, 185, 129')) return "Neutral Vibrant Emerald";
-  if (rgbaString.includes('139, 92, 246')) return "Alkaline Deep Violet";
-  if (rgbaString.includes('236, 72, 153')) return "Exothermic Hot Pink";
-  if (rgbaString.includes('225, 29, 72')) return "Acidic Rose Litmus";
-  if (rgbaString.includes('59, 130, 246')) return "Basic Ocean Blue Litmus";
-  if (rgbaString.includes('203, 213, 225')) return "Cloudy Fizz Emulsion";
-  return "Translucent Water Clear";
-}
-
-// Preset Protocols selector implementation
-function setupPresetCardListeners() {
-  const cards = document.querySelectorAll('.preset-card');
-  cards.forEach(card => {
-    card.addEventListener('click', () => {
-      // Reset styles
-      cards.forEach(c => c.classList.remove('preset-card-active'));
-      
-      // Select active card design
-      card.classList.add('preset-card-active');
-
-      // Grab custom data-attributes
-      const solvent = card.getAttribute('data-solvent');
-      const reagent = card.getAttribute('data-reagent');
-      const targetTemp = parseInt(card.getAttribute('data-temp'));
-      const title = card.getAttribute('data-title');
-
-      // Apply preset to active state representation
-      selectSolvent.value = solvent;
-      selectReagent.value = reagent;
-      sliderTemp.value = targetTemp;
-      LAB_STATE.solvent = solvent;
-      LAB_STATE.reagent = reagent;
-      LAB_STATE.activePresetTitle = title;
-
-      updateTemperatureUI(targetTemp);
-      triggerReactionCalculation(true);
-      
-      createToast(`Loaded protocol: "${title}" into core chamber!`, "indigo");
-    });
   });
+  ctx.restore();
 }
 
-// Dynamic Science Trivia Engine
-function loadTriviaQuestion(index) {
-  LAB_STATE.currentQuestionIndex = index % TRIVIA_QUESTIONS.length;
-  const currentQ = TRIVIA_QUESTIONS[LAB_STATE.currentQuestionIndex];
-  
-  quizQuestion.innerText = currentQ.question;
-  quizOptionsBox.innerHTML = '';
-  quizFeedback.classList.add('hidden');
+// Beautiful pins rendering with text and icon
+function drawWaypoints() {
+  ctx.save();
+  waypoints.forEach(wp => {
+    // Check if matches filter
+    if (searchFilter && !wp.name.toLowerCase().includes(searchFilter.toLowerCase())) {
+      ctx.globalAlpha = 0.25; // Dim filtered items
+    } else {
+      ctx.globalAlpha = 1.0;
+    }
 
-  currentQ.options.forEach((opt, idx) => {
-    const btn = document.createElement('button');
-    btn.className = "w-full p-2.5 text-left text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-800 hover:border-slate-700 transition duration-150 font-medium flex items-center justify-between";
-    btn.innerHTML = `<span>${opt}</span><span class='text-slate-600 font-mono text-[9px]'>[Option ${String.fromCharCode(65 + idx)}]</span>`;
+    const radius = 15;
     
-    btn.addEventListener('click', () => {
-      checkAnswer(idx, currentQ.correct, currentQ.feedback);
-    });
-    quizOptionsBox.appendChild(btn);
+    // Outer soft glow ring
+    ctx.beginPath();
+    ctx.arc(wp.x, wp.y, radius + 8, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(99, 102, 241, 0.15)";
+    ctx.fill();
+
+    // Core Anchor Pin Color based on category
+    let color = "#6366f1"; // default indigo
+    if (wp.cat === "danger") color = "#f43f5e";
+    if (wp.cat === "port") color = "#06b6d4";
+    if (wp.cat === "outpost") color = "#10b981";
+
+    // Draw pin container
+    ctx.beginPath();
+    ctx.arc(wp.x, wp.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "#0f172a";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2.5;
+    ctx.fill();
+    ctx.stroke();
+
+    // Text Icon inside
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "12px sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(wp.categoryIcon || "📍", wp.x, wp.y);
+
+    // Floating Label Text below
+    ctx.font = "bold 11px sans-serif";
+    ctx.fillStyle = "#f8fafc";
+    ctx.textAlign = "center";
+    ctx.fillText(wp.name, wp.x, wp.y + 28);
+    
+    // Subtext coordinates
+    ctx.font = "9px monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText(`X:${Math.round(wp.x)} Y:${Math.round(wp.y)}`, wp.x, wp.y + 39);
   });
+  ctx.restore();
 }
 
-function checkAnswer(chosenIndex, correctIndex, feedbackText) {
-  const optionButtons = quizOptionsBox.querySelectorAll('button');
+// Full canvas weather animation
+function drawWeather() {
+  weatherTick += 1;
+  ctx.save();
+  ctx.strokeStyle = "rgba(186, 230, 253, 0.2)";
+  ctx.lineWidth = 1.5;
   
-  // Disable option clicks
-  optionButtons.forEach(btn => btn.disabled = true);
-  
-  LAB_STATE.triviaScore.total += 1;
-
-  if (chosenIndex === correctIndex) {
-    LAB_STATE.triviaScore.correct += 1;
-    quizFeedback.innerText = "✓ Correct! " + feedbackText;
-    quizFeedback.className = "mt-3 text-xs font-semibold p-2.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 block";
-    optionButtons[chosenIndex].classList.add('border-emerald-500', 'bg-emerald-950/40');
-  } else {
-    quizFeedback.innerText = "✗ Incorrect. " + feedbackText;
-    quizFeedback.className = "mt-3 text-xs font-semibold p-2.5 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20 block";
-    optionButtons[chosenIndex].classList.add('border-rose-500', 'bg-rose-950/40');
-    optionButtons[correctIndex].classList.add('border-emerald-500', 'bg-emerald-950/20');
+  // Draw diagonal rain lines
+  for (let i = 0; i < canvas.width; i += 50) {
+    const yStart = (weatherTick * 4 + i) % canvas.height;
+    ctx.beginPath();
+    ctx.moveTo(i + (yStart * 0.2), yStart);
+    ctx.lineTo(i + (yStart * 0.2) + 10, yStart + 25);
+    ctx.stroke();
   }
-
-  // Update Score metrics on UI
-  quizScoreDisplay.innerText = `Score: ${LAB_STATE.triviaScore.correct}/${LAB_STATE.triviaScore.total}`;
+  ctx.restore();
 }
 
-btnNextQuestion.addEventListener('click', () => {
-  const nextIndex = (LAB_STATE.currentQuestionIndex + 1) % TRIVIA_QUESTIONS.length;
-  loadTriviaQuestion(nextIndex);
-});
+// Redraw and update dynamic side panel lists
+function updateWaypointList() {
+  const container = document.getElementById("waypoint-list");
+  const filtered = waypoints.filter(wp => 
+    wp.name.toLowerCase().includes(searchFilter.toLowerCase())
+  );
 
-// Lab Notebook Form Processing & Log management
-formLabLog.addEventListener('submit', (e) => {
-  e.preventDefault();
+  container.innerHTML = "";
 
-  const newLog = {
-    id: Date.now(),
-    title: logTitleInput.value.trim(),
-    reactant: logReactantInput.value.trim() || "N/A",
-    color: logColorInput.value.trim() || "Clear Solution",
-    temperature: LAB_STATE.temperature,
-    pH: LAB_STATE.currentPH,
-    notes: logNotesInput.value.trim() || "No additional observations recorded.",
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  };
-
-  LAB_STATE.logs.unshift(newLog);
-  saveLogsToStorage();
-  renderLogEntries();
-  
-  // Reset fields
-  logNotesInput.value = '';
-  
-  createToast("Entry added to local digital Log Ledger!", "emerald");
-});
-
-// Render active logs ledger
-function renderLogEntries() {
-  if (LAB_STATE.logs.length === 0) {
-    emptyLogsPlaceholder.classList.remove('hidden');
-    loggedEntriesBox.innerHTML = '';
-    notebookCounterBadge.innerText = "0 Logged";
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl">
+        No waypoints match "${searchFilter}"
+      </div>
+    `;
     return;
   }
 
-  emptyLogsPlaceholder.classList.add('hidden');
-  loggedEntriesBox.innerHTML = '';
-  
-  LAB_STATE.logs.forEach((log) => {
-    const entry = document.createElement('div');
-    entry.className = "p-3.5 bg-slate-950 border border-slate-800 rounded-xl relative hover:border-slate-700 transition duration-150 space-y-2";
+  filtered.forEach(wp => {
+    const div = document.createElement("div");
+    div.className = "group p-2.5 bg-slate-950/80 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-xl transition-all flex items-center justify-between cursor-pointer";
+    div.setAttribute("data-id", wp.id);
     
-    // pH tag color coding
-    let phColorBadge = "text-cyan-400 bg-cyan-900/20 border-cyan-500/20";
-    if (log.pH <= 3) phColorBadge = "text-red-400 bg-red-900/20 border-red-500/20";
-    else if (log.pH >= 10) phColorBadge = "text-purple-400 bg-purple-900/20 border-purple-500/20";
-    
-    entry.innerHTML = `
-      <div class="flex justify-between items-start">
-        <div class="space-y-0.5">
-          <h4 class="text-xs font-bold text-slate-100">${escapeHTML(log.title)}</h4>
-          <p class="text-[10px] text-slate-500 font-mono">Recorded: ${log.timestamp} | ${log.temperature}°C</p>
+    // Category color tag
+    let catBorder = "border-indigo-500/30";
+    if (wp.cat === "danger") catBorder = "border-rose-500/30";
+    if (wp.cat === "port") catBorder = "border-cyan-500/30";
+    if (wp.cat === "outpost") catBorder = "border-emerald-500/30";
+
+    div.innerHTML = `
+      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+        <span class="p-1 bg-slate-900 border ${catBorder} rounded-lg text-sm shrink-0">${wp.categoryIcon || "📍"}</span>
+        <div class="truncate">
+          <p class="font-medium text-slate-200 truncate group-hover:text-white transition-colors">${wp.name}</p>
+          <p class="text-[10px] text-slate-500 truncate">${wp.desc || "No extra coordinates telemetry"}</p>
         </div>
-        <button class="btn-delete-log text-slate-500 hover:text-red-400 transition duration-100" data-id="${log.id}" title="Remove Log Entry">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
+      </div>
+      <div class="flex items-center gap-1.5 shrink-0 ml-2">
+        <button class="btn-delete-wp p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-all" title="Delete Marker">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
         </button>
-      </div>
-      <div class="grid grid-cols-2 gap-2 text-[10px] font-mono">
-        <div class="p-1.5 bg-slate-900 rounded border border-slate-800/80">
-          <span class="text-slate-500 block">REACTANT:</span>
-          <span class="text-slate-300">${escapeHTML(log.reactant)}</span>
-        </div>
-        <div class="p-1.5 bg-slate-900 rounded border border-slate-800/80">
-          <span class="text-slate-500 block">CHAMBER COLOR:</span>
-          <span class="text-slate-300">${escapeHTML(log.color)}</span>
-        </div>
-      </div>
-      <div class="text-xs text-slate-300 bg-slate-900/30 p-2 rounded-lg border border-slate-800/50">
-        <span class="text-[9px] text-slate-500 font-bold block mb-1">OBSERVATIONS:</span>
-        ${escapeHTML(log.notes)}
-      </div>
-      <div class="flex justify-end">
-        <span class="px-2 py-0.5 rounded-full text-[9px] font-mono border ${phColorBadge}">
-          pH level: ${log.pH}
-        </span>
       </div>
     `;
 
-    // Delete listener
-    entry.querySelector('.btn-delete-log').addEventListener('click', (e) => {
-      const targetId = parseInt(e.currentTarget.getAttribute('data-id'));
-      deleteLogEntry(targetId);
+    // Click to fly map focus
+    div.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-delete-wp")) return;
+      flyToWaypoint(wp);
     });
 
-    loggedEntriesBox.appendChild(entry);
+    // Wire delete button
+    div.querySelector(".btn-delete-wp").addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteWaypoint(wp.id);
+    });
+
+    container.appendChild(div);
   });
 
-  // Update header / count labels
-  notebookCounterBadge.innerText = `${LAB_STATE.logs.length} Logged`;
+  // Update Select Menus for Routing dropdowns
+  populateRouteSelects();
 }
 
-// Handle log deletion
-function deleteLogEntry(id) {
-  LAB_STATE.logs = LAB_STATE.logs.filter(log => log.id !== id);
-  saveLogsToStorage();
-  renderLogEntries();
-  createToast("Entry deleted from workspace notebook.", "amber");
+// Populates Route origin and destination menus
+function populateRouteSelects() {
+  const originSelect = document.getElementById("route-origin");
+  const destSelect = document.getElementById("route-destination");
+  
+  const prevOrigin = originSelect.value;
+  const prevDest = destSelect.value;
+
+  originSelect.innerHTML = "";
+  destSelect.innerHTML = "";
+
+  waypoints.forEach(wp => {
+    const opt1 = document.createElement("option");
+    opt1.value = wp.id;
+    opt1.textContent = `${wp.categoryIcon || "📍"} ${wp.name}`;
+    originSelect.appendChild(opt1);
+
+    const opt2 = document.createElement("option");
+    opt2.value = wp.id;
+    opt2.textContent = `${wp.categoryIcon || "📍"} ${wp.name}`;
+    destSelect.appendChild(opt2);
+  });
+
+  // Restore previous selections if valid
+  if (waypoints.some(w => w.id === prevOrigin)) originSelect.value = prevOrigin;
+  else if (waypoints.length > 0) originSelect.value = waypoints[0].id;
+
+  if (waypoints.some(w => w.id === prevDest)) destSelect.value = prevDest;
+  else if (waypoints.length > 1) destSelect.value = waypoints[1].id;
 }
 
-// Clear entire ledger log entries
-btnClearLogs.addEventListener('click', () => {
-  if (LAB_STATE.logs.length === 0) return;
-  if (confirm("Are you sure you want to completely erase your science notebook entries? This action cannot be reversed.")) {
-    LAB_STATE.logs = [];
-    saveLogsToStorage();
-    renderLogEntries();
-    createToast("Notebook log database cleared successfully!", "rose");
+// Deletes selected custom marker node
+function deleteWaypoint(id) {
+  waypoints = waypoints.filter(wp => wp.id !== id);
+  if (activeRoute && (activeRoute.from === id || activeRoute.to === id)) {
+    activeRoute = null;
+    document.getElementById("route-details-panel").classList.add("hidden");
+  }
+  updateWaypointList();
+  drawMap();
+  logTerminal(`Waypoint [${id}] removed successfully.`);
+}
+
+// Center view and zoom to clicked pin
+function flyToWaypoint(wp) {
+  zoom = 1.25;
+  panX = canvas.width / 2 - wp.x * zoom;
+  panY = canvas.height / 2 - wp.y * zoom;
+  drawMap();
+  logTerminal(`Telemetry shifted focus to node: ${wp.name} [X: ${Math.round(wp.x)}, Y: ${Math.round(wp.y)}]`);
+}
+
+// Custom terminal output logger
+function logTerminal(message) {
+  document.getElementById("terminal-status").textContent = `Status: ${message}`;
+}
+
+// Update live bottom panel coordinates
+function updateTelemetry() {
+  const centerX = Math.round((canvas.width / 2 - panX) / zoom);
+  const centerY = Math.round((canvas.height / 2 - panY) / zoom);
+  document.getElementById("coord-tracker").textContent = `X: ${centerX}, Y: ${centerY}`;
+  document.getElementById("zoom-tracker").textContent = `${zoom.toFixed(2)}x`;
+  document.getElementById("telemetry-waypoint-count").textContent = `${waypoints.length} Active Points`;
+}
+
+// Setup Mouse Drag Map Pan Events
+canvas.addEventListener("mousedown", (e) => {
+  isDragging = true;
+  startDragX = e.clientX - panX;
+  startDragY = e.clientY - panY;
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (isDragging) {
+    panX = e.clientX - startDragX;
+    panY = e.clientY - startDragY;
+    drawMap();
   }
 });
 
-// Storage & Persistence utilities
-function saveLogsToStorage() {
-  localStorage.setItem('scilab_notebook_logs', JSON.stringify(LAB_STATE.logs));
-}
+canvas.addEventListener("mouseup", () => {
+  isDragging = false;
+});
 
-function loadLabStateFromStorage() {
-  const cached = localStorage.getItem('scilab_notebook_logs');
-  if (cached) {
-    try {
-      LAB_STATE.logs = JSON.parse(cached);
-    } catch (e) {
-      LAB_STATE.logs = [];
-    }
-  }
-  renderLogEntries();
-}
+canvas.addEventListener("mouseleave", () => {
+  isDragging = false;
+});
 
-// Custom dynamic Toast system notifications
-function createToast(message, variant = "indigo") {
-  const toastContainer = document.getElementById('toast-container');
-  const toast = document.createElement('div');
+// Double-Click anywhere on the map grid to request custom pin creation modal
+canvas.addEventListener("dblclick", (e) => {
+  // Calculate true map relative coordinates
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
+  currentModalCoords.x = Math.round((clickX - panX) / zoom);
+  currentModalCoords.y = Math.round((clickY - panY) / zoom);
+
+  document.getElementById("new-wp-x").textContent = currentModalCoords.x;
+  document.getElementById("new-wp-y").textContent = currentModalCoords.y;
+  document.getElementById("new-wp-title").value = "";
   
-  // Style variation
-  let borderClr = "border-indigo-500";
-  let bgClr = "bg-slate-900";
-  let textClr = "text-indigo-400";
+  // Show Modal
+  document.getElementById("add-waypoint-modal").classList.remove("hidden");
+});
 
-  if (variant === "emerald") {
-    borderClr = "border-emerald-500";
-    textClr = "text-emerald-400";
-  } else if (variant === "amber") {
-    borderClr = "border-amber-500";
-    textClr = "text-amber-400";
-  } else if (variant === "rose") {
-    borderClr = "border-rose-500";
-    textClr = "text-rose-400";
-  } else if (variant === "cyan") {
-    borderClr = "border-cyan-500";
-    textClr = "text-cyan-400";
+// Mouse scroll wheel to zoom map relative to center
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const zoomFactor = 1.1;
+  if (e.deltaY < 0) {
+    // Zoom In
+    if (zoom < 3.0) zoom *= zoomFactor;
+  } else {
+    // Zoom Out
+    if (zoom > 0.4) zoom /= zoomFactor;
+  }
+  drawMap();
+}, { passive: false });
+
+// Zoom Controls button wiring
+document.getElementById("btn-zoom-in").addEventListener("click", () => {
+  if (zoom < 3.0) zoom *= 1.2;
+  drawMap();
+});
+
+document.getElementById("btn-zoom-out").addEventListener("click", () => {
+  if (zoom > 0.4) zoom /= 1.2;
+  drawMap();
+});
+
+document.getElementById("btn-zoom-reset").addEventListener("click", () => {
+  zoom = 1.0;
+  panX = canvas.width / 2 - 450;
+  panY = canvas.height / 2 - 300;
+  drawMap();
+});
+
+// Theme Layer Swapping Logic
+function selectTheme(style) {
+  mapStyle = style;
+  
+  // Clear active style buttons
+  const buttons = ["layer-cyber", "layer-blueprint", "layer-topo"];
+  buttons.forEach(bId => {
+    const btn = document.getElementById(bId);
+    btn.className = "px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all";
+  });
+
+  // Highlight selected button
+  const selectedBtn = document.getElementById(`layer-${style}`);
+  selectedBtn.className = "px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-lg bg-indigo-600 text-white transition-all";
+
+  // Change label
+  const labels = {
+    cyber: "Cyberpunk Cyber-Grid",
+    blueprint: "Architectural Blueprint",
+    topo: "Topographical Outlands"
+  };
+  document.getElementById("telemetry-style-label").textContent = labels[style] || style;
+  
+  drawMap();
+  logTerminal(`Map overlay visual skin toggled to ${labels[style]}`);
+}
+
+document.getElementById("layer-cyber").addEventListener("click", () => selectTheme("cyber"));
+document.getElementById("layer-blueprint").addEventListener("click", () => selectTheme("blueprint"));
+document.getElementById("layer-topo").addEventListener("click", () => selectTheme("topo"));
+
+// Modal category buttons handler
+const catButtons = document.querySelectorAll(".cat-btn");
+catButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    // Reset all others to default slate
+    catButtons.forEach(b => {
+      b.className = "cat-btn py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-semibold text-center hover:bg-slate-700 hover:text-slate-200";
+    });
+    // Highlight current
+    btn.className = "cat-btn py-1.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 text-[10px] font-semibold text-center hover:bg-indigo-600/50";
+    selectedCategory = btn.getAttribute("data-cat");
+  });
+});
+
+// Save New Custom Waypoint Action
+document.getElementById("btn-save-waypoint").addEventListener("click", () => {
+  const titleInput = document.getElementById("new-wp-title").value.trim();
+  const finalTitle = titleInput || `Sector Delta-${Math.floor(Math.random() * 900) + 100}`;
+
+  // Pick icon based on category
+  let icon = "📍";
+  if (selectedCategory === "landmark") icon = "🏛";
+  if (selectedCategory === "port") icon = "⚓";
+  if (selectedCategory === "danger") icon = "⚡";
+  if (selectedCategory === "outpost") icon = "⛺";
+
+  const newId = "wp" + (Date.now());
+  const newPoint = {
+    id: newId,
+    name: finalTitle,
+    x: currentModalCoords.x,
+    y: currentModalCoords.y,
+    cat: selectedCategory,
+    desc: `User deployed node at [${currentModalCoords.x}, ${currentModalCoords.y}]`,
+    categoryIcon: icon
+  };
+
+  waypoints.push(newPoint);
+  
+  // Connect dynamically to nearest existing waypoint to ensure a valid route option
+  let nearestWp = null;
+  let minDist = Infinity;
+  waypoints.forEach(wp => {
+    if (wp.id === newId) return;
+    const dist = Math.hypot(wp.x - newPoint.x, wp.y - newPoint.y);
+    if (dist < minDist) {
+      minDist = dist;
+      nearestWp = wp.id;
+    }
+  });
+  if (nearestWp) {
+    roads.push({ from: newId, to: nearestWp });
   }
 
-  toast.className = `flex items-center space-x-3 p-3 rounded-xl border ${borderClr} ${bgClr} shadow-xl max-w-sm transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
-  toast.innerHTML = `
-    <div class="p-1.5 rounded-lg bg-slate-950">
-      🧪
-    </div>
-    <div class="flex-1 text-xs font-semibold ${textClr}">${message}</div>
-  `;
+  document.getElementById("add-waypoint-modal").classList.add("hidden");
+  updateWaypointList();
+  drawMap();
+  logTerminal(`Successfully deployed brand new custom marker: "${finalTitle}"`);
+});
 
-  toastContainer.appendChild(toast);
+// Cancel modal interactions
+const closeModal = () => {
+  document.getElementById("add-waypoint-modal").classList.add("hidden");
+};
+document.getElementById("btn-cancel-modal").addEventListener("click", closeModal);
+document.getElementById("btn-close-modal").addEventListener("click", closeModal);
 
-  // Trigger enter animation
-  setTimeout(() => {
-    toast.classList.remove('translate-y-2', 'opacity-0');
-  }, 50);
+// Calculate Route Interaction
+document.getElementById("btn-calculate-route").addEventListener("click", () => {
+  const originId = document.getElementById("route-origin").value;
+  const destId = document.getElementById("route-destination").value;
 
-  // Auto remove after duration
-  setTimeout(() => {
-    toast.classList.add('translate-y-2', 'opacity-0');
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
-  }, 4000);
+  if (originId === destId) {
+    logTerminal("Warning: Origin and Destination must be distinct waypoints!");
+    alert("Please select two distinct waypoints to calculate route.");
+    return;
+  }
+
+  const fromNode = waypoints.find(w => w.id === originId);
+  const toNode = waypoints.find(w => w.id === destId);
+
+  if (fromNode && toNode) {
+    activeRoute = { from: originId, to: destId };
+    
+    // Calculate distance mathematically
+    const pxDistance = Math.round(Math.hypot(fromNode.x - toNode.x, fromNode.y - toNode.y));
+    const travelTime = Math.round(pxDistance * 0.45 + (simulateTraffic ? 12 : 0));
+    
+    // Render calculated analytics to sidebar panels
+    document.getElementById("route-time").textContent = `${travelTime} mins`;
+    document.getElementById("route-distance").textContent = `${pxDistance} km`;
+    document.getElementById("route-delay").textContent = simulateTraffic ? "Moderate congestion delay (+12m)" : "Optimized path green";
+    
+    const detailsPanel = document.getElementById("route-details-panel");
+    detailsPanel.classList.remove("hidden");
+
+    document.getElementById("telemetry-route-status").textContent = "Active Route Enroute";
+    document.getElementById("telemetry-route-status").className = "font-medium text-pink-400";
+
+    drawMap();
+    logTerminal(`Optimal Route established between ${fromNode.name} and ${toNode.name}.`);
+  }
+});
+
+// Clear Route Interaction
+document.getElementById("btn-clear-route").addEventListener("click", () => {
+  activeRoute = null;
+  document.getElementById("route-details-panel").classList.add("hidden");
+  document.getElementById("telemetry-route-status").textContent = "Ready";
+  document.getElementById("telemetry-route-status").className = "font-medium text-emerald-400";
+  drawMap();
+  logTerminal("Active route cleared.");
+});
+
+// Simulate Traffic Toggle
+document.getElementById("btn-toggle-traffic").addEventListener("click", () => {
+  simulateTraffic = !simulateTraffic;
+  const btn = document.getElementById("btn-toggle-traffic");
+  if (simulateTraffic) {
+    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-indigo-900/40 hover:text-indigo-300 border border-slate-700 transition-all flex items-center gap-1.5";
+    logTerminal("Traffic simulations initialized.");
+  } else {
+    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-slate-500 border border-slate-800 transition-all flex items-center gap-1.5 opacity-60";
+    logTerminal("Traffic simulations disabled.");
+  }
+  drawMap();
+});
+
+// Weather Overlay Toggle
+document.getElementById("btn-toggle-weather").addEventListener("click", () => {
+  simulateWeather = !simulateWeather;
+  const btn = document.getElementById("btn-toggle-weather");
+  const indicator = document.getElementById("weather-indicator");
+  if (simulateWeather) {
+    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-900/40 text-indigo-300 border border-indigo-500/30 transition-all flex items-center gap-1.5";
+    indicator.textContent = "⛈";
+    logTerminal("Atmospheric weather telemetry overlay rendered live.");
+  } else {
+    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-indigo-900/40 hover:text-indigo-300 border border-slate-700 transition-all flex items-center gap-1.5";
+    indicator.textContent = "☀️";
+    logTerminal("Weather overlay turned off.");
+  }
+  drawMap();
+});
+
+// Dynamic Search Filter logic
+document.getElementById("search-places").addEventListener("input", (e) => {
+  searchFilter = e.target.value;
+  updateWaypointList();
+  drawMap();
+});
+
+// Real-time animation loop for traffic movements & rain
+function animate() {
+  if (simulateTraffic || simulateWeather) {
+    drawMap();
+  }
+  requestAnimationFrame(animate);
 }
 
-// Sanitization utility
-function escapeHTML(str) {
-  return str.replace(/[&<>'"/]/g, function (m) {
-    return {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      "'": '&#39;',
-      '"': '&quot;',
-      '/': '&#x2F;'
-    }[m];
-  });
-}
+// Initiate System
+window.addEventListener("resize", resizeCanvas);
+setTimeout(() => {
+  resizeCanvas();
+  updateWaypointList();
+  animate();
+}, 100);
