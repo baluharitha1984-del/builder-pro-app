@@ -1,749 +1,565 @@
-// CartoCraft Dynamic Simulation Engine
+// WonderLand Kids Playbox Interactivity Hub
 
-// Prepopulated custom location nodes
-let waypoints = [
-  { id: "wp1", name: "Hyper-City Core", x: 400, y: 300, cat: "landmark", desc: "Highly congested metropolitan center", categoryIcon: "🏛" },
-  { id: "wp2", name: "Starlight Cargo Docks", x: 150, y: 180, cat: "port", desc: "Primary marine import facilities", categoryIcon: "⚓" },
-  { id: "wp3", name: "Titan Energy Spire", x: 650, y: 150, cat: "danger", desc: "High voltage thermonuclear complex", categoryIcon: "⚡" },
-  { id: "wp4", name: "Verdant Canopy Reserve", x: 220, y: 480, cat: "outpost", desc: "Sustainable biological research sector", categoryIcon: "⛺" },
-  { id: "wp5", name: "Subterranean Conduit Delta", x: 680, y: 420, cat: "landmark", desc: "Technological water purification grid", categoryIcon: "🏛" },
-  { id: "wp6", name: "Pinnacle Peak Outpost", x: 800, y: 250, cat: "outpost", desc: "High elevation meteorological station", categoryIcon: "⛺" }
-];
+// State Management
+let starsCount = 0;
+let currentActivity = 'music'; // music, paint, memory, story
+let soundSynthType = 'triangle'; // triangle, sine, square
+let isDrawing = false;
+let lastX = 0;
+let lastY = 0;
+let paintColor = '#ef4444';
+let paintTool = 'draw'; // draw, sticker
+let selectedSticker = '🦄';
+let brushSize = 12;
 
-// Roads dataset for simulated path rendering & map visuals
-const roads = [
-  { from: "wp1", to: "wp2" },
-  { from: "wp1", to: "wp3" },
-  { from: "wp1", to: "wp4" },
-  { from: "wp1", to: "wp5" },
-  { from: "wp3", to: "wp6" },
-  { from: "wp4", to: "wp2" },
-  { from: "wp5", to: "wp6" }
-];
+// Web Audio API context setup
+let audioCtx = null;
 
-// Map Engine State
-let mapStyle = "cyber"; // cyber | blueprint | topo
-let zoom = 1.0;
-let panX = 0;
-let panY = 0;
-let isDragging = false;
-let startDragX = 0;
-let startDragY = 0;
-let activeRoute = null;
-let simulateTraffic = true;
-let simulateWeather = false;
-let trafficTick = 0;
-let weatherTick = 0;
-let searchFilter = "";
-let currentModalCoords = { x: 0, y: 0 };
-let selectedCategory = "landmark"; // for modal
+// Memory game states
+const memoryEmojis = ['🦁', '🦁', '🐼', '🐼', '🐸', '🐸', '🦊', '🦊', '🐙', '🐙', '🦄', '🦄'];
+let shuffledCards = [];
+let selectedCards = [];
+let matchedPairsCount = 0;
+let memoryMovesCount = 0;
 
-// Setup Canvas
-const canvas = document.getElementById("map-canvas");
-const ctx = canvas.getContext("2d");
+// Mascots pool
+const mascotsList = ['🦁', '🐼', '🐸', '🦊', '🐙', '🦄', '🐥', '🐵'];
 
-// Handle responsive sizing of map element
-function resizeCanvas() {
-  const container = canvas.parentElement;
-  canvas.width = container.clientWidth;
-  canvas.height = container.clientHeight;
+window.addEventListener('DOMContentLoaded', () => {
+  // Initialize localstorage stars
+  const cachedStars = localStorage.getItem('wonder_stars');
+  if (cachedStars) {
+    starsCount = parseInt(cachedStars, 10) || 0;
+    document.getElementById('star-counter').innerText = starsCount;
+  }
+
+  // Nav buttons setup
+  setupNavigation();
+
+  // Activity 1: Music Board Setup
+  setupSoundBoard();
+
+  // Activity 2: Painting Canvas Setup
+  setupCanvas();
+
+  // Activity 3: Memory Game Initializer
+  initMemoryGame();
+
+  // Activity 4: Story Generator Setup
+  setupStoryGenerator();
+
+  // Setup custom interval to animate/wiggle the header mascot random choice!
+  setInterval(() => {
+    const mascotEl = document.getElementById('mascot-avatar');
+    const randMascot = mascotsList[Math.floor(Math.random() * mascotsList.length)];
+    mascotEl.innerText = randMascot;
+  }, 5000);
+});
+
+/* ------------------ COMMON HELPERS ------------------ */
+function addStars(amount) {
+  starsCount += amount;
+  document.getElementById('star-counter').innerText = starsCount;
+  localStorage.setItem('wonder_stars', starsCount);
   
-  // Center map initially if pan is 0
-  if (panX === 0 && panY === 0) {
-    panX = canvas.width / 2 - 450;
-    panY = canvas.height / 2 - 300;
-  }
-  drawMap();
+  // Fire audio rewarding ding!
+  playBellDing();
 }
 
-// Draw full dynamic landscape, coordinates, and pins
-function drawMap() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.translate(panX, panY);
-  ctx.scale(zoom, zoom);
+function showToast(emoji, message) {
+  const toast = document.getElementById('toast-notif');
+  document.getElementById('toast-emoji').innerText = emoji;
+  document.getElementById('toast-msg').innerText = message;
 
-  // 1. Draw Map Style Specific Backgrounds & Terrain Grids
-  drawTerrain();
+  toast.classList.remove('opacity-0', 'pointer-events-none', 'scale-90');
+  toast.classList.add('opacity-100', 'scale-100');
 
-  // 2. Draw Vector Roads
-  drawRoads();
-
-  // 3. Draw Active glowing Route under the pins
-  if (activeRoute) {
-    drawRoutePath();
-  }
-
-  // 4. Draw Traffic Elements if enabled
-  if (simulateTraffic) {
-    drawTraffic();
-  }
-
-  // 5. Draw Waypoint Nodes / Pins
-  drawWaypoints();
-
-  // 6. Draw Weather Overlays (Rendered relative to view)
-  ctx.restore();
-
-  if (simulateWeather) {
-    drawWeather();
-  }
-
-  // Update telemetry details
-  updateTelemetry();
+  setTimeout(() => {
+    toast.classList.remove('opacity-100', 'scale-100');
+    toast.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
+  }, 2500);
 }
 
-// Renders stylistic grids, rivers, and areas based on current theme
-function drawTerrain() {
-  // Grid Size
-  const gridSize = 80;
-  const totalWidth = 1400;
-  const totalHeight = 900;
-
-  // Map boundary block
-  if (mapStyle === "cyber") {
-    ctx.fillStyle = "#050811";
-    ctx.fillRect(0, 0, totalWidth, totalHeight);
-    
-    // Cyan/Purple grids
-    ctx.strokeStyle = "rgba(99, 102, 241, 0.08)";
-    ctx.lineWidth = 1;
-    for (let x = 0; x <= totalWidth; x += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, totalHeight);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= totalHeight; y += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(totalWidth, y);
-      ctx.stroke();
-    }
-    
-    // Draw Simulated Cyber River (Glowing dark blue channel)
-    ctx.beginPath();
-    ctx.moveTo(-50, 450);
-    ctx.bezierCurveTo(400, 420, 500, 680, 1450, 600);
-    ctx.strokeStyle = "rgba(6, 182, 212, 0.15)";
-    ctx.lineWidth = 45;
-    ctx.stroke();
-    ctx.strokeStyle = "rgba(6, 182, 212, 0.05)";
-    ctx.lineWidth = 70;
-    ctx.stroke();
-
-  } else if (mapStyle === "blueprint") {
-    ctx.fillStyle = "#021636";
-    ctx.fillRect(0, 0, totalWidth, totalHeight);
-
-    // Fine blueprints ticks
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.15)";
-    ctx.lineWidth = 0.5;
-    for (let x = 0; x <= totalWidth; x += 40) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, totalHeight);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= totalHeight; y += 40) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(totalWidth, y);
-      ctx.stroke();
-    }
-    
-    // Blueprint Technical circular targets
-    ctx.beginPath();
-    ctx.arc(400, 300, 250, 0, Math.PI * 2);
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.06)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-  } else {
-    // TOPO GRAY theme
-    ctx.fillStyle = "#151518";
-    ctx.fillRect(0, 0, totalWidth, totalHeight);
-
-    // Topographical rings
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
-    ctx.lineWidth = 1.2;
-    for (let i = 1; i <= 6; i++) {
-      ctx.beginPath();
-      ctx.arc(400, 300, i * 110, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(800, 250, i * 75, 0, Math.PI * 2);
-      ctx.stroke();
-    }
+function playBellDing() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // high chime A5
+    osc.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.15); // slide up
+    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.4);
+  } catch (e) {
+    // browser locked audio context or unsupported
   }
-
-  // Border contour
-  ctx.strokeStyle = "rgba(99, 102, 241, 0.4)";
-  ctx.lineWidth = 3;
-  ctx.strokeRect(0, 0, totalWidth, totalHeight);
 }
 
-// Draw structural connector lanes
-function drawRoads() {
-  ctx.save();
-  roads.forEach(road => {
-    const fromNode = waypoints.find(w => w.id === road.from);
-    const toNode = waypoints.find(w => w.id === road.to);
-    if (fromNode && toNode) {
-      ctx.beginPath();
-      ctx.moveTo(fromNode.x, fromNode.y);
-      ctx.lineTo(toNode.x, toNode.y);
+/* ------------------ NAVIGATION CONTROL ------------------ */
+function setupNavigation() {
+  const tabs = ['music', 'paint', 'memory', 'story'];
+  tabs.forEach(tab => {
+    const btn = document.getElementById(`nav-btn-${tab}`);
+    btn.addEventListener('click', () => {
+      // Play brief navigation pop sound
+      playSynthNote(400, 'sine', 0.1);
       
-      if (mapStyle === "cyber") {
-        ctx.strokeStyle = "rgba(148, 163, 184, 0.15)";
-        ctx.lineWidth = 6;
-        ctx.stroke();
-        ctx.strokeStyle = "rgba(99, 102, 241, 0.3)";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      } else if (mapStyle === "blueprint") {
-        ctx.strokeStyle = "rgba(56, 189, 248, 0.3)";
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([6, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      } else {
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-        ctx.lineWidth = 3;
-        ctx.stroke();
+      // switch active classes on buttons
+      tabs.forEach(t => {
+        document.getElementById(`nav-btn-${t}`).classList.remove('active');
+        document.getElementById(`panel-${t}`).classList.add('hidden');
+        document.getElementById(`panel-${t}`).classList.remove('block');
+      });
+
+      btn.classList.add('active');
+      document.getElementById(`panel-${tab}`).classList.remove('hidden');
+      document.getElementById(`panel-${tab}`).classList.add('block');
+      currentActivity = tab;
+
+      // Resize canvas trigger if paint tab open
+      if (tab === 'paint') {
+        resizeCanvasToMatchContainer();
       }
-    }
+    });
   });
-  ctx.restore();
 }
 
-// Highlight calculated active path
-function drawRoutePath() {
-  const fromNode = waypoints.find(w => w.id === activeRoute.from);
-  const toNode = waypoints.find(w => w.id === activeRoute.to);
-  if (fromNode && toNode) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(fromNode.x, fromNode.y);
-    ctx.lineTo(toNode.x, toNode.y);
+/* ------------------ ACTIVITY 1: SOUND SYNTH BOARD ------------------ */
+function setupSoundBoard() {
+  const keys = document.querySelectorAll('.sound-key');
+  keys.forEach(key => {
+    key.addEventListener('click', () => {
+      const freq = parseFloat(key.getAttribute('data-freq'));
+      const emoji = key.getAttribute('data-emoji');
+      const color = key.getAttribute('data-color');
+
+      // Play corresponding frequency synthesized instrument wave
+      playSynthNote(freq, soundSynthType, 0.6);
+
+      // Small sparkle stars addition sometimes for playful reinforcement
+      if (Math.random() < 0.2) {
+        addStars(1);
+        showToast(emoji, `Silly note played! Star added!`);
+      }
+    });
+  });
+
+  // Wave type selectors
+  const types = ['triangle', 'sine', 'square'];
+  types.forEach(type => {
+    const btn = document.getElementById(`synth-type-${type}`);
+    btn.addEventListener('click', () => {
+      types.forEach(t => {
+        const currentBtn = document.getElementById(`synth-type-${t}`);
+        currentBtn.classList.remove('active', 'bg-indigo-100', 'border-indigo-400');
+        currentBtn.classList.add('bg-indigo-50', 'border-transparent');
+      });
+
+      btn.classList.add('active', 'bg-indigo-100', 'border-indigo-400');
+      btn.classList.remove('bg-indigo-50', 'border-transparent');
+      soundSynthType = type;
+      
+      // preview chime
+      playSynthNote(523.25, soundSynthType, 0.3);
+    });
+  });
+}
+
+function playSynthNote(freq, type, duration) {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    // resume if suspended by browser auto-play policy
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
     
-    // Glowing neon purple path
-    ctx.strokeStyle = "#c084fc";
-    ctx.lineWidth = 8;
-    ctx.shadowColor = "#a855f7";
-    ctx.shadowBlur = 15;
-    ctx.stroke();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    
+    // Adjust envelope based on wave style to keep volume children-safe & sweet
+    let initialVolume = 0.25;
+    if (type === 'square') {
+      initialVolume = 0.08; // softer robot sounds
+    } else if (type === 'sine') {
+      initialVolume = 0.3;
+    }
 
-    // Fine glowing center line
-    ctx.beginPath();
-    ctx.moveTo(fromNode.x, fromNode.y);
-    ctx.lineTo(toNode.x, toNode.y);
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
-    ctx.shadowBlur = 0;
-    ctx.stroke();
-
-    ctx.restore();
+    gainNode.gain.setValueAtTime(initialVolume, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+    
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  } catch (err) {
+    console.warn("Audio synthesis not fully supported by browser yet.", err);
   }
 }
 
-// Draw little dynamic simulated traffic signals
-function drawTraffic() {
-  trafficTick += 0.005;
-  ctx.save();
-  roads.forEach(road => {
-    const fromNode = waypoints.find(w => w.id === road.from);
-    const toNode = waypoints.find(w => w.id === road.to);
-    if (fromNode && toNode) {
-      // Interpolate positions over time
-      const steps = 3;
-      for (let i = 1; i <= steps; i++) {
-        const offset = (trafficTick + (i / steps)) % 1.0;
-        const tx = fromNode.x + (toNode.x - fromNode.x) * offset;
-        const ty = fromNode.y + (toNode.y - fromNode.y) * offset;
+/* ------------------ ACTIVITY 2: DOODLE ART CANVAS ------------------ */
+function setupCanvas() {
+  const canvas = document.getElementById('paint-canvas');
+  const ctx = canvas.getContext('2d');
 
-        ctx.beginPath();
-        ctx.arc(tx, ty, 4, 0, Math.PI * 2);
-        ctx.fillStyle = (i % 2 === 0) ? "#e11d48" : "#fbbf24"; // alternating red & yellow vehicles
-        ctx.shadowColor = ctx.fillStyle;
-        ctx.shadowBlur = 6;
-        ctx.fill();
-      }
-    }
+  // Brush slider
+  const brushSlider = document.getElementById('brush-size');
+  const brushSizeLabel = document.getElementById('brush-size-val');
+  brushSlider.addEventListener('input', (e) => {
+    brushSize = e.target.value;
+    brushSizeLabel.innerText = `${brushSize}px`;
   });
-  ctx.restore();
-}
 
-// Beautiful pins rendering with text and icon
-function drawWaypoints() {
-  ctx.save();
-  waypoints.forEach(wp => {
-    // Check if matches filter
-    if (searchFilter && !wp.name.toLowerCase().includes(searchFilter.toLowerCase())) {
-      ctx.globalAlpha = 0.25; // Dim filtered items
+  // Clear art board
+  document.getElementById('canvas-clear').addEventListener('click', () => {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    showToast('🧹', 'Drawing board cleaned up!');
+  });
+
+  // Toggle Draw vs Sticker mode
+  const toolDrawBtn = document.getElementById('tool-draw');
+  const toolStickerBtn = document.getElementById('tool-sticker');
+  const stickerBox = document.getElementById('sticker-box');
+
+  toolDrawBtn.addEventListener('click', () => {
+    paintTool = 'draw';
+    toolDrawBtn.classList.add('active', 'bg-pink-500', 'text-white');
+    toolDrawBtn.classList.remove('bg-white', 'text-pink-700');
+    toolStickerBtn.classList.remove('active', 'bg-pink-500', 'text-white');
+    toolStickerBtn.classList.add('bg-white', 'text-pink-700');
+    stickerBox.classList.add('hidden');
+  });
+
+  toolStickerBtn.addEventListener('click', () => {
+    paintTool = 'sticker';
+    toolStickerBtn.classList.add('active', 'bg-pink-500', 'text-white');
+    toolStickerBtn.classList.remove('bg-white', 'text-pink-700');
+    toolDrawBtn.classList.remove('active', 'bg-pink-500', 'text-white');
+    toolDrawBtn.classList.add('bg-white', 'text-pink-700');
+    stickerBox.classList.remove('hidden');
+  });
+
+  // Color selection swatches
+  const swatches = document.querySelectorAll('.color-swatch');
+  swatches.forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      swatches.forEach(s => s.classList.remove('active-swatch'));
+      swatch.classList.add('active-swatch');
+      paintColor = swatch.getAttribute('data-color');
+    });
+  });
+
+  // Sticker selection
+  const stickers = document.querySelectorAll('.sticker-selector');
+  stickers.forEach(st => {
+    st.addEventListener('click', () => {
+      stickers.forEach(s => s.classList.remove('active-sticker'));
+      st.classList.add('active-sticker');
+      selectedSticker = st.getAttribute('data-emoji');
+      
+      // Play a happy soft bubble pop preview sound
+      playSynthNote(500, 'sine', 0.1);
+    });
+  });
+
+  // Listen for mouse / touch on Canvas
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('mouseout', stopDrawing);
+
+  canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    isDrawing = true;
+    lastX = touch.clientX - rect.left;
+    lastY = touch.clientY - rect.top;
+
+    if (paintTool === 'sticker') {
+      stampEmoji(lastX, lastY);
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    if (paintTool === 'draw') {
+      const x = touch.clientX - rect.left;
+      const y = touch.clientY - rect.top;
+      drawSegment(lastX, lastY, x, y);
+      lastX = x;
+      lastY = y;
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', stopDrawing);
+
+  function startDrawing(e) {
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+
+    if (paintTool === 'sticker') {
+      stampEmoji(lastX, lastY);
+    }
+  }
+
+  function draw(e) {
+    if (!isDrawing || paintTool !== 'draw') return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    drawSegment(lastX, lastY, x, y);
+    lastX = x;
+    lastY = y;
+  }
+
+  let rewardThrottle = 0;
+  function drawSegment(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    
+    // Rainbow color check
+    if (paintColor === 'rainbow') {
+      const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+      grad.addColorStop(0, '#f43f5e');
+      grad.addColorStop(0.3, '#eab308');
+      grad.addColorStop(0.6, '#06b6d4');
+      grad.addColorStop(1, '#a855f7');
+      ctx.strokeStyle = grad;
     } else {
-      ctx.globalAlpha = 1.0;
+      ctx.strokeStyle = paintColor;
     }
 
-    const radius = 15;
-    
-    // Outer soft glow ring
-    ctx.beginPath();
-    ctx.arc(wp.x, wp.y, radius + 8, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(99, 102, 241, 0.15)";
-    ctx.fill();
-
-    // Core Anchor Pin Color based on category
-    let color = "#6366f1"; // default indigo
-    if (wp.cat === "danger") color = "#f43f5e";
-    if (wp.cat === "port") color = "#06b6d4";
-    if (wp.cat === "outpost") color = "#10b981";
-
-    // Draw pin container
-    ctx.beginPath();
-    ctx.arc(wp.x, wp.y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = "#0f172a";
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    ctx.fill();
+    ctx.lineWidth = brushSize;
+    ctx.lineCap = 'round';
     ctx.stroke();
 
-    // Text Icon inside
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "12px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(wp.categoryIcon || "📍", wp.x, wp.y);
+    // Reward kid after painting a bunch
+    rewardThrottle++;
+    if (rewardThrottle > 35) {
+      addStars(1);
+      showToast('🎨', 'Creative drawing is magical! +1 Star!');
+      rewardThrottle = 0;
+    }
+  }
 
-    // Floating Label Text below
-    ctx.font = "bold 11px sans-serif";
-    ctx.fillStyle = "#f8fafc";
-    ctx.textAlign = "center";
-    ctx.fillText(wp.name, wp.x, wp.y + 28);
-    
-    // Subtext coordinates
-    ctx.font = "9px monospace";
-    ctx.fillStyle = "#94a3b8";
-    ctx.fillText(`X:${Math.round(wp.x)} Y:${Math.round(wp.y)}`, wp.x, wp.y + 39);
-  });
-  ctx.restore();
+  function stampEmoji(x, y) {
+    ctx.font = `${brushSize * 2 + 16}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(selectedSticker, x, y);
+    addStars(1);
+    showToast('✨', `Stamped a ${selectedSticker}! +1 Star!`);
+  }
+
+  function stopDrawing() {
+    isDrawing = false;
+  }
 }
 
-// Full canvas weather animation
-function drawWeather() {
-  weatherTick += 1;
-  ctx.save();
-  ctx.strokeStyle = "rgba(186, 230, 253, 0.2)";
-  ctx.lineWidth = 1.5;
+function resizeCanvasToMatchContainer() {
+  const canvas = document.getElementById('paint-canvas');
+  const parent = canvas.parentElement;
+  const tempImg = canvas.toDataURL();
   
-  // Draw diagonal rain lines
-  for (let i = 0; i < canvas.width; i += 50) {
-    const yStart = (weatherTick * 4 + i) % canvas.height;
-    ctx.beginPath();
-    ctx.moveTo(i + (yStart * 0.2), yStart);
-    ctx.lineTo(i + (yStart * 0.2) + 10, yStart + 25);
-    ctx.stroke();
-  }
-  ctx.restore();
+  // Match actual size based on flex layout with nice min-height fallback
+  canvas.width = parent.clientWidth || 650;
+  canvas.height = 360;
+
+  // Reload picture background & restore previous art
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const img = new Image();
+  img.onload = function() {
+    ctx.drawImage(img, 0, 0);
+  };
+  img.src = tempImg;
 }
 
-// Redraw and update dynamic side panel lists
-function updateWaypointList() {
-  const container = document.getElementById("waypoint-list");
-  const filtered = waypoints.filter(wp => 
-    wp.name.toLowerCase().includes(searchFilter.toLowerCase())
-  );
+/* ------------------ ACTIVITY 3: MEMORY MATCH GAME ------------------ */
+function initMemoryGame() {
+  const grid = document.getElementById('memory-grid');
+  const victoryBox = document.getElementById('memory-victory');
+  
+  // Reset state variables
+  grid.innerHTML = '';
+  victoryBox.classList.add('hidden');
+  selectedCards = [];
+  matchedPairsCount = 0;
+  memoryMovesCount = 0;
+  document.getElementById('memory-moves').innerText = memoryMovesCount;
 
-  container.innerHTML = "";
+  // Shuffle cards
+  shuffledCards = [...memoryEmojis].sort(() => Math.random() - 0.5);
 
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="p-4 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl">
-        No waypoints match "${searchFilter}"
-      </div>
-    `;
-    return;
-  }
+  // Create DOM grid dynamically
+  shuffledCards.forEach((emoji, index) => {
+    const card = document.createElement('div');
+    card.className = 'memory-card w-full aspect-square relative';
+    card.setAttribute('data-id', index);
+    card.setAttribute('data-emoji', emoji);
 
-  filtered.forEach(wp => {
-    const div = document.createElement("div");
-    div.className = "group p-2.5 bg-slate-950/80 hover:bg-slate-800 border border-slate-800 hover:border-indigo-500/50 rounded-xl transition-all flex items-center justify-between cursor-pointer";
-    div.setAttribute("data-id", wp.id);
-    
-    // Category color tag
-    let catBorder = "border-indigo-500/30";
-    if (wp.cat === "danger") catBorder = "border-rose-500/30";
-    if (wp.cat === "port") catBorder = "border-cyan-500/30";
-    if (wp.cat === "outpost") catBorder = "border-emerald-500/30";
-
-    div.innerHTML = `
-      <div class="flex items-center gap-2.5 min-w-0 flex-1">
-        <span class="p-1 bg-slate-900 border ${catBorder} rounded-lg text-sm shrink-0">${wp.categoryIcon || "📍"}</span>
-        <div class="truncate">
-          <p class="font-medium text-slate-200 truncate group-hover:text-white transition-colors">${wp.name}</p>
-          <p class="text-[10px] text-slate-500 truncate">${wp.desc || "No extra coordinates telemetry"}</p>
+    card.innerHTML = `
+      <div class="memory-card-inner w-full h-full relative pointer-events-none">
+        <div class="card-back w-full h-full shadow-md rounded-2xl flex items-center justify-center text-4xl bg-gradient-to-tr from-emerald-100 to-emerald-200 hover:from-emerald-200 hover:to-emerald-300 transition-colors">
+          ❓
+        </div>
+        <div class="card-front w-full h-full shadow-md rounded-2xl flex items-center justify-center text-5xl bg-white border-4 border-emerald-400">
+          ${emoji}
         </div>
       </div>
-      <div class="flex items-center gap-1.5 shrink-0 ml-2">
-        <button class="btn-delete-wp p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition-all" title="Delete Marker">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-        </button>
-      </div>
     `;
 
-    // Click to fly map focus
-    div.addEventListener("click", (e) => {
-      if (e.target.closest(".btn-delete-wp")) return;
-      flyToWaypoint(wp);
-    });
-
-    // Wire delete button
-    div.querySelector(".btn-delete-wp").addEventListener("click", (e) => {
-      e.stopPropagation();
-      deleteWaypoint(wp.id);
-    });
-
-    container.appendChild(div);
+    card.addEventListener('click', () => handleCardClick(card));
+    grid.appendChild(card);
   });
-
-  // Update Select Menus for Routing dropdowns
-  populateRouteSelects();
 }
 
-// Populates Route origin and destination menus
-function populateRouteSelects() {
-  const originSelect = document.getElementById("route-origin");
-  const destSelect = document.getElementById("route-destination");
-  
-  const prevOrigin = originSelect.value;
-  const prevDest = destSelect.value;
+function handleCardClick(card) {
+  // check restrictions
+  if (selectedCards.length >= 2) return;
+  if (card.classList.contains('flipped')) return;
 
-  originSelect.innerHTML = "";
-  destSelect.innerHTML = "";
+  // Play cute note trigger on flipping
+  playSynthNote(350 + (selectedCards.length * 150), 'sine', 0.2);
 
-  waypoints.forEach(wp => {
-    const opt1 = document.createElement("option");
-    opt1.value = wp.id;
-    opt1.textContent = `${wp.categoryIcon || "📍"} ${wp.name}`;
-    originSelect.appendChild(opt1);
+  card.classList.add('flipped');
+  selectedCards.push(card);
 
-    const opt2 = document.createElement("option");
-    opt2.value = wp.id;
-    opt2.textContent = `${wp.categoryIcon || "📍"} ${wp.name}`;
-    destSelect.appendChild(opt2);
-  });
-
-  // Restore previous selections if valid
-  if (waypoints.some(w => w.id === prevOrigin)) originSelect.value = prevOrigin;
-  else if (waypoints.length > 0) originSelect.value = waypoints[0].id;
-
-  if (waypoints.some(w => w.id === prevDest)) destSelect.value = prevDest;
-  else if (waypoints.length > 1) destSelect.value = waypoints[1].id;
-}
-
-// Deletes selected custom marker node
-function deleteWaypoint(id) {
-  waypoints = waypoints.filter(wp => wp.id !== id);
-  if (activeRoute && (activeRoute.from === id || activeRoute.to === id)) {
-    activeRoute = null;
-    document.getElementById("route-details-panel").classList.add("hidden");
+  if (selectedCards.length === 2) {
+    memoryMovesCount++;
+    document.getElementById('memory-moves').innerText = memoryMovesCount;
+    checkForMatch();
   }
-  updateWaypointList();
-  drawMap();
-  logTerminal(`Waypoint [${id}] removed successfully.`);
 }
 
-// Center view and zoom to clicked pin
-function flyToWaypoint(wp) {
-  zoom = 1.25;
-  panX = canvas.width / 2 - wp.x * zoom;
-  panY = canvas.height / 2 - wp.y * zoom;
-  drawMap();
-  logTerminal(`Telemetry shifted focus to node: ${wp.name} [X: ${Math.round(wp.x)}, Y: ${Math.round(wp.y)}]`);
-}
+function checkForMatch() {
+  const [card1, card2] = selectedCards;
+  const emoji1 = card1.getAttribute('data-emoji');
+  const emoji2 = card2.getAttribute('data-emoji');
 
-// Custom terminal output logger
-function logTerminal(message) {
-  document.getElementById("terminal-status").textContent = `Status: ${message}`;
-}
+  if (emoji1 === emoji2) {
+    // Match made!
+    matchedPairsCount++;
+    selectedCards = [];
 
-// Update live bottom panel coordinates
-function updateTelemetry() {
-  const centerX = Math.round((canvas.width / 2 - panX) / zoom);
-  const centerY = Math.round((canvas.height / 2 - panY) / zoom);
-  document.getElementById("coord-tracker").textContent = `X: ${centerX}, Y: ${centerY}`;
-  document.getElementById("zoom-tracker").textContent = `${zoom.toFixed(2)}x`;
-  document.getElementById("telemetry-waypoint-count").textContent = `${waypoints.length} Active Points`;
-}
+    // happy audio indicator scale
+    setTimeout(() => {
+      playSynthNote(783.99, 'triangle', 0.4); // G5 note
+      // visually tag them with gold ring
+      card1.querySelector('.card-front').classList.add('border-yellow-400');
+      card2.querySelector('.card-front').classList.add('border-yellow-400');
+    }, 200);
 
-// Setup Mouse Drag Map Pan Events
-canvas.addEventListener("mousedown", (e) => {
-  isDragging = true;
-  startDragX = e.clientX - panX;
-  startDragY = e.clientY - panY;
-});
-
-canvas.addEventListener("mousemove", (e) => {
-  if (isDragging) {
-    panX = e.clientX - startDragX;
-    panY = e.clientY - startDragY;
-    drawMap();
-  }
-});
-
-canvas.addEventListener("mouseup", () => {
-  isDragging = false;
-});
-
-canvas.addEventListener("mouseleave", () => {
-  isDragging = false;
-});
-
-// Double-Click anywhere on the map grid to request custom pin creation modal
-canvas.addEventListener("dblclick", (e) => {
-  // Calculate true map relative coordinates
-  const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
-
-  currentModalCoords.x = Math.round((clickX - panX) / zoom);
-  currentModalCoords.y = Math.round((clickY - panY) / zoom);
-
-  document.getElementById("new-wp-x").textContent = currentModalCoords.x;
-  document.getElementById("new-wp-y").textContent = currentModalCoords.y;
-  document.getElementById("new-wp-title").value = "";
-  
-  // Show Modal
-  document.getElementById("add-waypoint-modal").classList.remove("hidden");
-});
-
-// Mouse scroll wheel to zoom map relative to center
-canvas.addEventListener("wheel", (e) => {
-  e.preventDefault();
-  const zoomFactor = 1.1;
-  if (e.deltaY < 0) {
-    // Zoom In
-    if (zoom < 3.0) zoom *= zoomFactor;
+    // check victory
+    if (matchedPairsCount === memoryEmojis.length / 2) {
+      setTimeout(() => {
+        document.getElementById('memory-victory').classList.remove('hidden');
+        addStars(15);
+        showToast('🏆', 'Victory! You matched all cute buddies! +15 Stars');
+        
+        // play winner sound scale
+        playSynthNote(523.25, 'triangle', 0.1);
+        setTimeout(() => playSynthNote(659.25, 'triangle', 0.1), 100);
+        setTimeout(() => playSynthNote(783.99, 'triangle', 0.15), 200);
+        setTimeout(() => playSynthNote(1046.50, 'triangle', 0.3), 300);
+      }, 800);
+    }
   } else {
-    // Zoom Out
-    if (zoom > 0.4) zoom /= zoomFactor;
+    // No match, turn back over
+    setTimeout(() => {
+      card1.classList.remove('flipped');
+      card2.classList.remove('flipped');
+      selectedCards = [];
+      playSynthNote(220, 'sawtooth', 0.15); // soft error note buzzer
+    }, 1200);
   }
-  drawMap();
-}, { passive: false });
-
-// Zoom Controls button wiring
-document.getElementById("btn-zoom-in").addEventListener("click", () => {
-  if (zoom < 3.0) zoom *= 1.2;
-  drawMap();
-});
-
-document.getElementById("btn-zoom-out").addEventListener("click", () => {
-  if (zoom > 0.4) zoom /= 1.2;
-  drawMap();
-});
-
-document.getElementById("btn-zoom-reset").addEventListener("click", () => {
-  zoom = 1.0;
-  panX = canvas.width / 2 - 450;
-  panY = canvas.height / 2 - 300;
-  drawMap();
-});
-
-// Theme Layer Swapping Logic
-function selectTheme(style) {
-  mapStyle = style;
-  
-  // Clear active style buttons
-  const buttons = ["layer-cyber", "layer-blueprint", "layer-topo"];
-  buttons.forEach(bId => {
-    const btn = document.getElementById(bId);
-    btn.className = "px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all";
-  });
-
-  // Highlight selected button
-  const selectedBtn = document.getElementById(`layer-${style}`);
-  selectedBtn.className = "px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-lg bg-indigo-600 text-white transition-all";
-
-  // Change label
-  const labels = {
-    cyber: "Cyberpunk Cyber-Grid",
-    blueprint: "Architectural Blueprint",
-    topo: "Topographical Outlands"
-  };
-  document.getElementById("telemetry-style-label").textContent = labels[style] || style;
-  
-  drawMap();
-  logTerminal(`Map overlay visual skin toggled to ${labels[style]}`);
 }
 
-document.getElementById("layer-cyber").addEventListener("click", () => selectTheme("cyber"));
-document.getElementById("layer-blueprint").addEventListener("click", () => selectTheme("blueprint"));
-document.getElementById("layer-topo").addEventListener("click", () => selectTheme("topo"));
-
-// Modal category buttons handler
-const catButtons = document.querySelectorAll(".cat-btn");
-catButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    // Reset all others to default slate
-    catButtons.forEach(b => {
-      b.className = "cat-btn py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-semibold text-center hover:bg-slate-700 hover:text-slate-200";
-    });
-    // Highlight current
-    btn.className = "cat-btn py-1.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 text-[10px] font-semibold text-center hover:bg-indigo-600/50";
-    selectedCategory = btn.getAttribute("data-cat");
-  });
+// Reset memory game button trigger
+document.getElementById('btn-reset-memory').addEventListener('click', () => {
+  initMemoryGame();
+  showToast('🔄', 'New memory deck shuffled!');
 });
 
-// Save New Custom Waypoint Action
-document.getElementById("btn-save-waypoint").addEventListener("click", () => {
-  const titleInput = document.getElementById("new-wp-title").value.trim();
-  const finalTitle = titleInput || `Sector Delta-${Math.floor(Math.random() * 900) + 100}`;
+/* ------------------ ACTIVITY 4: SILLY STORY GENERATOR ------------------ */
+function setupStoryGenerator() {
+  const generateBtn = document.getElementById('btn-generate-story');
+  const readAloudBtn = document.getElementById('btn-read-aloud');
+  const storyOutputBox = document.getElementById('story-output-box');
 
-  // Pick icon based on category
-  let icon = "📍";
-  if (selectedCategory === "landmark") icon = "🏛";
-  if (selectedCategory === "port") icon = "⚓";
-  if (selectedCategory === "danger") icon = "⚡";
-  if (selectedCategory === "outpost") icon = "⛺";
+  generateBtn.addEventListener('click', () => {
+    const hero = document.getElementById('story-hero').value;
+    const action = document.getElementById('story-action').value;
+    const place = document.getElementById('story-place').value;
 
-  const newId = "wp" + (Date.now());
-  const newPoint = {
-    id: newId,
-    name: finalTitle,
-    x: currentModalCoords.x,
-    y: currentModalCoords.y,
-    cat: selectedCategory,
-    desc: `User deployed node at [${currentModalCoords.x}, ${currentModalCoords.y}]`,
-    categoryIcon: icon
-  };
+    // Craft funny child fantasy sentences
+    const storiesPool = [
+      `Once upon a time, there was ${hero} who ${action}. And guess what? This all occurred ${place}`,
+      `Attention everyone! A silly legend says that ${hero} loved to visit ${place} just so they could ${action}! Isn't that wild?`,
+      `Kaboom! Out of nowhere, ${hero} bounced happily! They quickly ${action} right in front of everyone ${place}. It was the best day ever!`
+    ];
 
-  waypoints.push(newPoint);
-  
-  // Connect dynamically to nearest existing waypoint to ensure a valid route option
-  let nearestWp = null;
-  let minDist = Infinity;
-  waypoints.forEach(wp => {
-    if (wp.id === newId) return;
-    const dist = Math.hypot(wp.x - newPoint.x, wp.y - newPoint.y);
-    if (dist < minDist) {
-      minDist = dist;
-      nearestWp = wp.id;
+    const randomTemplate = storiesPool[Math.floor(Math.random() * storiesPool.length)];
+    
+    // Update display markup text
+    storyOutputBox.innerHTML = randomTemplate;
+
+    // Reward kid
+    addStars(5);
+    showToast('📖', 'Magnificent! You crafted a silly story! +5 Stars!');
+
+    // Play playful retro level-up tune
+    playSynthNote(440, 'triangle', 0.15);
+    setTimeout(() => playSynthNote(554.37, 'triangle', 0.15), 100);
+    setTimeout(() => playSynthNote(659.25, 'triangle', 0.25), 200);
+  });
+
+  // Web Speech Synthesis Reader
+  readAloudBtn.addEventListener('click', () => {
+    const textToRead = storyOutputBox.innerText;
+    
+    if ('speechSynthesis' in window) {
+      // cancel current spoken text if active
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(textToRead);
+      
+      // Pick a high pitch child friendly speed/voice if available
+      utterance.pitch = 1.4;
+      utterance.rate = 1.0;
+      
+      // Visual status changes during speech
+      utterance.onstart = () => {
+        document.getElementById('voice-status').innerText = "🎙️ Magic voice speaking... listen closely!";
+        document.getElementById('voice-status').classList.add('text-amber-600', 'font-black');
+      };
+      
+      utterance.onend = () => {
+        document.getElementById('voice-status').innerText = "Reads story using Web Speech narration synth!";
+        document.getElementById('voice-status').classList.remove('text-amber-600', 'font-black');
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } else {
+      showToast('❌', 'Oops! Web Voice synthesizer is busy or unsupported on this device.');
     }
   });
-  if (nearestWp) {
-    roads.push({ from: newId, to: nearestWp });
-  }
-
-  document.getElementById("add-waypoint-modal").classList.add("hidden");
-  updateWaypointList();
-  drawMap();
-  logTerminal(`Successfully deployed brand new custom marker: "${finalTitle}"`);
-});
-
-// Cancel modal interactions
-const closeModal = () => {
-  document.getElementById("add-waypoint-modal").classList.add("hidden");
-};
-document.getElementById("btn-cancel-modal").addEventListener("click", closeModal);
-document.getElementById("btn-close-modal").addEventListener("click", closeModal);
-
-// Calculate Route Interaction
-document.getElementById("btn-calculate-route").addEventListener("click", () => {
-  const originId = document.getElementById("route-origin").value;
-  const destId = document.getElementById("route-destination").value;
-
-  if (originId === destId) {
-    logTerminal("Warning: Origin and Destination must be distinct waypoints!");
-    alert("Please select two distinct waypoints to calculate route.");
-    return;
-  }
-
-  const fromNode = waypoints.find(w => w.id === originId);
-  const toNode = waypoints.find(w => w.id === destId);
-
-  if (fromNode && toNode) {
-    activeRoute = { from: originId, to: destId };
-    
-    // Calculate distance mathematically
-    const pxDistance = Math.round(Math.hypot(fromNode.x - toNode.x, fromNode.y - toNode.y));
-    const travelTime = Math.round(pxDistance * 0.45 + (simulateTraffic ? 12 : 0));
-    
-    // Render calculated analytics to sidebar panels
-    document.getElementById("route-time").textContent = `${travelTime} mins`;
-    document.getElementById("route-distance").textContent = `${pxDistance} km`;
-    document.getElementById("route-delay").textContent = simulateTraffic ? "Moderate congestion delay (+12m)" : "Optimized path green";
-    
-    const detailsPanel = document.getElementById("route-details-panel");
-    detailsPanel.classList.remove("hidden");
-
-    document.getElementById("telemetry-route-status").textContent = "Active Route Enroute";
-    document.getElementById("telemetry-route-status").className = "font-medium text-pink-400";
-
-    drawMap();
-    logTerminal(`Optimal Route established between ${fromNode.name} and ${toNode.name}.`);
-  }
-});
-
-// Clear Route Interaction
-document.getElementById("btn-clear-route").addEventListener("click", () => {
-  activeRoute = null;
-  document.getElementById("route-details-panel").classList.add("hidden");
-  document.getElementById("telemetry-route-status").textContent = "Ready";
-  document.getElementById("telemetry-route-status").className = "font-medium text-emerald-400";
-  drawMap();
-  logTerminal("Active route cleared.");
-});
-
-// Simulate Traffic Toggle
-document.getElementById("btn-toggle-traffic").addEventListener("click", () => {
-  simulateTraffic = !simulateTraffic;
-  const btn = document.getElementById("btn-toggle-traffic");
-  if (simulateTraffic) {
-    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-indigo-900/40 hover:text-indigo-300 border border-slate-700 transition-all flex items-center gap-1.5";
-    logTerminal("Traffic simulations initialized.");
-  } else {
-    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-900 text-slate-500 border border-slate-800 transition-all flex items-center gap-1.5 opacity-60";
-    logTerminal("Traffic simulations disabled.");
-  }
-  drawMap();
-});
-
-// Weather Overlay Toggle
-document.getElementById("btn-toggle-weather").addEventListener("click", () => {
-  simulateWeather = !simulateWeather;
-  const btn = document.getElementById("btn-toggle-weather");
-  const indicator = document.getElementById("weather-indicator");
-  if (simulateWeather) {
-    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-900/40 text-indigo-300 border border-indigo-500/30 transition-all flex items-center gap-1.5";
-    indicator.textContent = "⛈";
-    logTerminal("Atmospheric weather telemetry overlay rendered live.");
-  } else {
-    btn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-indigo-900/40 hover:text-indigo-300 border border-slate-700 transition-all flex items-center gap-1.5";
-    indicator.textContent = "☀️";
-    logTerminal("Weather overlay turned off.");
-  }
-  drawMap();
-});
-
-// Dynamic Search Filter logic
-document.getElementById("search-places").addEventListener("input", (e) => {
-  searchFilter = e.target.value;
-  updateWaypointList();
-  drawMap();
-});
-
-// Real-time animation loop for traffic movements & rain
-function animate() {
-  if (simulateTraffic || simulateWeather) {
-    drawMap();
-  }
-  requestAnimationFrame(animate);
 }
-
-// Initiate System
-window.addEventListener("resize", resizeCanvas);
-setTimeout(() => {
-  resizeCanvas();
-  updateWaypointList();
-  animate();
-}, 100);
