@@ -3,39 +3,378 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retro Neon Clock</title>
+  <title>Numeria Number Arcade</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Retro Digital Glowing Neon Clock -->
-<div class="clock-container">
-  <div class="glow-orb"></div>
-  <div class="glow-orb secondary"></div>
-  
-  <div class="glass-board">
-    <div class="app-header">
-      <span class="status-dot"></span>
-      <span class="header-title">LIVE NEON CLOCK</span>
+  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white pb-12">
+  <!-- Header Section -->
+  <header class="border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-50 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-indigo-600/20 rounded-xl border border-indigo-500/30 text-indigo-400 shadow-lg shadow-indigo-500/5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">NUMERIA</h1>
+          <p class="text-xs text-slate-400 font-medium tracking-wide">THE INTERACTIVE NUMBER ARCADE</p>
+        </div>
+      </div>
+
+      <!-- Global Arcade Stats -->
+      <div class="flex items-center gap-6 bg-slate-900/80 px-5 py-2.5 rounded-2xl border border-slate-800">
+        <div class="text-center">
+          <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-bold">Arcade Level</span>
+          <span id="global-level" class="text-lg font-extrabold text-indigo-400">1</span>
+        </div>
+        <div class="h-8 w-px bg-slate-800"></div>
+        <div class="text-center">
+          <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-bold">Total XP</span>
+          <span id="global-xp" class="text-lg font-extrabold text-purple-400">0</span>
+        </div>
+        <div class="h-8 w-px bg-slate-800"></div>
+        <div class="text-center">
+          <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-bold">Audio FX</span>
+          <button id="toggle-audio" class="mt-0.5 text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all">
+            ON
+          </button>
+        </div>
+      </div>
     </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
     
-    <div class="time-display">
-      <span id="hours">00</span>
-      <span class="colon">:</span>
-      <span id="minutes">00</span>
-      <span class="colon">:</span>
-      <span id="seconds">00</span>
-      <span id="ampm" class="ampm">AM</span>
+    <!-- Tab Navigation (Game Selectors) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <button id="tab-guess-game" class="game-tab-btn active relative overflow-hidden group p-5 rounded-2xl border transition-all duration-300 text-left bg-slate-900/50 hover:bg-slate-900 border-indigo-500/30 shadow-md shadow-indigo-500/5">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl group-hover:scale-125 transition-all"></div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="p-2 bg-indigo-500/10 rounded-lg text-indigo-400 text-sm font-bold">Game 01</span>
+          <span class="text-xs font-semibold text-indigo-300/80 bg-indigo-500/10 px-2 py-0.5 rounded-full">Classic</span>
+        </div>
+        <h3 class="text-lg font-bold text-slate-100 mb-1 group-hover:text-indigo-300 transition-colors">Guess My Number</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">Deduce the mystery number. Get smart clues, hot/cold indicators and record stats.</p>
+      </button>
+
+      <button id="tab-blitz-game" class="game-tab-btn relative overflow-hidden group p-5 rounded-2xl border transition-all duration-300 text-left bg-slate-900/30 hover:bg-slate-900/60 border-slate-800/80">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/5 rounded-full blur-xl group-hover:scale-125 transition-all"></div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="p-2 bg-amber-500/10 rounded-lg text-amber-400 text-sm font-bold">Game 02</span>
+          <span class="text-xs font-semibold text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-full">Speed Blitz</span>
+        </div>
+        <h3 class="text-lg font-bold text-slate-200 mb-1 group-hover:text-amber-300 transition-colors">Math Blitz</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">Solve arithmetic quickies under pressure! Maximize streak before time burns out.</p>
+      </button>
+
+      <button id="tab-sequence-game" class="game-tab-btn relative overflow-hidden group p-5 rounded-2xl border transition-all duration-300 text-left bg-slate-900/30 hover:bg-slate-900/60 border-slate-800/80">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:scale-125 transition-all"></div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 text-sm font-bold">Game 03</span>
+          <span class="text-xs font-semibold text-emerald-300/80 bg-emerald-500/10 px-2 py-0.5 rounded-full">Memory Span</span>
+        </div>
+        <h3 class="text-lg font-bold text-slate-200 mb-1 group-hover:text-emerald-300 transition-colors">Sequence Matrix</h3>
+        <p class="text-xs text-slate-400 leading-relaxed">Memorize and repeat progressively longer sequences of numbers. Train focus.</p>
+      </button>
     </div>
-    
-    <div class="date-display" id="date">Loading Today's Date...</div>
-    
-    <div class="controls-row">
-      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
-      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
+
+    <!-- Main Gameplay Arena -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Game Content Area -->
+      <div class="lg:col-span-8 bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 sm:p-8 backdrop-blur-md relative overflow-hidden min-h-[500px]">
+        <!-- Decorative ambient background glow -->
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+
+        <!-- GAME 1: GUESS MY NUMBER -->
+        <div id="game-guess-view" class="game-view active">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-800/60">
+            <div>
+              <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider">Classic Mode</span>
+              <h2 class="text-2xl font-bold text-white">Guess My Number</h2>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="difficulty-btn px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all bg-slate-800/60 border-slate-700 hover:border-indigo-500 text-indigo-300 active-diff" data-diff="easy">
+                1-100 (Easy)
+              </button>
+              <button class="difficulty-btn px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all bg-slate-950 border-slate-900 hover:border-indigo-500 text-slate-400" data-diff="medium">
+                1-500 (Mid)
+              </button>
+              <button class="difficulty-btn px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all bg-slate-950 border-slate-900 hover:border-indigo-500 text-slate-400" data-diff="hard">
+                1-1000 (Hard)
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Game Left -->
+            <div class="space-y-6">
+              <p class="text-sm text-slate-300 leading-relaxed">
+                I have chosen a secret number between <span id="guess-range-low" class="text-indigo-400 font-bold">1</span> and <span id="guess-range-high" class="text-indigo-400 font-bold">100</span>. Try to pinpoint it in the fewest attempts possible.
+              </p>
+
+              <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-5">
+                <label for="guess-input" class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Your Guess</label>
+                <div class="flex gap-3">
+                  <input type="number" id="guess-input" class="w-full bg-slate-900 border-2 border-slate-800 focus:border-indigo-500 focus:outline-none rounded-xl px-4 py-3 text-xl font-bold text-white transition-all" placeholder="?" min="1" max="1000" autofocus>
+                  <button id="guess-submit-btn" class="px-6 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2">
+                    <span>Submit</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                  </button>
+                </div>
+                <p id="guess-validation-msg" class="text-xs text-rose-400 mt-2 hidden">Please enter a valid positive number.</p>
+              </div>
+
+              <div class="flex justify-between items-center gap-4">
+                <button id="reset-guess-btn" class="text-xs text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors bg-slate-800/40 hover:bg-slate-800 px-3 py-2 rounded-lg border border-slate-700/60">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 110 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>
+                  Reset / New Number
+                </button>
+                
+                <div class="text-right">
+                  <span class="text-xs text-slate-400 block">Attempts</span>
+                  <span id="guess-count" class="text-lg font-bold text-slate-200">0</span>
+                </div>
+              </div>
+
+              <!-- Hot/Cold visual feedback area -->
+              <div id="clue-banner" class="p-4 rounded-xl border border-slate-800 bg-slate-950/40 text-center transition-all min-h-[56px] flex items-center justify-center">
+                <span class="text-sm font-medium text-slate-400">Submit a guess to trigger system diagnostics.</span>
+              </div>
+            </div>
+
+            <!-- Game Right (Guess Feed) -->
+            <div class="flex flex-col border-t md:border-t-0 md:border-l border-slate-800/60 pt-6 md:pt-0 md:pl-6">
+              <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Diagnostics Log / Guesses</h4>
+              <div id="guesses-history-list" class="flex-1 overflow-y-auto max-h-[220px] space-y-2 pr-2 custom-scrollbar">
+                <p class="text-xs text-slate-500 italic text-center py-8">No diagnostic pulses submitted yet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GAME 2: MATH BLITZ -->
+        <div id="game-blitz-view" class="game-view hidden">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-800/60">
+            <div>
+              <span class="text-xs text-amber-400 font-bold uppercase tracking-wider">Speed Challenge</span>
+              <h2 class="text-2xl font-bold text-white">Math Blitz</h2>
+            </div>
+            <div class="flex items-center gap-4 bg-slate-950 px-4 py-1.5 rounded-xl border border-slate-800">
+              <div class="text-center">
+                <span class="block text-[9px] text-slate-400 uppercase tracking-widest font-bold">Time Left</span>
+                <span id="blitz-timer" class="text-lg font-black text-amber-400">30s</span>
+              </div>
+              <div class="h-6 w-px bg-slate-800"></div>
+              <div class="text-center">
+                <span class="block text-[9px] text-slate-400 uppercase tracking-widest font-bold">Streak</span>
+                <span id="blitz-streak" class="text-lg font-black text-purple-400">0 🔥</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Start Screen for Blitz -->
+          <div id="blitz-start-screen" class="text-center py-10 space-y-6">
+            <div class="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-400 mx-auto border border-amber-500/20 shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            </div>
+            <div class="max-w-md mx-auto">
+              <h3 class="text-lg font-bold text-slate-100 mb-2">Solve as many as you can before the timer dies!</h3>
+              <p class="text-xs text-slate-400">
+                Correct answers add <span class="text-emerald-400 font-semibold">+2 seconds</span>. Incorrect responses penalize you by <span class="text-rose-400 font-semibold">-3 seconds</span>. Power through the equations!
+              </p>
+            </div>
+            <button id="blitz-start-btn" class="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold rounded-xl shadow-xl shadow-amber-500/10 hover:shadow-amber-500/20 active:scale-95 transition-all">
+              INITIALIZE MATH BLITZ
+            </button>
+          </div>
+
+          <!-- Play Arena for Blitz -->
+          <div id="blitz-play-screen" class="hidden space-y-8 py-4">
+            <!-- Dynamic Formula Bubble -->
+            <div class="text-center">
+              <div class="inline-block bg-slate-950/90 border border-slate-800 rounded-3xl px-12 py-8 shadow-inner relative overflow-hidden">
+                <!-- Timer progress bar visualizer -->
+                <div id="blitz-progress-bar" class="absolute bottom-0 left-0 h-1.5 bg-gradient-to-r from-amber-500 to-purple-500 transition-all duration-300" style="width: 100%"></div>
+                <span class="text-xs uppercase tracking-wider text-slate-500 font-bold block mb-2">Solve this formula</span>
+                <h1 id="blitz-equation" class="text-5xl font-black text-white tracking-tight">12 &times; 8</h1>
+              </div>
+            </div>
+
+            <!-- Answer Row -->
+            <div class="max-w-xs mx-auto">
+              <div class="relative">
+                <input type="number" id="blitz-input" class="w-full text-center bg-slate-950 border-2 border-slate-800 focus:border-amber-500 focus:outline-none rounded-2xl py-4 text-3xl font-extrabold text-white transition-all" placeholder="Your answer" autocomplete="off">
+                <button id="blitz-submit-btn" class="absolute right-2 top-2 bottom-2 px-4 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold transition-all border border-slate-700">Press Enter</button>
+              </div>
+              <p id="blitz-feedback" class="text-center text-sm font-semibold mt-4 min-h-[20px] text-slate-400">Keep going!</p>
+            </div>
+          </div>
+
+          <!-- Blitz End Game screen -->
+          <div id="blitz-end-screen" class="hidden text-center py-10 space-y-6">
+            <div class="w-20 h-20 bg-purple-500/10 rounded-full flex items-center justify-center text-purple-400 mx-auto border border-purple-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+            </div>
+            <div>
+              <h3 class="text-2xl font-black text-slate-100">System Overloaded!</h3>
+              <p class="text-slate-400 mt-1">The countdown has completed. Excellent processing sequence.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto bg-slate-950/80 p-5 rounded-2xl border border-slate-800">
+              <div class="text-left">
+                <span class="text-xs text-slate-500 uppercase tracking-widest block font-bold">Solved</span>
+                <span id="blitz-final-solved" class="text-2xl font-black text-amber-400">0</span>
+              </div>
+              <div class="text-left">
+                <span class="text-xs text-slate-500 uppercase tracking-widest block font-bold">Max Streak</span>
+                <span id="blitz-final-streak" class="text-2xl font-black text-purple-400">0</span>
+              </div>
+            </div>
+            <button id="blitz-restart-btn" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl border border-slate-700 active:scale-95 transition-all">
+              Try Blitz Again
+            </button>
+          </div>
+        </div>
+
+        <!-- GAME 3: SEQUENCE MATRIX -->
+        <div id="game-sequence-view" class="game-view hidden">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-800/60">
+            <div>
+              <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Focus & Memory</span>
+              <h2 class="text-2xl font-bold text-white">Sequence Matrix</h2>
+            </div>
+            <div class="flex items-center gap-4 bg-slate-950 px-4 py-1.5 rounded-xl border border-slate-800">
+              <div class="text-center">
+                <span class="block text-[9px] text-slate-400 uppercase tracking-widest font-bold">Round / Level</span>
+                <span id="seq-round" class="text-lg font-black text-emerald-400">0</span>
+              </div>
+              <div class="h-6 w-px bg-slate-800"></div>
+              <div class="text-center">
+                <span class="block text-[9px] text-slate-400 uppercase tracking-widest font-bold">Grid Mode</span>
+                <span class="text-xs font-extrabold text-slate-300">3x3 Keypad</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sequence Play Area -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            <!-- Description / Controller (Left) -->
+            <div class="md:col-span-5 space-y-4">
+              <p class="text-sm text-slate-300 leading-relaxed">
+                Pay strict attention to the blinking sequence flashing on the keypad. After the cycle is complete, press the digits in the exact same order.
+              </p>
+
+              <div class="space-y-2">
+                <button id="seq-start-btn" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-emerald-500/10 active:scale-95 transition-all">
+                  START MEMORY RUN
+                </button>
+                <p id="seq-status" class="text-xs text-center text-slate-400 font-medium py-1"></p>
+              </div>
+            </div>
+
+            <!-- Keyboard Grid (Right) -->
+            <div class="md:col-span-7 flex justify-center">
+              <div class="grid grid-cols-3 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800/80 max-w-[280px] w-full">
+                <!-- Buttons 1 to 9 -->
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="1">1</button>
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="2">2</button>
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="3">3</button>
+                
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="4">4</button>
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="5">5</button>
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="6">6</button>
+                
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="7">7</button>
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="8">8</button>
+                <button class="seq-grid-btn aspect-square bg-slate-900 border border-slate-800 text-xl font-black rounded-xl text-slate-400 focus:outline-none transition-all duration-150 active:scale-95 hover:border-emerald-500/40" data-num="9">9</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar Panel: Statistics and Achievements -->
+      <div class="lg:col-span-4 space-y-6">
+        
+        <!-- High Scores & Record Card -->
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 backdrop-blur-md">
+          <div class="flex items-center gap-2 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Your High Scores</h3>
+          </div>
+
+          <div class="space-y-3">
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+              <span class="text-xs text-slate-400">Guess Game (Best attempts)</span>
+              <span id="record-guess" class="text-sm font-bold text-indigo-400">--</span>
+            </div>
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+              <span class="text-xs text-slate-400">Math Blitz (Best Streak)</span>
+              <span id="record-blitz" class="text-sm font-bold text-amber-400">0 answers</span>
+            </div>
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 flex justify-between items-center">
+              <span class="text-xs text-slate-400">Sequence (Max Level)</span>
+              <span id="record-seq" class="text-sm font-bold text-emerald-400">0 rounds</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Achievements Panel -->
+        <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 backdrop-blur-md">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4l-2 3h4m-4-3L9 11h4M3 21h18M3 10h18" /></svg>
+              <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200">Achievements</h3>
+            </div>
+            <span id="achievements-ratio" class="text-[10px] font-extrabold bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full">0/4</span>
+          </div>
+
+          <!-- Achievement List -->
+          <div class="space-y-3">
+            <!-- Arch. 1 -->
+            <div id="ach-first-guess" class="achievement-row opacity-50 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80 flex items-start gap-3 transition-all duration-300">
+              <span class="text-xl">🎯</span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-200">First Diagnostic</h4>
+                <p class="text-[10px] text-slate-400">Submit 1 correct guess in Guess My Number.</p>
+              </div>
+            </div>
+            <!-- Arch. 2 -->
+            <div id="ach-blitz-streak" class="achievement-row opacity-50 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80 flex items-start gap-3 transition-all duration-300">
+              <span class="text-xl">⚡</span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-200">Math Dynamo</h4>
+                <p class="text-[10px] text-slate-400">Hit a streak of 8 correct equations in Blitz.</p>
+              </div>
+            </div>
+            <!-- Arch. 3 -->
+            <div id="ach-seq-master" class="achievement-row opacity-50 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80 flex items-start gap-3 transition-all duration-300">
+              <span class="text-xl">🧠</span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-200">Mental Titan</h4>
+                <p class="text-[10px] text-slate-400">Complete Round 5 in Sequence Memory Matrix.</p>
+              </div>
+            </div>
+            <!-- Arch. 4 -->
+            <div id="ach-level-five" class="achievement-row opacity-50 bg-slate-950/40 p-3 rounded-xl border border-slate-800/80 flex items-start gap-3 transition-all duration-300">
+              <span class="text-xl">👑</span>
+              <div>
+                <h4 class="text-xs font-bold text-slate-200">Arcade Elite</h4>
+                <p class="text-[10px] text-slate-400">Reach Arcade Level 5 by accumulating XP.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
-  </div>
+  </main>
 </div>
   
   <script src="script.js"></script>
