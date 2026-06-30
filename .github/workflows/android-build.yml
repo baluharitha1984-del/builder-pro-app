@@ -109,17 +109,17 @@ jobs:
           elif [ "${{ env.PROJECT_TYPE }}" = "existing-capacitor" ] || [ "${{ env.PROJECT_TYPE }}" = "html-pwa" ]; then
             chmod +x android/gradlew
             echo "========== DEBUG =========="
-            find app/src/main/java -name "MainActivity.java"
+            find android/app/src/main/java -name "MainActivity.java" || true
 
-            MAIN=$(find app/src/main/java -name "MainActivity.java" | head -1)
+            MAIN=$(find android/app/src/main/java -name "MainActivity.java" | head -1) || true
 
-            cat "$MAIN" | head -5
+            cat "$MAIN" | head -5 || true
 
-            grep "package=" app/src/main/AndroidManifest.xml || true
-            grep "android:name" app/src/main/AndroidManifest.xml || true
+            grep "package=" android/app/src/main/AndroidManifest.xml || true
+            grep "android:name" android/app/src/main/AndroidManifest.xml || true
 
-            grep "namespace" app/build.gradle || true
-            grep "applicationId" app/build.gradle || true
+            grep "namespace" android/app/build.gradle || true
+            grep "applicationId" android/app/build.gradle || true
 
             echo "========================="
             cd android
@@ -133,14 +133,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: LumixStudioPro-debug-apk
+          name: RetroNeonClock-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: LumixStudioPro-release-aab
+          name: RetroNeonClock-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
