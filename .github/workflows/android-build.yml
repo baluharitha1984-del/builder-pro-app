@@ -109,14 +109,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: SciLabProSimulationHub-debug-apk
+          name: CartoCraftVectorStudio-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: SciLabProSimulationHub-release-aab
+          name: CartoCraftVectorStudio-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
