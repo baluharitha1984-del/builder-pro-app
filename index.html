@@ -3,352 +3,247 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SciLab Pro Simulation Hub</title>
+  <title>CartoCraft Vector Studio</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased pb-12">
-  <!-- Header / Navigation -->
-  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="p-2 bg-gradient-to-br from-indigo-500 to-cyan-400 rounded-xl text-white shadow-lg shadow-indigo-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-          </svg>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">SciLab Pro</h1>
-          <p class="text-[10px] text-cyan-400 font-mono tracking-wider uppercase">Virtual Simulation & Research Lab</p>
-        </div>
+  <div class="relative w-full h-screen bg-slate-950 text-slate-100 overflow-hidden font-sans flex flex-col">
+  <!-- Top Navigation Bar -->
+  <header class="w-full h-16 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between z-20 shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-indigo-600/20 text-indigo-400 rounded-xl border border-indigo-500/30 shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 animate-pulse">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.446 6.002-3.446a.75.75 0 0 0 .502-.65V3.434a.75.75 0 0 0-.502-.649l-6.002-3.446a.75.75 0 0 0-.502 0L9.002 2.785a.75.75 0 0 1-.502 0L2.5 1.139a.75.75 0 0 0-.502.65v13.52c0 .243.118.47.313.607l6.002 3.446c.156.09.346.09.502 0l6.002-3.446Z" />
+        </svg>
       </div>
-      
-      <!-- Interactive Stats -->
-      <div class="flex items-center space-x-6">
-        <div class="hidden md:flex items-center space-x-2 text-xs font-mono text-slate-400 bg-slate-800/40 px-3 py-1.5 rounded-lg border border-slate-800">
-          <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>REACTION CORE: ONLINE</span>
-        </div>
-        <div class="flex items-center space-x-4">
-          <div class="text-right hidden sm:block">
-            <p class="text-[10px] text-slate-500 uppercase font-semibold">Saved Notebooks</p>
-            <p id="notebook-counter-badge" class="text-sm font-bold text-indigo-400">0 Logged</p>
-          </div>
-          <button id="btn-reset-simulation" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition duration-200 border border-slate-700 flex items-center space-x-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H18.21" />
-            </svg>
-            <span>Reset Lab</span>
-          </button>
-        </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">CartoCraft Vector Map</h1>
+        <p class="text-xs text-slate-400">Interactive Simulated GIS & Navigation Studio</p>
       </div>
+    </div>
+
+    <!-- Quick Global Stats/Telemetry -->
+    <div class="hidden md:flex items-center gap-6 text-xs text-slate-400 border-l border-slate-800 pl-6">
+      <div>
+        <span class="text-slate-500 block uppercase tracking-wider text-[10px]">Map Mode</span>
+        <span id="telemetry-style-label" class="font-medium text-slate-200">Cyberpunk Cyber-Grid</span>
+      </div>
+      <div>
+        <span class="text-slate-500 block uppercase tracking-wider text-[10px]">Saved Waypoints</span>
+        <span id="telemetry-waypoint-count" class="font-medium text-slate-200">6 Active Points</span>
+      </div>
+      <div>
+        <span class="text-slate-500 block uppercase tracking-wider text-[10px]">Active Route</span>
+        <span id="telemetry-route-status" class="font-medium text-emerald-400">Ready</span>
+      </div>
+    </div>
+
+    <!-- Simulation Controls -->
+    <div class="flex items-center gap-2">
+      <button id="btn-toggle-traffic" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-indigo-900/40 hover:text-indigo-300 border border-slate-700 transition-all flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+        <span>Simulate Traffic</span>
+      </button>
+      <button id="btn-toggle-weather" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:bg-indigo-900/40 hover:text-indigo-300 border border-slate-700 transition-all flex items-center gap-1.5">
+        <span id="weather-indicator" class="text-sky-400">🌧</span>
+        <span>Weather Overlay</span>
+      </button>
     </div>
   </header>
 
   <!-- Main Workspace -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- LEFT GRID: Virtual Lab Simulator (7 Cols on desktop) -->
-      <div class="lg:col-span-7 space-y-8">
-        
-        <!-- VIRTUAL LAB INTERACTIVE PANEL -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
-          <!-- Ambient backdrop glows -->
-          <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
-          <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="flex-1 w-full flex overflow-hidden relative">
 
-          <!-- Top section indicators -->
-          <div class="flex justify-between items-center mb-6 relative z-10">
-            <div class="flex items-center space-x-2">
-              <span class="px-2 py-1 bg-cyan-500/10 text-cyan-400 text-[10px] uppercase font-bold tracking-wider rounded border border-cyan-500/20">Interactive Simulation</span>
-              <span class="text-xs text-slate-400">v2.4</span>
+    <!-- Floating Tools Overlay Left (Sidebar panel for routing/managing) -->
+    <aside class="absolute lg:relative top-4 left-4 z-10 w-96 max-h-[calc(100vh-10rem)] lg:max-h-none lg:h-full lg:top-0 lg:left-0 flex flex-col gap-4 p-4 pointer-events-none select-none shrink-0">
+      <!-- Route Planner -->
+      <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800 shadow-2xl p-4 flex flex-col gap-3 transition-transform duration-300">
+        <div class="flex justify-between items-center border-b border-slate-800/80 pb-2">
+          <h2 class="text-sm font-semibold tracking-wide flex items-center gap-2 text-indigo-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+            Adaptive Route Planner
+          </h2>
+          <span class="px-2 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-300 font-mono">A* Engine</span>
+        </div>
+
+        <!-- From & To Selectors -->
+        <div class="space-y-2">
+          <div class="relative">
+            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Origin Node</label>
+            <select id="route-origin" class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <!-- Generated dynamically in JS -->
+            </select>
+          </div>
+          <div class="relative">
+            <label class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1">Destination Node</label>
+            <select id="route-destination" class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+              <!-- Generated dynamically in JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button id="btn-calculate-route" class="flex-1 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-xs py-2 px-3 rounded-lg transition-colors shadow-lg shadow-indigo-500/10 flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Calculate Fast Path
+          </button>
+          <button id="btn-clear-route" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition-colors">
+            Clear
+          </button>
+        </div>
+
+        <!-- Navigation Results (Hidden initially, shown after calculation) -->
+        <div id="route-details-panel" class="hidden mt-1 p-3 bg-slate-950/70 border border-slate-800/50 rounded-lg text-xs space-y-2 animate-fadeIn">
+          <div class="flex justify-between border-b border-slate-800 pb-1.5">
+            <span class="text-slate-400">Est. Travel Time:</span>
+            <span id="route-time" class="font-mono font-medium text-slate-200">-- mins</span>
+          </div>
+          <div class="flex justify-between border-b border-slate-800 pb-1.5">
+            <span class="text-slate-400">Direct Distance:</span>
+            <span id="route-distance" class="font-mono font-medium text-indigo-400">-- px</span>
+          </div>
+          <div class="flex justify-between pb-0.5">
+            <span class="text-slate-400">Congestion Penalty:</span>
+            <span id="route-delay" class="font-mono font-medium text-amber-400">None</span>
+          </div>
+          <div class="p-1.5 bg-indigo-950/30 text-[11px] text-indigo-300 rounded border border-indigo-900/40 text-center">
+            💡 Visual glowing route trace rendered live on the map grid.
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Saved Waypoints / Place List -->
+      <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-md rounded-2xl border border-slate-800 shadow-2xl p-4 flex-1 flex flex-col min-h-0">
+        <div class="flex justify-between items-center border-b border-slate-800/80 pb-2.5 mb-2">
+          <div class="flex items-center gap-2">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <h2 class="text-sm font-semibold tracking-wide text-slate-200">Interactive Waypoints</h2>
+          </div>
+          <span class="text-[10px] text-slate-400">Click to Teleport</span>
+        </div>
+
+        <!-- Search/Filter -->
+        <div class="relative mb-3">
+          <input id="search-places" type="text" placeholder="Search places by name..." class="w-full bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-lg pl-8 pr-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none placeholder-slate-500" />
+          <svg class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+
+        <!-- Waypoint Container (Scrollable) -->
+        <div id="waypoint-list" class="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar text-xs">
+          <!-- Populated in JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- Central interactive map wrapper -->
+    <main class="flex-1 h-full relative overflow-hidden flex items-center justify-center bg-slate-950">
+      <!-- Instructions Overlay -->
+      <div class="absolute top-4 right-4 z-10 flex flex-col items-end gap-2 pointer-events-none">
+        <div class="bg-slate-900/95 backdrop-blur-md border border-slate-800/80 rounded-xl px-4 py-3 shadow-2xl text-xs space-y-1.5 max-w-sm pointer-events-auto">
+          <div class="font-semibold text-indigo-400 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Interactive Vector Canvas Controls
+          </div>
+          <p class="text-slate-400 text-[11px] leading-relaxed">
+            Drag the map to <strong class="text-slate-200">Pan</strong>, scroll to <strong class="text-slate-200">Zoom</strong>, or simply <strong class="text-indigo-300">Double-click anywhere</strong> to register a new map landmark point.
+          </p>
+        </div>
+
+        <!-- Quick map layer switches -->
+        <div class="flex items-center gap-1.5 bg-slate-900/95 backdrop-blur-md border border-slate-800/80 rounded-xl p-1.5 shadow-2xl pointer-events-auto">
+          <button id="layer-cyber" class="px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-lg bg-indigo-600 text-white transition-all">CYBER NEON</button>
+          <button id="layer-blueprint" class="px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all">BLUEPRINT</button>
+          <button id="layer-topo" class="px-2.5 py-1 text-[10px] font-bold tracking-wider rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all">TOPO GRAY</button>
+        </div>
+      </div>
+
+      <!-- Interactive Map Canvas Element -->
+      <canvas id="map-canvas" class="absolute inset-0 cursor-grab active:cursor-grabbing w-full h-full block bg-slate-950"></canvas>
+
+      <!-- Floating Overlay Map Controls bottom center/right -->
+      <div class="absolute bottom-6 right-6 z-10 flex flex-col gap-2 pointer-events-auto">
+        <!-- Scale, Coordinate Meter and Zoom -->
+        <div class="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-2xl flex flex-col gap-2 min-w-[200px]">
+          <div class="flex items-center justify-between text-[11px] font-mono border-b border-slate-800 pb-1">
+            <span class="text-slate-500">Center Coords:</span>
+            <span id="coord-tracker" class="text-cyan-400 font-bold">X: 0.00, Y: 0.00</span>
+          </div>
+          <div class="flex items-center justify-between text-[11px] font-mono">
+            <span class="text-slate-500">Current Zoom:</span>
+            <span id="zoom-tracker" class="text-indigo-400 font-bold">1.0x</span>
+          </div>
+          <div class="flex gap-1.5 mt-1">
+            <button id="btn-zoom-in" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-1.5 rounded border border-slate-700 hover:border-slate-600 transition-all text-sm">+</button>
+            <button id="btn-zoom-out" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-1.5 rounded border border-slate-700 hover:border-slate-600 transition-all text-sm">-</button>
+            <button id="btn-zoom-reset" class="px-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded border border-slate-700 transition-all text-[11px] font-semibold">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Double Click Popup Form (Hidden until dynamic prompt) -->
+      <div id="add-waypoint-modal" class="hidden absolute z-30 inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300">
+        <div class="bg-slate-900 border border-indigo-500/30 rounded-2xl w-full max-w-sm p-5 shadow-2xl relative animate-scaleUp">
+          <button id="btn-close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 text-lg font-bold">&times;</button>
+          
+          <div class="flex items-center gap-2 mb-4">
+            <div class="p-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
             </div>
-            <div class="flex items-center space-x-2">
-              <span class="text-xs text-slate-400">Temp:</span>
-              <span id="temp-digital-display" class="text-xs font-mono font-bold text-amber-400">25°C</span>
-            </div>
+            <h3 class="text-sm font-bold text-slate-200">Create Custom Map Marker</h3>
           </div>
 
-          <!-- Visual Experiment Flask Sandbox -->
-          <div class="bg-slate-950/80 rounded-xl p-8 border border-slate-800/80 relative flex flex-col items-center justify-center min-h-[340px] shadow-inner">
-            <!-- Visual Grid Overlay -->
-            <div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
-            
-            <!-- Steam/Heat Effect overlay -->
-            <div id="steam-effect" class="absolute top-12 flex space-x-4 opacity-0 transition-opacity duration-500 pointer-events-none">
-              <span class="steam-particle"></span>
-              <span class="steam-particle delay-200"></span>
-              <span class="steam-particle delay-500"></span>
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block text-[11px] text-slate-400 font-medium mb-1">Marker Title</label>
+              <input id="new-wp-title" type="text" placeholder="e.g. Secret Cyber Docks" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
             </div>
-
-            <!-- Thermometer Display Left -->
-            <div class="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col items-center">
-              <div class="w-3 h-32 bg-slate-800 rounded-full relative overflow-hidden border border-slate-700">
-                <div id="thermometer-bar" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-red-600 to-amber-400 transition-all duration-300" style="height: 25%;"></div>
-              </div>
-              <span class="text-[10px] text-slate-400 mt-2 font-mono">TEMP</span>
-            </div>
-
-            <!-- Beaker Container Graphic -->
-            <div class="relative w-48 h-60 mt-4">
-              <!-- Glass Outline -->
-              <div class="absolute inset-0 border-4 border-slate-400/30 rounded-b-[40px] rounded-t-[10px] overflow-hidden backdrop-blur-sm shadow-lg">
-                <!-- Measurement markings -->
-                <div class="absolute left-2 top-8 w-4 h-0.5 bg-slate-500/50"></div>
-                <span class="absolute left-8 top-6 text-[8px] text-slate-500 font-mono">400ml</span>
-                <div class="absolute left-2 top-16 w-3 h-0.5 bg-slate-500/50"></div>
-                <div class="absolute left-2 top-24 w-4 h-0.5 bg-slate-500/50"></div>
-                <span class="absolute left-8 top-22 text-[8px] text-slate-500 font-mono">250ml</span>
-                <div class="absolute left-2 top-32 w-3 h-0.5 bg-slate-500/50"></div>
-                <div class="absolute left-2 top-40 w-4 h-0.5 bg-slate-500/50"></div>
-                <span class="absolute left-8 top-38 text-[8px] text-slate-500 font-mono">100ml</span>
-
-                <!-- Simulated Liquid Container -->
-                <div id="beaker-liquid" class="absolute bottom-0 left-0 right-0 h-2/5 bg-slate-700/40 transition-all duration-700 ease-in-out flex items-end justify-center">
-                  
-                  <!-- Active Bubbles (only visible or active during certain states) -->
-                  <div id="liquid-bubbles" class="absolute inset-0 opacity-25 overflow-hidden pointer-events-none"></div>
-                  
-                  <!-- Reaction flash overlay -->
-                  <div id="reaction-flash" class="absolute inset-0 bg-white opacity-0 transition-opacity duration-300"></div>
+            <div>
+              <label class="block text-[11px] text-slate-400 font-medium mb-1">Coordinate Anchors</label>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-400 font-mono text-[10px]">
+                  X: <span id="new-wp-x" class="text-indigo-400 font-bold">0</span>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-slate-400 font-mono text-[10px]">
+                  Y: <span id="new-wp-y" class="text-indigo-400 font-bold">0</span>
                 </div>
               </div>
-              <!-- Flask Neck and Lip -->
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-4 bg-slate-400/30 border-2 border-slate-400/40 rounded-full"></div>
-            </div>
-
-            <!-- pH & Chemical Status Overlay (Floating) -->
-            <div class="absolute right-4 bottom-4 bg-slate-900/90 border border-slate-700/60 rounded-xl p-3 text-xs font-mono space-y-1 shadow-md min-w-[130px]">
-              <div class="flex justify-between">
-                <span class="text-slate-400">pH Value:</span>
-                <span id="sim-ph-val" class="text-cyan-400 font-bold">7.0</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">pH Class:</span>
-                <span id="sim-ph-class" class="text-slate-300 font-bold">Neutral</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Solubility:</span>
-                <span id="sim-solubility" class="text-emerald-400 font-bold">High</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Simulation Controls Dashboard -->
-          <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-            
-            <!-- Control A: Acid / Base Selector -->
-            <div class="space-y-2">
-              <label class="text-xs text-slate-400 font-semibold block uppercase tracking-wider">Select Solvent (Base)</label>
-              <select id="select-solvent" class="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-cyan-500 focus:outline-none">
-                <option value="water">Water (pH 7.0)</option>
-                <option value="acid-hcl">Hydrochloric Acid (pH 1.2)</option>
-                <option value="base-naoh">Sodium Hydroxide (pH 13.5)</option>
-                <option value="vinegar">Acetic Acid / Vinegar (pH 3.0)</option>
-              </select>
-            </div>
-
-            <!-- Control B: Reagent / Additives -->
-            <div class="space-y-2">
-              <label class="text-xs text-slate-400 font-semibold block uppercase tracking-wider">Add Reagent / Indicator</label>
-              <select id="select-reagent" class="w-full bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-cyan-500 focus:outline-none">
-                <option value="none">-- No Reagent --</option>
-                <option value="universal">Universal Indicator</option>
-                <option value="phenolphthalein">Phenolphthalein</option>
-                <option value="litmus-blue">Litmus Blue Paper/Solution</option>
-                <option value="baking-soda">Baking Soda (Sodium Bicarbonate)</option>
-              </select>
-            </div>
-
-            <!-- Control C: Temperature Control -->
-            <div class="space-y-2">
-              <div class="flex justify-between">
-                <label class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Bunsen Burner Heat</label>
-                <span id="temp-slider-label" class="text-xs text-slate-400 font-mono">25°C</span>
-              </div>
-              <input id="slider-temp" type="range" min="5" max="100" value="25" class="w-full accent-cyan-400 bg-slate-850 h-2 rounded-lg cursor-pointer">
-            </div>
-          </div>
-
-          <!-- Primary Simulation Actions -->
-          <div class="mt-4 flex flex-wrap gap-3 items-center justify-between">
-            <div class="flex gap-3">
-              <button id="btn-trigger-mix" class="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-white font-semibold rounded-xl text-xs transition duration-200 shadow-md shadow-indigo-500/10 flex items-center space-x-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547" />
-                </svg>
-                <span>Trigger Reaction</span>
-              </button>
-              <button id="btn-quick-add-ice" class="px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs transition duration-200 border border-slate-700">
-                ❄️ Snap Cool (5°C)
-              </button>
-            </div>
-
-            <!-- Realtime Alert/Warning Display -->
-            <div id="lab-reaction-warning" class="flex items-center space-x-2 text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-xl border border-amber-500/20 max-w-full hidden">
-              <span class="animate-ping h-2 w-2 rounded-full bg-amber-400"></span>
-              <span id="warning-text-content">Caution: High exothermic potential!</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- SCIENCE TRIVIA & KNOWLEDGE CHECK -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center space-x-2">
-              <span class="p-1.5 bg-violet-500/10 text-violet-400 rounded-lg">
-                🧠
-              </span>
-              <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Daily Knowledge Challenge</h3>
-            </div>
-            <span class="text-xs font-mono text-violet-400" id="quiz-score-display">Score: 0/0</span>
-          </div>
-          
-          <div id="quiz-container" class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-            <p id="quiz-question" class="text-sm font-semibold text-slate-300 mb-3">Select "New Question" below to load active science trivia challenges!</p>
-            <div id="quiz-options-box" class="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <!-- Options injected dynamically by JS -->
-            </div>
-            <div id="quiz-feedback" class="mt-3 text-xs font-semibold hidden p-2 rounded-lg"></div>
-          </div>
-
-          <div class="mt-3 flex justify-end">
-            <button id="btn-next-question" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium transition duration-200">
-              New Question ➔
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- RIGHT GRID: Active Guide & Lab Notebook (5 Cols on desktop) -->
-      <div class="lg:col-span-5 space-y-8">
-        
-        <!-- EXPERIMENT FINDER & ACTIVE GUIDE -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl relative">
-          <div class="flex items-center justify-between mb-4">
-            <div class="space-y-0.5">
-              <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Active Lab Protocols</h3>
-              <p class="text-xs text-slate-400">Click a guide to load parameters</p>
-            </div>
-            <span class="px-2 py-1 bg-indigo-500/10 text-indigo-400 rounded-full text-[10px] font-mono border border-indigo-500/20">Presets Available</span>
-          </div>
-
-          <!-- Preset Selectors -->
-          <div class="space-y-3 max-h-[280px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800">
-            
-            <!-- Preset Card 1 -->
-            <div class="preset-card p-3 rounded-xl bg-slate-950 hover:bg-slate-950/40 border border-slate-800 hover:border-slate-700 transition cursor-pointer" 
-                 data-solvent="acid-hcl" data-reagent="universal" data-temp="35" data-title="The Universal pH Indicator Color Wave">
-              <div class="flex justify-between items-start mb-1">
-                <span class="text-xs font-bold text-slate-200 hover:text-indigo-400">1. The Universal pH Indicator</span>
-                <span class="px-1.5 py-0.5 text-[9px] bg-emerald-500/10 text-emerald-400 rounded uppercase font-bold">Easy</span>
-              </div>
-              <p class="text-[11px] text-slate-400 mb-2">Observe vibrant chromatic transformations across pH scales 1 through 14.</p>
-              <div class="flex justify-between text-[10px] font-mono text-slate-500">
-                <span>Acid: HCl</span>
-                <span>Temp: Ambient</span>
-              </div>
-            </div>
-
-            <!-- Preset Card 2 -->
-            <div class="preset-card p-3 rounded-xl bg-slate-950 hover:bg-slate-950/40 border border-slate-800 hover:border-slate-700 transition cursor-pointer" 
-                 data-solvent="base-naoh" data-reagent="phenolphthalein" data-temp="60" data-title="Exothermic Alkaline Hot Pink Flashes">
-              <div class="flex justify-between items-start mb-1">
-                <span class="text-xs font-bold text-slate-200 hover:text-indigo-400">2. Alkaline Exothermic Vaporization</span>
-                <span class="px-1.5 py-0.5 text-[9px] bg-amber-500/10 text-amber-400 rounded uppercase font-bold">Medium</span>
-              </div>
-              <p class="text-[11px] text-slate-400 mb-2">Superheat Phenolphthalein and strong bases to view deep pink hues with bubble vapors.</p>
-              <div class="flex justify-between text-[10px] font-mono text-slate-500">
-                <span>Base: NaOH</span>
-                <span>Temp: Heat > 60°C</span>
-              </div>
-            </div>
-
-            <!-- Preset Card 3 -->
-            <div class="preset-card p-3 rounded-xl bg-slate-950 hover:bg-slate-950/40 border border-slate-800 hover:border-slate-700 transition cursor-pointer" 
-                 data-solvent="vinegar" data-reagent="baking-soda" data-temp="20" data-title="Neutralization Fizz Expansion">
-              <div class="flex justify-between items-start mb-1">
-                <span class="text-xs font-bold text-slate-200 hover:text-indigo-400">3. Acid-Base Gas Expansion Fizz</span>
-                <span class="px-1.5 py-0.5 text-[9px] bg-red-500/10 text-red-400 rounded uppercase font-bold">Hard</span>
-              </div>
-              <p class="text-[11px] text-slate-400 mb-2">Combine Acetic Acid and Baking Soda to generate vigorous simulated gas output logs.</p>
-              <div class="flex justify-between text-[10px] font-mono text-slate-500">
-                <span>Acid: Acetic</span>
-                <span>Temp: Cool (20°C)</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- MY LAB NOTEBOOK -->
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
-          <div class="flex items-center space-x-2">
-            <span class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
-              📝
-            </span>
-            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">My Lab Notebook Log</h3>
-          </div>
-
-          <!-- Input Form -->
-          <form id="lab-log-form" class="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800/80">
-            <div>
-              <label class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider mb-1">Experiment Title / Lab Focus</label>
-              <input id="log-title" type="text" placeholder="e.g., Thermal Acid Catalytic Test" class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none" required>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider mb-1">Main Reactant</label>
-                <input id="log-reactant" type="text" placeholder="e.g., 0.1M HCl" class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
-              </div>
-              <div>
-                <label class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider mb-1">Observed pH Color</label>
-                <input id="log-color" type="text" placeholder="e.g., Electric Crimson" class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
-              </div>
             </div>
             <div>
-              <label class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider mb-1">Observations & Analytical Notes</label>
-              <textarea id="log-notes" rows="2" placeholder="Describe color changes, bubbles, temperature spikes, or gas emission behavior here..." class="w-full bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:outline-none"></textarea>
+              <label class="block text-[11px] text-slate-400 font-medium mb-1">Category Icon Style</label>
+              <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" data-cat="landmark" class="cat-btn py-1.5 rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/50 text-[10px] font-semibold text-center hover:bg-indigo-600/50">🏛 Landmark</button>
+                <button type="button" data-cat="port" class="cat-btn py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-semibold text-center hover:bg-slate-700 hover:text-slate-200">⚓ Port</button>
+                <button type="button" data-cat="danger" class="cat-btn py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-semibold text-center hover:bg-slate-700 hover:text-slate-200">⚡ Danger</button>
+                <button type="button" data-cat="outpost" class="cat-btn py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 text-[10px] font-semibold text-center hover:bg-slate-700 hover:text-slate-200">⛺ Outpost</button>
+              </div>
             </div>
-            <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs transition duration-150 flex items-center justify-center space-x-1.5">
-              <span>Log Observation Entry</span>
-            </button>
-          </form>
-
-          <!-- Logged List Container -->
-          <div class="space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Chronological Log Ledger</span>
-              <button id="btn-clear-logs" class="text-[10px] text-rose-400 hover:text-rose-300 transition duration-150">Clear All Entries</button>
-            </div>
-
-            <!-- Empty State placeholder -->
-            <div id="empty-logs-placeholder" class="text-center py-6 border border-dashed border-slate-800 rounded-xl bg-slate-950/20">
-              <p class="text-xs text-slate-500">No experiments documented in this session yet.</p>
-              <p class="text-[10px] text-slate-600 mt-1">Run mixtures and document findings above!</p>
-            </div>
-
-            <!-- Scrollable Log Container -->
-            <div id="logged-entries-box" class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
-              <!-- Dynamic Entries Loaded Here -->
+            <div class="pt-2 flex gap-2">
+              <button id="btn-save-waypoint" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-lg font-bold transition-colors">Deploy Marker</button>
+              <button id="btn-cancel-modal" class="px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors">Cancel</button>
             </div>
           </div>
-
         </div>
-
       </div>
-
-    </div>
-  </main>
-
-  <!-- Live Lab Logs Toast / Toast Area bottom-right -->
-  <div class="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none" id="toast-container">
-    <!-- Dynamic system notices and alerts go here -->
+    </main>
   </div>
+
+  <!-- Bottom State Panel / Terminal Feed -->
+  <footer class="h-12 w-full bg-slate-950 border-t border-slate-800/80 px-6 flex items-center justify-between z-10 shrink-0 text-xs text-slate-500">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span>Vector System Engine Active</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span id="terminal-status">Status: Map loaded successfully. Click anywhere to explore coordinates.</span>
+      <span class="text-slate-700">|</span>
+      <span>WebGL Simulation Render v2.4</span>
+    </div>
+  </footer>
 </div>
   
   <script src="script.js"></script>
