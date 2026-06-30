@@ -1,106 +1,42 @@
-/* Customized styling overrides for WonderLand Kids app */
-
-.nav-btn {
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* Custom sliders accent branding for cross-browser standard */
+.slider-indigo {
+  accent-color: #6366f1;
 }
 
-.nav-btn.active {
-  transform: translateY(2px);
-  background-color: #f8fafc;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-}
-
-#nav-btn-music.active {
-  border-bottom: 2px solid #6366f1 !important;
-  background-color: #f5f3ff;
-}
-#nav-btn-paint.active {
-  border-bottom: 2px solid #ec4899 !important;
-  background-color: #fdf2f8;
-}
-#nav-btn-memory.active {
-  border-bottom: 2px solid #10b981 !important;
-  background-color: #ecfdf5;
-}
-#nav-btn-story.active {
-  border-bottom: 2px solid #f59e0b !important;
-  background-color: #fffbeb;
-}
-
-/* Sound keys extra press glow */
-.sound-key {
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-.sound-key:active {
-  transform: scale(0.95) translateY(4px);
-  border-bottom-width: 2px;
-}
-
-/* Color swatches layout outline active */
-.color-swatch {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.color-swatch:hover {
-  transform: scale(1.15);
-}
-.color-swatch.active-swatch {
-  border-color: #000000 !important;
-  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.8);
-}
-
-/* Sticker selection state layout */
-.sticker-selector {
-  transition: transform 0.1s ease;
-}
-.sticker-selector:hover {
-  transform: scale(1.2);
-}
-.sticker-selector.active-sticker {
-  background-color: #fbcfe8;
-  border: 2px solid #ec4899;
-}
-
-/* Memory Match Game styling */
-.memory-card {
-  perspective: 1000px;
+.slider-indigo::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6366f1;
   cursor: pointer;
-  user-select: none;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  transition: transform 0.15s ease-in-out;
 }
 
-.memory-card-inner {
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
+.slider-indigo::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
 }
 
-.memory-card.flipped .memory-card-inner {
-  transform: rotateY(180deg);
+/* Interactive Checkered background pattern creator using pure linear CSS */
+.canvas-checkered {
+  background-size: 20px 20px;
+  background-image: 
+    linear-gradient(45deg, #18181b 25%, transparent 25%), 
+    linear-gradient(-45deg, #18181b 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #18181b 75%), 
+    linear-gradient(-45deg, transparent 75%, #18181b 75%);
+  background-color: #09090b;
 }
 
-.card-front, .card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  border-radius: 1rem;
+/* Subtle glowing animations for interactive parts */
+@keyframes softPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
 
-.card-back {
-  background-color: #f1f5f9;
-  border: 4px solid #cbd5e1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-front {
-  transform: rotateY(180deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.glowing-badge {
+  animation: softPulse 2s infinite ease-in-out;
 }
