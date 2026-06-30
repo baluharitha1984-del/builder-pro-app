@@ -1,79 +1,48 @@
-/* Science grid backdrop patterns & animations */
-.bg-grid-pattern {
-  background-size: 20px 20px;
-  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+/* Dynamic Map Canvas Styling and Custom Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Steam and Gas Particles styling */
-.steam-particle {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 255, 255, 0.25);
-  border-radius: 50%;
-  filter: blur(4px);
-  animation: steamRise 2s infinite linear;
-}
-.delay-200 {
-  animation-delay: 0.4s;
-}
-.delay-500 {
-  animation-delay: 1s;
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes steamRise {
-  0% {
-    transform: translateY(20px) scale(0.6);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(-80px) scale(1.6);
-    opacity: 0;
-  }
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
 }
 
-/* Bubbling within Beaker */
-.bubble-unit {
-  position: absolute;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  animation: bubbleFloat 3s infinite ease-in;
+.animate-scaleUp {
+  animation: scaleUp 0.2s ease-out forwards;
 }
 
-@keyframes bubbleFloat {
-  0% {
-    transform: translateY(0) scale(0.5);
-    opacity: 0.2;
-  }
-  50% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(-160px) scale(1.2);
-    opacity: 0;
-  }
+/* Elegant Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
 }
-
-/* Active protocol selected card styles */
-.preset-card-active {
-  border-color: #06b6d4 !important;
-  background-color: rgba(6, 182, 212, 0.05) !important;
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
-}
-
-/* Custom scrollbars */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: #334155;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
   border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+/* Map styles visual elements */
+#map-canvas {
+  background-color: #0b0f19;
+  transition: filter 0.3s ease-in-out;
+}
+
+.layer-blueprint #map-canvas {
+  background-color: #021a40;
+}
+
+.layer-topo #map-canvas {
+  background-color: #121214;
 }
