@@ -109,14 +109,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: RetroNeonSnakeAdventureOfflineMatched-debug-apk
+          name: SciLabProSimulationHub-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: RetroNeonSnakeAdventureOfflineMatched-release-aab
+          name: SciLabProSimulationHub-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
