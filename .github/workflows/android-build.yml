@@ -84,6 +84,16 @@ jobs:
               node configure_package.js
             fi
           fi
+      - name: Build Web Assets and Sync Capacitor
+        run: |-
+          if [ "${{ env.PROJECT_TYPE }}" = "existing-capacitor" ]; then
+            echo "Installing npm dependencies..."
+            npm install
+            echo "Building web assets..."
+            npm run build --if-present
+            echo "Syncing web assets to Capacitor Android..."
+            npx cap sync android
+          fi
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -98,6 +108,20 @@ jobs:
             ./gradlew bundleRelease
           elif [ "${{ env.PROJECT_TYPE }}" = "existing-capacitor" ] || [ "${{ env.PROJECT_TYPE }}" = "html-pwa" ]; then
             chmod +x android/gradlew
+            echo "========== DEBUG =========="
+            find app/src/main/java -name "MainActivity.java"
+
+            MAIN=$(find app/src/main/java -name "MainActivity.java" | head -1)
+
+            cat "$MAIN" | head -5
+
+            grep "package=" app/src/main/AndroidManifest.xml || true
+            grep "android:name" app/src/main/AndroidManifest.xml || true
+
+            grep "namespace" app/build.gradle || true
+            grep "applicationId" app/build.gradle || true
+
+            echo "========================="
             cd android
             ./gradlew assembleDebug
             ./gradlew bundleRelease
@@ -109,14 +133,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: WonderLandPlaybox-debug-apk
+          name: LumixStudioPro-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: WonderLandPlaybox-release-aab
+          name: LumixStudioPro-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
