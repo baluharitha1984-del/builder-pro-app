@@ -1,25 +1,79 @@
-/* Retro Arcade Styling */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #03000a;
-  color: #fff;
-  font-family: 'Inter', system-ui, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+/* Science grid backdrop patterns & animations */
+.bg-grid-pattern {
+  background-size: 20px 20px;
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
 }
 
-.arcade-cabinet {
-  background: #090314;
-  border: 3px solid #3b0764;
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
-  max-width: 440px;
-  width: 90%;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+/* Steam and Gas Particles styling */
+.steam-particle {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  filter: blur(4px);
+  animation: steamRise 2s infinite linear;
+}
+.delay-200 {
+  animation-delay: 0.4s;
+}
+.delay-500 {
+  animation-delay: 1s;
+}
+
+@keyframes steamRise {
+  0% {
+    transform: translateY(20px) scale(0.6);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-80px) scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Bubbling within Beaker */
+.bubble-unit {
+  position: absolute;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  animation: bubbleFloat 3s infinite ease-in;
+}
+
+@keyframes bubbleFloat {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-160px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* Active protocol selected card styles */
+.preset-card-active {
+  border-color: #06b6d4 !important;
+  background-color: rgba(6, 182, 212, 0.05) !important;
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.15);
+}
+
+/* Custom scrollbars */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #334155;
+  border-radius: 4px;
 }
