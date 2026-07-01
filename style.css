@@ -1,1 +1,1 @@
-.active\:scale-95:active { transform: scale(0.95); }.font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+.banner-card { transition: transform 0.2s, box-shadow 0.2s; }.banner-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
