@@ -1,559 +1,605 @@
-// Wait for DOM to be fully prepared
-window.addEventListener('DOMContentLoaded', () => {
-  // Elements
-  const unitMetricBtn = document.getElementById('unitMetricBtn');
-  const unitImperialBtn = document.getElementById('unitImperialBtn');
-  const unitIndicatorText = document.getElementById('unitIndicatorText');
+// Core state management
+const state = {
+  recentSearches: ['twilight', 'fire', 'dream', 'rhyme'],
+  savedRhymes: [],
+  activeWord: '',
+  clickAction: 'insert', // 'insert' | 'copy'
+  activeTab: 'favs' // 'favs' | 'history'
+};
+
+// Datamuse fallback dictionary to guarantee app stays highly functional even if API rates are hit or offline
+const fallbackDictionary = {
+  twilight: [
+    { word: 'skylight', score: 300, numSyllables: 2 },
+    { word: 'highlight', score: 290, numSyllables: 2 },
+    { word: 'night', score: 280, numSyllables: 1 },
+    { word: 'bright', score: 275, numSyllables: 1 },
+    { word: 'flight', score: 260, numSyllables: 1 },
+    { word: 'insight', score: 250, numSyllables: 2 },
+    { word: 'satellite', score: 220, numSyllables: 3 },
+    { word: 'daylight', score: 210, numSyllables: 2 }
+  ],
+  fire: [
+    { word: 'wire', score: 320, numSyllables: 1 },
+    { word: 'desire', score: 310, numSyllables: 2 },
+    { word: 'higher', score: 300, numSyllables: 2 },
+    { word: 'admire', score: 280, numSyllables: 2 },
+    { word: 'aspire', score: 270, numSyllables: 2 },
+    { word: 'choir', score: 260, numSyllables: 1 },
+    { word: 'pyre', score: 250, numSyllables: 1 }
+  ],
+  dream: [
+    { word: 'gleam', score: 310, numSyllables: 1 },
+    { word: 'stream', score: 300, numSyllables: 1 },
+    { word: 'scheme', score: 290, numSyllables: 1 },
+    { word: 'scream', score: 280, numSyllables: 1 },
+    { word: 'beam', score: 270, numSyllables: 1 },
+    { word: 'theme', score: 260, numSyllables: 1 },
+    { word: 'supreme', score: 240, numSyllables: 2 }
+  ],
+  rhyme: [
+    { word: 'chime', score: 320, numSyllables: 1 },
+    { word: 'climb', score: 310, numSyllables: 1 },
+    { word: 'time', score: 300, numSyllables: 1 },
+    { word: 'prime', score: 290, numSyllables: 1 },
+    { word: 'slime', score: 280, numSyllables: 1 },
+    { word: 'sublime', score: 270, numSyllables: 2 },
+    { word: 'lifetime', score: 260, numSyllables: 2 }
+  ],
+  sky: [
+    { word: 'high', score: 320, numSyllables: 1 },
+    { word: 'fly', score: 310, numSyllables: 1 },
+    { word: 'cry', score: 300, numSyllables: 1 },
+    { word: 'sigh', score: 290, numSyllables: 1 },
+    { word: 'why', score: 280, numSyllables: 1 },
+    { word: 'butterfly', score: 260, numSyllables: 3 },
+    { word: 'reply', score: 250, numSyllables: 2 }
+  ],
+  shadow: [
+    { word: 'meadow', score: 290, numSyllables: 2 },
+    { word: 'shallow', score: 280, numSyllables: 2 },
+    { word: 'widow', score: 270, numSyllables: 2 },
+    { word: 'elbow', score: 240, numSyllables: 2 },
+    { word: 'yellow', score: 230, numSyllables: 2 }
+  ],
+  night: [
+    { word: 'bright', score: 330, numSyllables: 1 },
+    { word: 'light', score: 320, numSyllables: 1 },
+    { word: 'might', score: 310, numSyllables: 1 },
+    { word: 'tight', score: 300, numSyllables: 1 },
+    { word: 'flight', score: 290, numSyllables: 1 },
+    { word: 'insight', score: 270, numSyllables: 2 },
+    { word: 'overnight', score: 250, numSyllables: 3 }
+  ],
+  dance: [
+    { word: 'glance', score: 310, numSyllables: 1 },
+    { word: 'romance', score: 300, numSyllables: 2 },
+    { word: 'chance', score: 290, numSyllables: 1 },
+    { word: 'trance', score: 280, numSyllables: 1 },
+    { word: 'stance', score: 270, numSyllables: 1 },
+    { word: 'circumstance', score: 240, numSyllables: 3 }
+  ],
+  ocean: [
+    { word: 'motion', score: 320, numSyllables: 2 },
+    { word: 'devotion', score: 310, numSyllables: 3 },
+    { word: 'potion', score: 300, numSyllables: 2 },
+    { word: 'notion', score: 290, numSyllables: 2 },
+    { word: 'emotion', score: 280, numSyllables: 3 }
+  ]
+};
+
+// DOM Elements References
+const searchForm = document.getElementById('searchForm');
+const searchInput = document.getElementById('searchInput');
+const relationType = document.getElementById('relationType');
+const syllableFilter = document.getElementById('syllableFilter');
+const rhymeResultsGrid = document.getElementById('rhymeResultsGrid');
+const resultsTitle = document.getElementById('resultsTitle');
+const resultsSummary = document.getElementById('resultsSummary');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const matchCountBadge = document.getElementById('matchCountBadge');
+
+const rhymePadTextArea = document.getElementById('rhymePadTextArea');
+const lineSyllablesCount = document.getElementById('lineSyllablesCount');
+const totalWordsCount = document.getElementById('totalWordsCount');
+const globalSyllableIndicator = document.getElementById('globalSyllableIndicator');
+
+const modeInsertBtn = document.getElementById('modeInsertBtn');
+const modeCopyBtn = document.getElementById('modeCopyBtn');
+const clearPadBtn = document.getElementById('clearPadBtn');
+const copyAllBtn = document.getElementById('copyAllBtn');
+const triggerDemoBtn = document.getElementById('triggerDemoBtn');
+
+const tabFavs = document.getElementById('tabFavs');
+const tabHistory = document.getElementById('tabHistory');
+const favsPanel = document.getElementById('favsPanel');
+const historyPanel = document.getElementById('historyPanel');
+const favsGrid = document.getElementById('favsGrid');
+const historyList = document.getElementById('historyList');
+const noFavsMsg = document.getElementById('noFavsMsg');
+const noHistoryMsg = document.getElementById('noHistoryMsg');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const favCountBadge = document.getElementById('favCount');
+
+const toast = document.getElementById('toast');
+const toastIcon = document.getElementById('toastIcon');
+const toastMsg = document.getElementById('toastMsg');
+
+// Load from Local Storage
+function loadFromLocalStorage() {
+  const saved = localStorage.getItem('versecraft_favs');
+  if (saved) {
+    state.savedRhymes = JSON.parse(saved);
+  }
+  const hist = localStorage.getItem('versecraft_history');
+  if (hist) {
+    state.recentSearches = JSON.parse(hist);
+  }
+  renderSavedRhymes();
+  renderHistory();
+}
+
+// Save to Local Storage
+function saveToLocalStorage() {
+  localStorage.setItem('versecraft_favs', JSON.stringify(state.savedRhymes));
+  localStorage.setItem('versecraft_history', JSON.stringify(state.recentSearches));
+  favCountBadge.textContent = state.savedRhymes.length;
+}
+
+// Show Toast notifications
+function showToast(message, icon = '✨') {
+  toastMsg.textContent = message;
+  toastIcon.textContent = icon;
+  toast.classList.remove('opacity-0', 'translate-y-10');
+  toast.classList.add('opacity-100', 'translate-y-0');
   
-  const genderMaleBtn = document.getElementById('genderMaleBtn');
-  const genderFemaleBtn = document.getElementById('genderFemaleBtn');
+  setTimeout(() => {
+    toast.classList.remove('opacity-100', 'translate-y-0');
+    toast.classList.add('opacity-0', 'translate-y-10');
+  }, 2400);
+}
+
+// Estimate syllables simplified fallback function
+function estimateSyllableCount(word) {
+  let cleanWord = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (cleanWord.length <= 3) return 1;
+  cleanWord = cleanWord.replace(/(?:uo|ea|oa|ai|oi|ae|ou|au|oo|ee)/g, 'a');
+  cleanWord = cleanWord.replace(/[^aeiouy]e$/g, '');
+  const matches = cleanWord.match(/[aeiouy]{1,2}/g);
+  return matches ? matches.length : 1;
+}
+
+// Count syllables inside textarea's active/focused line
+function updatePadCounts() {
+  const text = rhymePadTextArea.value;
   
-  const ageSlider = document.getElementById('ageSlider');
-  const ageInput = document.getElementById('ageInput');
-  const ageDisplay = document.getElementById('ageDisplay');
+  // Word counter
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+  totalWordsCount.textContent = words.length;
+
+  // Line-by-line analyzer for active line
+  const cursorPosition = rhymePadTextArea.selectionStart;
+  const lines = text.substring(0, cursorPosition).split('\n');
+  const activeLineText = lines[lines.length - 1] || '';
   
-  const heightDisplay = document.getElementById('heightDisplay');
-  const heightLabel = document.getElementById('heightLabel');
-  const heightSlider = document.getElementById('heightSlider');
-  const heightInputCm = document.getElementById('heightInputCm');
+  // Count syllables in that line
+  const lineWords = activeLineText.split(/\s+/).filter(w => w.length > 0);
+  let lineSyllableSum = 0;
+  lineWords.forEach(w => {
+    lineSyllableSum += estimateSyllableCount(w);
+  });
   
-  const metricHeightSliderContainer = document.getElementById('metricHeightSliderContainer');
-  const metricHeightInputs = document.getElementById('metricHeightInputs');
-  const imperialHeightInputs = document.getElementById('imperialHeightInputs');
-  const heightInputFt = document.getElementById('heightInputFt');
-  const heightInputIn = document.getElementById('heightInputIn');
+  lineSyllablesCount.textContent = lineSyllableSum;
+  globalSyllableIndicator.textContent = `${lineSyllableSum} Syllable${lineSyllableSum === 1 ? '' : 's'} (Line)`;
+}
+
+// Main API / Local dictionary lookup function
+async function searchRhymes(word, type = 'rhy', userInitiated = true) {
+  if (!word) return;
   
-  const weightDisplay = document.getElementById('weightDisplay');
-  const weightLabel = document.getElementById('weightLabel');
-  const weightSlider = document.getElementById('weightSlider');
-  const weightInput = document.getElementById('weightInput');
-  const weightUnitLabel = document.getElementById('weightUnitLabel');
+  // Format word input
+  const searchWord = word.trim().toLowerCase();
+  state.activeWord = searchWord;
   
-  const goalDisplay = document.getElementById('goalDisplay');
-  const goalWeightInput = document.getElementById('goalWeightInput');
-  const goalWeightUnitLabel = document.getElementById('goalWeightUnitLabel');
-  
-  // Presets
-  const presetAverageMale = document.getElementById('presetAverageMale');
-  const presetAverageFemale = document.getElementById('presetAverageFemale');
-  const presetAthlete = document.getElementById('presetAthlete');
-  
-  // Right Column outputs
-  const bmiNumericValue = document.getElementById('bmiNumericValue');
-  const bmiCategoryBadge = document.getElementById('bmiCategoryBadge');
-  const bmiStatusHeadline = document.getElementById('bmiStatusHeadline');
-  const bmiStatusDescription = document.getElementById('bmiStatusDescription');
-  const bmiArc = document.getElementById('bmiArc');
-  const bmiPointer = document.getElementById('bmiPointer');
-  
-  const idealWeightRangeText = document.getElementById('idealWeightRangeText');
-  const bmrRateText = document.getElementById('bmrRateText');
-  const waterTargetText = document.getElementById('waterTargetText');
-  
-  const goalDeltaBadge = document.getElementById('goalDeltaBadge');
-  const goalStartDisplay = document.getElementById('goalStartDisplay');
-  const goalTargetDisplay = document.getElementById('goalTargetDisplay');
-  const goalProgressBar = document.getElementById('goalProgressBar');
-  const goalMessageText = document.getElementById('goalMessageText');
-  
-  // Saved Log elements
-  const saveRecordBtn = document.getElementById('saveRecordBtn');
-  const clearAllRecordsBtn = document.getElementById('clearAllRecordsBtn');
-  const historyEmptyState = document.getElementById('historyEmptyState');
-  const historyContainerList = document.getElementById('historyContainerList');
-  const historyTableBody = document.getElementById('historyTableBody');
-
-  // App State variables
-  let isMetric = true;
-  let selectedGender = 'male'; // 'male' | 'female'
-  let savedLogs = JSON.parse(localStorage.getItem('aura_bmi_logs') || '[]');
-
-  // Initialize on start
-  renderHistoryLogs();
-  triggerRecalculation();
-
-  // Switch to Metric Mode
-  unitMetricBtn.addEventListener('click', () => {
-    if (isMetric) return;
-    isMetric = true;
-    
-    // Visual toggling on buttons
-    unitMetricBtn.className = "px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 bg-teal-500 text-slate-950 shadow-md";
-    unitImperialBtn.className = "px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200";
-    unitIndicatorText.textContent = "Metric (cm, kg)";
-    weightUnitLabel.textContent = "kg";
-    goalWeightUnitLabel.textContent = "kg";
-    
-    // Hide imperial fields, reveal metric fields
-    metricHeightSliderContainer.classList.remove('hidden');
-    metricHeightInputs.classList.remove('hidden');
-    imperialHeightInputs.classList.add('hidden');
-    
-    // Convert current Imperial inputs back to Metric
-    const feet = parseFloat(heightInputFt.value) || 0;
-    const inches = parseFloat(heightInputIn.value) || 0;
-    const totalInches = (feet * 12) + inches;
-    const calculatedCm = Math.round(totalInches * 2.54);
-    
-    heightSlider.min = "100";
-    heightSlider.max = "250";
-    heightSlider.value = calculatedCm;
-    heightInputCm.value = calculatedCm;
-    
-    // Convert weight from lbs to kg
-    const currentLbs = parseFloat(weightInput.value) || 165;
-    const calculatedKg = Math.round(currentLbs / 2.20462 * 10) / 10;
-    weightSlider.min = "20";
-    weightSlider.max = "250";
-    weightSlider.value = calculatedKg;
-    weightInput.value = calculatedKg;
-    
-    // Convert target weight
-    const currentGoalLbs = parseFloat(goalWeightInput.value) || 150;
-    const calculatedGoalKg = Math.round(currentGoalLbs / 2.20462 * 10) / 10;
-    goalWeightInput.value = calculatedGoalKg;
-    
-    triggerRecalculation();
-  });
-
-  // Switch to Imperial Mode
-  unitImperialBtn.addEventListener('click', () => {
-    if (!isMetric) return;
-    isMetric = false;
-    
-    // Visual toggling on buttons
-    unitImperialBtn.className = "px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 bg-teal-500 text-slate-950 shadow-md";
-    unitMetricBtn.className = "px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200";
-    unitIndicatorText.textContent = "Imperial (in, lbs)";
-    weightUnitLabel.textContent = "lbs";
-    goalWeightUnitLabel.textContent = "lbs";
-    
-    // Show imperial height inputs, hide metric inputs
-    metricHeightSliderContainer.classList.add('hidden');
-    metricHeightInputs.classList.add('hidden');
-    imperialHeightInputs.classList.remove('hidden');
-    
-    // Convert metric cm to feet/inches
-    const cmVal = parseFloat(heightInputCm.value) || 175;
-    const totalInches = cmVal / 2.54;
-    const calculatedFeet = Math.floor(totalInches / 12);
-    const calculatedRemainingInches = Math.round(totalInches % 12);
-    
-    heightInputFt.value = calculatedFeet;
-    heightInputIn.value = calculatedRemainingInches;
-    
-    // Convert weight from kg to lbs
-    const currentKg = parseFloat(weightInput.value) || 75;
-    const calculatedLbs = Math.round(currentKg * 2.20462);
-    weightSlider.min = "45";
-    weightSlider.max = "550";
-    weightSlider.value = calculatedLbs;
-    weightInput.value = calculatedLbs;
-    
-    // Convert target weight
-    const currentGoalKg = parseFloat(goalWeightInput.value) || 70;
-    const calculatedGoalLbs = Math.round(currentGoalKg * 2.20462);
-    goalWeightInput.value = calculatedGoalLbs;
-    
-    triggerRecalculation();
-  });
-
-  // Gender Toggling
-  genderMaleBtn.addEventListener('click', () => {
-    selectedGender = 'male';
-    genderMaleBtn.className = "flex items-center justify-center gap-2 py-3 rounded-xl border border-teal-500/30 bg-teal-500/10 text-teal-300 font-semibold transition-all duration-200";
-    genderFemaleBtn.className = "flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-400 hover:text-slate-200 transition-all duration-200";
-    triggerRecalculation();
-  });
-
-  genderFemaleBtn.addEventListener('click', () => {
-    selectedGender = 'female';
-    genderFemaleBtn.className = "flex items-center justify-center gap-2 py-3 rounded-xl border border-teal-500/30 bg-teal-500/10 text-teal-300 font-semibold transition-all duration-200";
-    genderMaleBtn.className = "flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-400 hover:text-slate-200 transition-all duration-200";
-    triggerRecalculation();
-  });
-
-  // Sync Sliders and Numerical Inputs
-  // Age
-  ageSlider.addEventListener('input', (e) => {
-    ageInput.value = e.target.value;
-    triggerRecalculation();
-  });
-  ageInput.addEventListener('input', (e) => {
-    let val = parseInt(e.target.value) || 28;
-    if (val < 2) val = 2;
-    if (val > 120) val = 120;
-    ageSlider.value = val;
-    triggerRecalculation();
-  });
-
-  // Height (Metric)
-  heightSlider.addEventListener('input', (e) => {
-    heightInputCm.value = e.target.value;
-    triggerRecalculation();
-  });
-  heightInputCm.addEventListener('input', (e) => {
-    let val = parseInt(e.target.value) || 150;
-    if (val < 100) val = 100;
-    if (val > 250) val = 250;
-    heightSlider.value = val;
-    triggerRecalculation();
-  });
-
-  // Imperial Height switches
-  heightInputFt.addEventListener('input', triggerRecalculation);
-  heightInputIn.addEventListener('input', triggerRecalculation);
-
-  // Weight
-  weightSlider.addEventListener('input', (e) => {
-    weightInput.value = e.target.value;
-    triggerRecalculation();
-  });
-  weightInput.addEventListener('input', (e) => {
-    let val = parseFloat(e.target.value) || 70;
-    if (val < 20) val = 20;
-    if (val > 500) val = 500;
-    weightSlider.value = Math.round(val);
-    triggerRecalculation();
-  });
-
-  // Goal Weight
-  goalWeightInput.addEventListener('input', triggerRecalculation);
-
-  // Preset Profiles Loader
-  presetAverageMale.addEventListener('click', () => {
-    loadPresetProfile('male', 30, 178, 80, 75);
-  });
-  presetAverageFemale.addEventListener('click', () => {
-    loadPresetProfile('female', 28, 163, 62, 57);
-  });
-  presetAthlete.addEventListener('click', () => {
-    loadPresetProfile('male', 26, 185, 88, 84);
-  });
-
-  function loadPresetProfile(gender, age, heightCm, weightKg, goalWeightKg) {
-    selectedGender = gender;
-    if (gender === 'male') {
-      genderMaleBtn.click();
-    } else {
-      genderFemaleBtn.click();
-    }
-    
-    ageSlider.value = age;
-    ageInput.value = age;
-    
-    if (isMetric) {
-      heightSlider.value = heightCm;
-      heightInputCm.value = heightCm;
-      weightSlider.value = weightKg;
-      weightInput.value = weightKg;
-      goalWeightInput.value = goalWeightKg;
-    } else {
-      // Convert presets to imperial format
-      const totalInches = heightCm / 2.54;
-      heightInputFt.value = Math.floor(totalInches / 12);
-      heightInputIn.value = Math.round(totalInches % 12);
-      
-      const weightLbs = Math.round(weightKg * 2.20462);
-      weightSlider.value = weightLbs;
-      weightInput.value = weightLbs;
-      
-      const goalLbs = Math.round(goalWeightKg * 2.20462);
-      goalWeightInput.value = goalLbs;
-    }
-    triggerRecalculation();
+  // Add to History
+  if (userInitiated) {
+    state.recentSearches = [searchWord, ...state.recentSearches.filter(w => w !== searchWord)].slice(0, 15);
+    renderHistory();
+    saveToLocalStorage();
   }
 
-  // Central calculation algorithm
-  function triggerRecalculation() {
-    const age = parseInt(ageInput.value) || 28;
-    ageDisplay.textContent = age;
-    
-    let heightInCm = 175;
-    let weightInKg = 75;
-    let goalWeightInKg = 70;
-    
-    // Convert and read according to system settings
-    if (isMetric) {
-      heightInCm = parseFloat(heightInputCm.value) || 175;
-      weightInKg = parseFloat(weightInput.value) || 75;
-      goalWeightInKg = parseFloat(goalWeightInput.value) || 0;
-      
-      heightDisplay.textContent = `${heightInCm} cm`;
-      weightDisplay.textContent = `${weightInKg} kg`;
-      goalDisplay.textContent = goalWeightInKg > 0 ? `${goalWeightInKg} kg` : 'Not set';
+  // Setup UI elements for loading
+  loadingSpinner.classList.remove('hidden');
+  rhymeResultsGrid.innerHTML = '';
+  resultsTitle.textContent = `Finding Matches...`;
+  resultsSummary.textContent = `Scouring matching patterns for "${searchWord}"`;
+  matchCountBadge.classList.add('hidden');
+
+  // Datamuse API map criteria
+  const apiRelMap = {
+    'rhy': 'rel_rhy',
+    'nry': 'rel_nry',
+    'hom': 'rel_hom',
+    'cns': 'rel_cns',
+    'syn': 'ml',
+    'ant': 'rel_ant'
+  };
+
+  const relParam = apiRelMap[type] || 'rel_rhy';
+  let results = [];
+  let isFallbackUsed = false;
+
+  try {
+    // Dynamic Fetch call to the awesome public Datamuse API
+    const response = await fetch(`https://api.datamuse.com/words?${relParam}=${encodeURIComponent(searchWord)}&max=100`);
+    if (!response.ok) throw new Error('API request failed');
+    results = await response.json();
+  } catch (err) {
+    // Graceful offline fallback
+    console.warn('Datamuse API unavailable, switching to localized offline thesaurus.');
+    isFallbackUsed = true;
+    if (fallbackDictionary[searchWord]) {
+      results = fallbackDictionary[searchWord];
     } else {
-      const feet = parseFloat(heightInputFt.value) || 5;
-      const inches = parseFloat(heightInputIn.value) || 8;
-      const totalInches = (feet * 12) + inches;
-      heightInCm = totalInches * 2.54;
-      
-      const weightLbs = parseFloat(weightInput.value) || 165;
-      weightInKg = weightLbs / 2.20462;
-      
-      const goalLbs = parseFloat(goalWeightInput.value) || 0;
-      goalWeightInKg = goalLbs > 0 ? (goalLbs / 2.20462) : 0;
-      
-      heightDisplay.textContent = `${feet}'${Math.round(inches)}"`;
-      weightDisplay.textContent = `${Math.round(weightLbs)} lbs`;
-      goalDisplay.textContent = goalLbs > 0 ? `${Math.round(goalLbs)} lbs` : 'Not set';
-    }
-    
-    // Prevent division errors
-    if (!heightInCm || heightInCm <= 0) heightInCm = 1;
-    
-    // BMI Calculation
-    const heightInMeters = heightInCm / 100;
-    const bmi = weightInKg / (heightInMeters * heightInMeters);
-    const roundedBmi = Math.round(bmi * 10) / 10;
-    
-    // Update primary UI metrics displays
-    bmiNumericValue.textContent = roundedBmi.toFixed(1);
-    
-    // Categorization logic
-    let category = "";
-    let badgeClass = "";
-    let headline = "";
-    let description = "";
-    
-    if (bmi < 18.5) {
-      category = "Underweight";
-      badgeClass = "bg-bmi-underweight";
-      headline = "Below Recommended Ranges";
-      description = "A BMI below 18.5 points to lower than normal energy stores. Consider consulting with a nutritionist.";
-    } else if (bmi >= 18.5 && bmi < 25) {
-      category = "Normal Weight";
-      badgeClass = "bg-bmi-normal";
-      headline = "Optimized Metabolic Standard";
-      description = "Excellent work. You fall precisely in the statistical target zone for lowest risk metrics.";
-    } else if (bmi >= 25 && bmi < 30) {
-      category = "Overweight";
-      badgeClass = "bg-bmi-overweight";
-      headline = "Moderate Health Risk Zone";
-      description = "Increased risk indicators for long-term respiratory and cardiovascular parameters. Active monitoring is helpful.";
-    } else {
-      category = "Obese";
-      badgeClass = "bg-bmi-obese";
-      headline = "Significant Clinical Zone";
-      description = "Highly elevated risks for hypertension and systemic metabolic imbalances. Reach out to primary health caretakers.";
-    }
-    
-    bmiCategoryBadge.textContent = category;
-    bmiCategoryBadge.className = `mt-4 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase transition-colors duration-300 ${badgeClass}`;
-    bmiStatusHeadline.textContent = headline;
-    bmiStatusDescription.textContent = description;
-    
-    // Set Arc circumference attributes
-    // Total stroke-dasharray = 2 * PI * r = 2 * 3.14159 * 42 = 263.8
-    // Let's scale visual range from BMI 15 to 40.
-    const minBmiScale = 15;
-    const maxBmiScale = 40;
-    let scalePercentage = (bmi - minBmiScale) / (maxBmiScale - minBmiScale);
-    if (scalePercentage < 0) scalePercentage = 0;
-    if (scalePercentage > 1) scalePercentage = 1;
-    
-    const strokeOffset = 263.8 - (scalePercentage * 263.8);
-    bmiArc.setAttribute('stroke-dashoffset', strokeOffset);
-    
-    // Dynamic Pointer update
-    const leftPercent = Math.min(Math.max(scalePercentage * 100, 0), 100);
-    bmiPointer.style.left = `${leftPercent}%`;
-    
-    // Ideal Weight Range limiters (BMI 18.5 up to 24.9)
-    const idealMinWeight = 18.5 * (heightInMeters * heightInMeters);
-    const idealMaxWeight = 24.9 * (heightInMeters * heightInMeters);
-    
-    if (isMetric) {
-      idealWeightRangeText.textContent = `${Math.round(idealMinWeight * 10) / 10} - ${Math.round(idealMaxWeight * 10) / 10} kg`;
-    } else {
-      idealWeightRangeText.textContent = `${Math.round(idealMinWeight * 2.20462)} - ${Math.round(idealMaxWeight * 2.20462)} lbs`;
-    }
-    
-    // Mifflin-St Jeor formula for BMR
-    let bmr = 0;
-    if (selectedGender === 'male') {
-      bmr = (10 * weightInKg) + (6.25 * heightInCm) - (5 * age) + 5;
-    } else {
-      bmr = (10 * weightInKg) + (6.25 * heightInCm) - (5 * age) - 161;
-    }
-    bmrRateText.textContent = `${Math.round(bmr)} kcal/day`;
-    
-    // Water Target (approx. 35 ml per kilogram of body mass)
-    const waterLiters = (weightInKg * 0.035);
-    waterTargetText.textContent = `${waterLiters.toFixed(1)} Liters`;
-    
-    // Goal Weight Progress tracking
-    if (goalWeightInKg > 0) {
-      const diff = Math.abs(weightInKg - goalWeightInKg);
-      const badgeLabelText = `${Math.round(diff * (isMetric ? 1 : 2.20462) * 10) / 10} ${isMetric ? 'kg' : 'lbs'} diff`;
-      goalDeltaBadge.textContent = badgeLabelText;
-      goalDeltaBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/15 text-amber-400";
-      
-      if (isMetric) {
-        goalStartDisplay.textContent = `Now: ${Math.round(weightInKg * 10) / 10}kg`;
-        goalTargetDisplay.textContent = `Goal: ${Math.round(goalWeightInKg * 10) / 10}kg`;
-      } else {
-        goalStartDisplay.textContent = `Now: ${Math.round(weightInKg * 2.20462)}lbs`;
-        goalTargetDisplay.textContent = `Goal: ${Math.round(goalWeightInKg * 2.20462)}lbs`;
-      }
-      
-      // Simple progress towards goal
-      // Assuming arbitrary target boundaries to scale visual progress indicator nicely
-      const initialRef = weightInKg > goalWeightInKg ? goalWeightInKg + 15 : goalWeightInKg - 15;
-      const totalJourney = Math.abs(initialRef - goalWeightInKg);
-      const currentJourney = Math.abs(weightInKg - goalWeightInKg);
-      let progressPercent = 100 - ((currentJourney / totalJourney) * 100);
-      if (progressPercent < 5) progressPercent = 5;
-      if (progressPercent > 100) progressPercent = 100;
-      
-      goalProgressBar.style.width = `${Math.round(progressPercent)}%`;
-      
-      if (diff < 1) {
-        goalMessageText.textContent = "Outstanding, target goal weight achieved!";
-        goalDeltaBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400";
-      } else if (weightInKg > goalWeightInKg) {
-        goalMessageText.textContent = `Caloric deficit targeting required to lose ${Math.round(diff * (isMetric ? 1 : 2.20462))} ${isMetric ? 'kg' : 'lbs'}.`;
-      } else {
-        goalMessageText.textContent = `Caloric surplus targeting required to gain ${Math.round(diff * (isMetric ? 1 : 2.20462))} ${isMetric ? 'kg' : 'lbs'}.`;
-      }
-    } else {
-      goalDeltaBadge.textContent = "Not Configured";
-      goalDeltaBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400";
-      goalStartDisplay.textContent = "--";
-      goalTargetDisplay.textContent = "--";
-      goalProgressBar.style.width = "0%";
-      goalMessageText.textContent = "Set a target weight inside the calculator panel to map targets.";
+      // Fallback word gen algorithm dynamically if input is not in dictionary
+      results = generateSimulatedRhymes(searchWord);
     }
   }
 
-  // History Log Handling
-  saveRecordBtn.addEventListener('click', () => {
-    const timestamp = new Date().toLocaleString([], {month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
-    const age = parseInt(ageInput.value) || 28;
-    
-    let heightLabel = "";
-    let weightLabel = "";
-    
-    let heightInCm = 175;
-    let weightInKg = 75;
-    
-    if (isMetric) {
-      heightInCm = parseFloat(heightInputCm.value) || 175;
-      weightInKg = parseFloat(weightInput.value) || 75;
-      heightLabel = `${heightInCm} cm`;
-      weightLabel = `${weightInKg} kg`;
-    } else {
-      const feet = parseFloat(heightInputFt.value) || 5;
-      const inches = parseFloat(heightInputIn.value) || 8;
-      heightInCm = ((feet * 12) + inches) * 2.54;
-      
-      const weightLbs = parseFloat(weightInput.value) || 165;
-      weightInKg = weightLbs / 2.20462;
-      
-      heightLabel = `${feet}'${Math.round(inches)}"`;
-      weightLabel = `${Math.round(weightLbs)} lbs`;
-    }
-    
-    const heightInMeters = heightInCm / 100;
-    const bmi = weightInKg / (heightInMeters * heightInMeters);
-    const roundedBmi = Math.round(bmi * 10) / 10;
-    
-    let category = "";
-    if (roundedBmi < 18.5) category = "Underweight";
-    else if (roundedBmi >= 18.5 && roundedBmi < 25) category = "Normal";
-    else if (roundedBmi >= 25 && roundedBmi < 30) category = "Overweight";
-    else category = "Obese";
-
-    const newRecord = {
-      id: Date.now(),
-      date: timestamp,
-      gender: selectedGender.charAt(0).toUpperCase() + selectedGender.slice(1),
-      age: age,
-      height: heightLabel,
-      weight: weightLabel,
-      bmi: roundedBmi,
-      category: category
-    };
-
-    savedLogs.unshift(newRecord); // Add to beginning of history
-    localStorage.setItem('aura_bmi_logs', JSON.stringify(savedLogs));
-    
-    renderHistoryLogs();
-    
-    // Visual Confirmation Action
-    const originalText = saveRecordBtn.innerHTML;
-    saveRecordBtn.innerHTML = `
-      <svg class="w-5 h-5 text-emerald-950 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-      Assessment Saved!
-    `;
-    saveRecordBtn.classList.remove('from-teal-500', 'to-emerald-500');
-    saveRecordBtn.classList.add('from-emerald-400', 'to-green-400');
-    
-    setTimeout(() => {
-      saveRecordBtn.innerHTML = originalText;
-      saveRecordBtn.classList.add('from-teal-500', 'to-emerald-500');
-      saveRecordBtn.classList.remove('from-emerald-400', 'to-green-400');
-    }, 1800);
-  });
-
-  // Render log elements table
-  function renderHistoryLogs() {
-    if (savedLogs.length === 0) {
-      historyEmptyState.classList.remove('hidden');
-      historyContainerList.classList.add('hidden');
-      return;
-    }
-    
-    historyEmptyState.classList.add('hidden');
-    historyContainerList.classList.remove('hidden');
-    
-    historyTableBody.innerHTML = '';
-    
-    savedLogs.forEach((item) => {
-      let classificationColor = "text-teal-400 bg-teal-500/10";
-      if (item.category === "Underweight") classificationColor = "text-blue-400 bg-blue-500/10";
-      if (item.category === "Overweight") classificationColor = "text-amber-400 bg-amber-500/10";
-      if (item.category === "Obese") classificationColor = "text-red-400 bg-red-500/10";
-
-      const row = document.createElement('tr');
-      row.className = "hover:bg-slate-800/45 transition-colors duration-150 border-b border-slate-800/60";
-      
-      row.innerHTML = `
-        <td class="py-3.5 px-4 font-medium text-slate-300">${item.date}</td>
-        <td class="py-3.5 px-4 text-slate-400">${item.gender}, ${item.age}y</td>
-        <td class="py-3.5 px-4 font-mono">${item.height}</td>
-        <td class="py-3.5 px-4 font-mono">${item.weight}</td>
-        <td class="py-3.5 px-4 text-center font-bold text-white font-mono">
-          <span class="px-2 py-1 rounded bg-slate-950 border border-slate-800">${item.bmi}</span>
-        </td>
-        <td class="py-3.5 px-4">
-          <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${classificationColor}">${item.category}</span>
-        </td>
-        <td class="py-3.5 px-4 text-right">
-          <button class="delete-log-btn text-red-400 hover:text-red-300 p-1.5 hover:bg-red-500/10 rounded-lg transition-all" data-id="${item.id}">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-          </button>
-        </td>
-      `;
-      
-      // Event listener for current row delete btn
-      row.querySelector('.delete-log-btn').addEventListener('click', (e) => {
-        const recordId = parseInt(e.currentTarget.getAttribute('data-id'));
-        savedLogs = savedLogs.filter(log => log.id !== recordId);
-        localStorage.setItem('aura_bmi_logs', JSON.stringify(savedLogs));
-        renderHistoryLogs();
-      });
-
-      historyTableBody.appendChild(row);
+  // Render Results
+  loadingSpinner.classList.add('hidden');
+  
+  // Filter by Syllables
+  const currentSyllableValue = syllableFilter.value;
+  let filteredResults = results;
+  if (currentSyllableValue !== 'all') {
+    const targetSyllables = parseInt(currentSyllableValue, 10);
+    filteredResults = results.filter(item => {
+      const count = item.numSyllables || estimateSyllableCount(item.word);
+      if (targetSyllables === 3) return count >= 3;
+      return count === targetSyllables;
     });
   }
 
-  // Clear All Records logic
-  clearAllRecordsBtn.addEventListener('click', () => {
-    if (confirm('Are you certain you wish to completely clear your historical logs? This cannot be undone.')) {
-      savedLogs = [];
-      localStorage.removeItem('aura_bmi_logs');
-      renderHistoryLogs();
-    }
+  if (!filteredResults || filteredResults.length === 0) {
+    rhymeResultsGrid.innerHTML = `
+      <div class="col-span-full text-center py-10">
+        <p class="text-slate-400 text-sm font-medium">No perfect match found in instant vault.</p>
+        <p class="text-xs text-slate-500 mt-1">Try changing relation type or clearing syllable filter constraints.</p>
+      </div>
+    `;
+    resultsTitle.textContent = `Matches for "${searchWord}"`;
+    resultsSummary.textContent = `No matches found matching criteria.`;
+    return;
+  }
+
+  resultsTitle.textContent = `Matches for "${searchWord}"`;
+  resultsSummary.textContent = `${isFallbackUsed ? 'Offline Local Dictionary' : 'Datamuse Direct Vault'} • Syllables: ${currentSyllableValue}`;
+  matchCountBadge.textContent = `${filteredResults.length} items`;
+  matchCountBadge.classList.remove('hidden');
+
+  filteredResults.forEach((item, index) => {
+    const wordSyllables = item.numSyllables || estimateSyllableCount(item.word);
+    const isSaved = state.savedRhymes.includes(item.word);
+    
+    const card = document.createElement('div');
+    card.className = 'word-badge-entry bg-slate-900 border border-slate-800/80 hover:border-indigo-500/50 rounded-xl p-3 flex flex-col justify-between hover:bg-slate-800/40 cursor-pointer transition-all duration-150 relative group';
+    card.style.animationDelay = `${index * 15}ms`;
+    
+    card.innerHTML = `
+      <div class="flex items-center justify-between gap-1">
+        <span class="font-medium text-slate-100 hover:text-white transition break-all select-all text-sm" onclick="handleWordAction(event, '${item.word}')">${item.word}</span>
+        <button class="text-slate-500 hover:text-amber-400 transition transform hover:scale-115 focus:outline-none" onclick="toggleSaveWord(event, '${item.word}')">
+          ${isSaved ? '★' : '☆'}
+        </button>
+      </div>
+      <div class="flex items-center justify-between mt-2.5">
+        <span class="text-[10px] bg-slate-950 px-1.5 py-0.5 rounded text-indigo-400 font-mono">${wordSyllables} syl</span>
+        <div class="flex items-center space-x-1">
+          <button class="p-1 text-[10px] hover:bg-indigo-950 text-slate-400 hover:text-indigo-400 rounded transition" onclick="speakWord(event, '${item.word}')" title="Listen">
+            🔊
+          </button>
+        </div>
+      </div>
+    `;
+    
+    // Let card itself trigger click action when clicked on non-button elements
+    card.addEventListener('click', (e) => {
+      if (!e.target.closest('button') && !e.target.closest('span')) {
+        handleWordAction(e, item.word);
+      }
+    });
+
+    rhymeResultsGrid.appendChild(card);
   });
+}
+
+// Generate random mock items based on common suffix
+function generateSimulatedRhymes(word) {
+  const commonSuffixes = ['ing', 'ed', 'er', 'y', 'al', 'ion', 'ly', 'est', 'or'];
+  const matchedSuffix = commonSuffixes.find(sfx => word.endsWith(sfx)) || '';
+  
+  const basePool = [
+    'flight', 'night', 'bright', 'clear', 'dear', 'fear', 'light', 'mind', 
+    'find', 'blind', 'wind', 'line', 'fine', 'shine', 'glow', 'show', 
+    'grow', 'flow', 'spring', 'sing', 'ring', 'bring', 'king', 'thing'
+  ];
+  
+  // Shuffle & pick 10 items mapping to some arbitrary syllables
+  return basePool.slice(0, 12).map((w, index) => ({
+    word: matchedSuffix ? (w.replace(/e$/, '') + matchedSuffix) : w,
+    score: 200 - (index * 10),
+    numSyllables: estimateSyllableCount(w) + (matchedSuffix ? 1 : 0)
+  }));
+}
+
+// Handle inserting or copying selected word
+function handleWordAction(event, word) {
+  event.stopPropagation();
+  if (state.clickAction === 'insert') {
+    insertWordToPad(word);
+  } else {
+    copyToClipboard(word);
+  }
+}
+
+// Speech Synthesis API audio feedback
+function speakWord(event, word) {
+  event.stopPropagation();
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(word);
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
+  } else {
+    showToast("Speech synthesis not supported in browser", "⚠️");
+  }
+}
+
+// Insert word into RhymePad
+function insertWordToPad(word) {
+  const textarea = rhymePadTextArea;
+  const startPos = textarea.selectionStart;
+  const endPos = textarea.selectionEnd;
+  const text = textarea.value;
+  
+  // Insert word at cursor or append to end
+  if (startPos || startPos === 0) {
+    textarea.value = text.substring(0, startPos) + word + text.substring(endPos, text.length);
+    // Set cursor just after the inserted word
+    textarea.selectionStart = startPos + word.length;
+    textarea.selectionEnd = startPos + word.length;
+  } else {
+    textarea.value += (textarea.value ? ' ' : '') + word;
+  }
+  
+  textarea.focus();
+  updatePadCounts();
+  showToast(`Inserted "${word}" into Verse Pad`, "📝");
+}
+
+// Copy single word helper
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`Copied "${text}" to clipboard`, "📋");
+  }).catch(() => {
+    showToast("Unable to copy to clipboard", "❌");
+  });
+}
+
+// Save & Toggle Favourites Word State
+function toggleSaveWord(event, word) {
+  event.stopPropagation();
+  const isAlreadySaved = state.savedRhymes.includes(word);
+  if (isAlreadySaved) {
+    state.savedRhymes = state.savedRhymes.filter(item => item !== word);
+    showToast(`Removed "${word}" from Saved`, "⭐");
+  } else {
+    state.savedRhymes.push(word);
+    showToast(`Saved "${word}"!`, "⭐");
+  }
+  
+  saveToLocalStorage();
+  renderSavedRhymes();
+  
+  // Refresh active rhymes layout to keep states uniform
+  if (state.activeWord) {
+    const currentQueryWord = state.activeWord;
+    const relationValue = relationType.value;
+    searchRhymes(currentQueryWord, relationValue, false);
+  }
+}
+
+// Render Saved Words Grid
+function renderSavedRhymes() {
+  favsGrid.innerHTML = '';
+  if (state.savedRhymes.length === 0) {
+    noFavsMsg.classList.remove('hidden');
+    return;
+  }
+  noFavsMsg.classList.add('hidden');
+
+  state.savedRhymes.forEach(word => {
+    const sylCount = estimateSyllableCount(word);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'group flex items-center justify-between p-2 bg-slate-950 border border-slate-800/80 hover:border-indigo-500/40 rounded-lg text-xs transition duration-150';
+    wrapper.innerHTML = `
+      <div class="flex flex-col truncate cursor-pointer" onclick="quickSearch('${word}')">
+        <span class="font-medium text-slate-300 group-hover:text-indigo-300 transition truncate">${word}</span>
+        <span class="text-[9px] text-slate-500">${sylCount} syl</span>
+      </div>
+      <div class="flex items-center space-x-1">
+        <button class="text-slate-600 hover:text-indigo-400 p-0.5" onclick="insertWordToPad('${word}')" title="Insert">
+          ✍️
+        </button>
+        <button class="text-rose-500 hover:text-rose-400 font-bold p-0.5" onclick="toggleSaveWord(event, '${word}')" title="Unsave">
+          ×
+        </button>
+      </div>
+    `;
+    favsGrid.appendChild(wrapper);
+  });
+}
+
+// Render History List
+function renderHistory() {
+  historyList.innerHTML = '';
+  if (state.recentSearches.length === 0) {
+    noHistoryMsg.classList.remove('hidden');
+    clearHistoryBtn.classList.add('hidden');
+    return;
+  }
+  noHistoryMsg.classList.add('hidden');
+  clearHistoryBtn.classList.remove('hidden');
+
+  state.recentSearches.forEach(word => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flex items-center justify-between p-2 bg-slate-950/60 hover:bg-slate-950 border border-slate-900 rounded-lg text-xs cursor-pointer hover:border-slate-800 transition duration-150';
+    wrapper.innerHTML = `
+      <span class="text-slate-300 font-medium capitalize" onclick="quickSearch('${word}')">🔍 ${word}</span>
+      <button class="text-slate-500 hover:text-rose-400 text-[11px] px-1" onclick="removeHistoryItem(event, '${word}')">
+        Delete
+      </button>
+    `;
+    historyList.appendChild(wrapper);
+  });
+}
+
+// Quick Search Helper triggered by tag or history item
+window.quickSearch = function(word) {
+  searchInput.value = word;
+  const relationValue = relationType.value;
+  searchRhymes(word, relationValue, true);
+};
+
+// Remove single history item
+window.removeHistoryItem = function(event, word) {
+  event.stopPropagation();
+  state.recentSearches = state.recentSearches.filter(item => item !== word);
+  renderHistory();
+  saveToLocalStorage();
+  showToast('Removed history item', '🗑️');
+};
+
+// Register listeners & UI interactions
+
+// Search submission
+searchForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const query = searchInput.value;
+  const rel = relationType.value;
+  searchRhymes(query, rel, true);
 });
+
+// On Type select or Syllable filter change, instantly query if there's an active word
+relationType.addEventListener('change', () => {
+  if (searchInput.value) {
+    searchRhymes(searchInput.value, relationType.value, false);
+  }
+});
+
+syllableFilter.addEventListener('change', () => {
+  if (searchInput.value) {
+    searchRhymes(searchInput.value, relationType.value, false);
+  }
+});
+
+// Action Mode Toggles
+modeInsertBtn.addEventListener('click', () => {
+  state.clickAction = 'insert';
+  modeInsertBtn.className = 'px-2 py-1 text-xs font-medium rounded bg-indigo-600 text-white transition';
+  modeCopyBtn.className = 'px-2 py-1 text-xs font-medium rounded text-slate-400 hover:text-slate-200 transition';
+});
+
+modeCopyBtn.addEventListener('click', () => {
+  state.clickAction = 'copy';
+  modeCopyBtn.className = 'px-2 py-1 text-xs font-medium rounded bg-indigo-600 text-white transition';
+  modeInsertBtn.className = 'px-2 py-1 text-xs font-medium rounded text-slate-400 hover:text-slate-200 transition';
+});
+
+// Clear Pad
+clearPadBtn.addEventListener('click', () => {
+  if (confirm("Are you sure you want to clear your current work?")) {
+    rhymePadTextArea.value = '';
+    updatePadCounts();
+    showToast('Verse Pad Cleared', '🗑️');
+  }
+});
+
+// Copy All
+copyAllBtn.addEventListener('click', () => {
+  const text = rhymePadTextArea.value;
+  if (!text.trim()) {
+    showToast('Verse Pad is empty. Write something first!', '📝');
+    return;
+  }
+  copyToClipboard(text);
+});
+
+// Tab switcher handlers
+tabFavs.addEventListener('click', () => {
+  state.activeTab = 'favs';
+  tabFavs.className = 'flex-1 py-3 px-4 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 focus:outline-none flex items-center justify-center space-x-2';
+  tabHistory.className = 'flex-1 py-3 px-4 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent focus:outline-none flex items-center justify-center space-x-2';
+  favsPanel.classList.remove('hidden');
+  historyPanel.classList.add('hidden');
+});
+
+tabHistory.addEventListener('click', () => {
+  state.activeTab = 'history';
+  tabHistory.className = 'flex-1 py-3 px-4 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 focus:outline-none flex items-center justify-center space-x-2';
+  tabFavs.className = 'flex-1 py-3 px-4 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent focus:outline-none flex items-center justify-center space-x-2';
+  historyPanel.classList.remove('hidden');
+  favsPanel.classList.add('hidden');
+});
+
+// Clear History
+clearHistoryBtn.addEventListener('click', () => {
+  state.recentSearches = [];
+  renderHistory();
+  saveToLocalStorage();
+  showToast('Search history cleared', '🗑️');
+});
+
+// Live counting on Verse Pad text keypresses
+rhymePadTextArea.addEventListener('input', updatePadCounts);
+rhymePadTextArea.addEventListener('keyup', updatePadCounts);
+rhymePadTextArea.addEventListener('click', updatePadCounts);
+
+// Double-click word look-up inside the textarea
+rhymePadTextArea.addEventListener('dblclick', () => {
+  const text = rhymePadTextArea.value;
+  const selStart = rhymePadTextArea.selectionStart;
+  const selEnd = rhymePadTextArea.selectionEnd;
+  
+  if (selStart !== selEnd) {
+    const selectedWord = text.substring(selStart, selEnd).trim().replace(/[^a-zA-Z]/g, '');
+    if (selectedWord.length > 1) {
+      quickSearch(selectedWord);
+      showToast(`Quick lookup for "${selectedWord}"`, '🔍');
+    }
+  }
+});
+
+// Load Inspiration button demo template text
+triggerDemoBtn.addEventListener('click', () => {
+  const inspirationList = [
+    "I seek the silence of the night,\nIn search of words to make it bright.\nA lonely path where stars align,\nTo form a simple rhyming sign.",
+    "The ocean whispers to the sand,\nA secret language across the land.\nA perfect wave of quiet grace,\nTo wash away the time and space.",
+    "A burning fire inside the soul,\nTo make the broken spirits whole.\nWith every spark, a story told,\nOf silver dreams and sunset gold."
+  ];
+  const randomLine = inspirationList[Math.floor(Math.random() * inspirationList.length)];
+  rhymePadTextArea.value = randomLine;
+  updatePadCounts();
+  showToast('Inspiration Loaded', '💡');
+});
+
+// Boot Initialization
+function init() {
+  loadFromLocalStorage();
+  updatePadCounts();
+  // Warmup default search of 'twilight' so page has visual contents immediately
+  quickSearch('twilight');
+}
+
+init();
