@@ -1,78 +1,54 @@
-/* Specialized transitions and customized elements for the BMI calculations */
+/* Custom Styling to elevate standard tailwind constraints */
 
-/* Interactive scale sliders customized appearance */
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
-  transition: transform 0.15s ease-in-out, background 0.15s ease-in-out;
-}
-
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  background: #34d399;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border: none;
-  border-radius: 50%;
-  background: #2dd4bf;
-  cursor: pointer;
-  box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
-  transition: transform 0.15s ease-in-out, background 0.15s ease-in-out;
-}
-
-input[type="range"]::-moz-range-thumb:hover {
-  transform: scale(1.2);
-  background: #34d399;
-}
-
-/* Smooth layout and backdrop-blur support */
-.backdrop-blur-md {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-/* Custom scrollbar to match sleek theme */
-::-webkit-scrollbar {
+/* Scrollbar Styling for Rhymes and History Grid */
+#rhymeResultsGrid::-webkit-scrollbar,
+.overflow-y-auto::-webkit-scrollbar {
   width: 6px;
-  height: 6px;
 }
 
-::-webkit-scrollbar-track {
-  background: #020617;
+#rhymeResultsGrid::-webkit-scrollbar-track,
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 8px;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 3px;
+#rhymeResultsGrid::-webkit-scrollbar-thumb,
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(79, 70, 229, 0.3);
+  border-radius: 8px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+#rhymeResultsGrid::-webkit-scrollbar-thumb:hover,
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 70, 229, 0.6);
 }
 
-/* Highlight effects for category badges */
-.bg-bmi-underweight {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+/* Custom Glowing Text and Borders */
+.glowing-border-active {
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.8);
 }
-.bg-bmi-normal {
-  background-color: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+
+/* Keyframe animations */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
 }
-.bg-bmi-overweight {
-  background-color: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
+
+.glow-active {
+  animation: pulseGlow 2s infinite ease-in-out;
 }
-.bg-bmi-obese {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #f87171;
+
+/* Smooth Grid Item Entry */
+.word-badge-entry {
+  animation: badgePop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+@keyframes badgePop {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
