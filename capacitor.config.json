@@ -1,7 +1,7 @@
 {
-  "appId": "com.builder.retroneonclock.id73360dbc",
-  "appName": "HighLow Arena",
-  "webDir": "www",
+  "appId": "com.builder.retroneonclock.id3b355d2e",
+  "appName": "Banner Studio",
+  "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"
