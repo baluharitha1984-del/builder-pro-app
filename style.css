@@ -1,1 +1,27 @@
-.banner-card { transition: transform 0.2s, box-shadow 0.2s; }.banner-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+/* Extra customizations and enhancements */
+@keyframes progress-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+.progress-ring-active {
+  animation: progress-bounce 1s ease-in-out;
+}
+/* Custom focus overrides and map background textures */
+#sim-canvas {
+  background: radial-gradient(circle, #020617 20%, #090d16 100%);
+}
+
+/* Subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #020617;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
