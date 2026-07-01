@@ -1,7 +1,7 @@
 {
-  "appId": "com.builder.retroneonclock.id07df2e4a",
-  "appName": "StrideFlow - Dynamic Step & Activity Tracker",
-  "webDir": "dist",
+  "appId": "com.builder.retroneonclock.id616b46e9",
+  "appName": "AuraBMI Advanced Health Suite",
+  "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https"
