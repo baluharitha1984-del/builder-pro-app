@@ -3,358 +3,276 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AuraBMI Advanced Health Suite</title>
+  <title>VerseCraft Engine</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between font-sans antialiased selection:bg-teal-500 selection:text-slate-900">
-  <!-- Header Section -->
-  <header class="border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+  <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="p-2.5 bg-gradient-to-tr from-teal-500 to-emerald-400 rounded-xl shadow-lg shadow-teal-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
           </svg>
         </div>
         <div>
-          <h1 class="text-xl font-bold tracking-tight text-white">Aura<span class="bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">BMI</span></h1>
-          <p class="text-xs text-slate-400 hidden sm:block">Advanced Clinical & Dynamic Health Planner</p>
+          <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">VerseCraft</h1>
+          <p class="text-xs text-slate-400 font-medium tracking-wide uppercase">Creative Rhyme & Poetry Engine</p>
         </div>
       </div>
       
-      <!-- Unit System & Preset Profile Toggles -->
-      <div class="flex items-center space-x-4">
-        <div class="bg-slate-850 p-1 rounded-xl border border-slate-800 flex items-center">
-          <button id="unitMetricBtn" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 bg-teal-500 text-slate-950 shadow-md">Metric</button>
-          <button id="unitImperialBtn" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 text-slate-400 hover:text-slate-200">Imperial</button>
+      <!-- Global Stats & Info -->
+      <div class="hidden md:flex items-center space-x-6">
+        <div class="text-right">
+          <p class="text-xs text-slate-400">Syllable Counter</p>
+          <p id="globalSyllableIndicator" class="text-sm font-semibold text-indigo-400">0 Syllables (Line)</p>
         </div>
+        <div class="h-8 w-[1px] bg-slate-800"></div>
+        <button id="triggerDemoBtn" class="px-3.5 py-1.5 rounded-lg border border-slate-700 hover:border-indigo-500/50 bg-slate-800/40 text-xs text-slate-300 hover:text-white transition duration-200">
+          💡 Load Inspiration
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
     
-    <!-- Quick Start Presets bar -->
-    <div class="mb-8 p-4 bg-slate-900/60 border border-slate-800/80 rounded-2xl flex flex-wrap items-center gap-3 justify-between">
-      <div class="flex items-center space-x-2">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Quick Fill Demographics:</p>
-      </div>
-      <div class="flex flex-wrap gap-2">
-        <button id="presetAverageMale" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition-colors border border-slate-700/60">Average Male (1.78m, 80kg)</button>
-        <button id="presetAverageFemale" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition-colors border border-slate-700/60">Average Female (1.63m, 62kg)</button>
-        <button id="presetAthlete" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition-colors border border-slate-700/60">Active Athlete (1.85m, 88kg)</button>
-      </div>
-    </div>
-
-    <!-- Central Calculations Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- Left/Top Section: Search Panel & History (5 Cols) -->
+    <section class="lg:col-span-5 flex flex-col space-y-6">
       
-      <!-- LEFT COLUMN: User Metrics Input Form (5 cols) -->
-      <div class="lg:col-span-5 bg-slate-900 border border-slate-800/80 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl shadow-slate-950/50">
-        <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.36 1.246.58 1.81l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.883a1 1 0 00-1.18 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118L2.98 10.1c-.778-.564-.38-1.81.58-1.81h4.908a1 1 0 00.95-.69l1.519-4.674z"></path></svg>
-            Your Details
-          </h2>
-          <span class="text-xs text-slate-400 font-mono" id="unitIndicatorText">Metric (cm, kg)</span>
-        </div>
-
-        <!-- Biological Gender Switcher -->
-        <div class="space-y-2">
-          <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Biological Sex</label>
-          <div class="grid grid-cols-2 gap-3">
-            <button id="genderMaleBtn" class="flex items-center justify-center gap-2 py-3 rounded-xl border border-teal-500/30 bg-teal-500/10 text-teal-300 font-semibold transition-all duration-200">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-              Male
-            </button>
-            <button id="genderFemaleBtn" class="flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-400 hover:text-slate-200 transition-all duration-200">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-              Female
-            </button>
-          </div>
-        </div>
-
-        <!-- Dynamic Age Input & Slider -->
-        <div class="space-y-3">
-          <div class="flex justify-between items-center">
-            <label for="ageInput" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Age (Years)</label>
-            <span id="ageDisplay" class="text-teal-400 font-bold text-lg font-mono">28</span>
-          </div>
-          <input type="range" id="ageSlider" min="2" max="120" value="28" class="w-full accent-teal-400 bg-slate-800 h-2 rounded-lg appearance-none cursor-pointer">
-          <input type="number" id="ageInput" value="28" min="2" max="120" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-teal-400 transition-all text-sm" placeholder="Enter age">
-        </div>
-
-        <!-- Height Input Module (Metric & Imperial dual states managed via JS) -->
-        <div class="space-y-3" id="heightContainer">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider" id="heightLabel">Height</label>
-            <span id="heightDisplay" class="text-teal-400 font-bold text-lg font-mono">175 cm</span>
-          </div>
-
-          <!-- Metric Height Slider -->
-          <div id="metricHeightSliderContainer">
-            <input type="range" id="heightSlider" min="100" max="250" value="175" class="w-full accent-teal-400 bg-slate-800 h-2 rounded-lg appearance-none cursor-pointer">
-          </div>
-
-          <!-- Metric Height Inputs -->
-          <div class="flex gap-3" id="metricHeightInputs">
-            <div class="relative flex-1">
-              <input type="number" id="heightInputCm" value="175" min="100" max="250" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-teal-400 transition-all text-sm">
-              <span class="absolute right-4 top-2.5 text-slate-500 text-sm">cm</span>
-            </div>
-          </div>
-
-          <!-- Imperial Height Inputs (Hidden by default, shown when imperial selected) -->
-          <div class="grid grid-cols-2 gap-3 hidden" id="imperialHeightInputs">
-            <div class="relative">
-              <input type="number" id="heightInputFt" value="5" min="3" max="8" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-teal-400 transition-all text-sm">
-              <span class="absolute right-4 top-2.5 text-slate-500 text-sm">ft</span>
-            </div>
-            <div class="relative">
-              <input type="number" id="heightInputIn" value="9" min="0" max="11" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-teal-400 transition-all text-sm">
-              <span class="absolute right-4 top-2.5 text-slate-500 text-sm">in</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Weight Input Module -->
-        <div class="space-y-3">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider" id="weightLabel">Weight</label>
-            <span id="weightDisplay" class="text-teal-400 font-bold text-lg font-mono">75 kg</span>
-          </div>
-          <input type="range" id="weightSlider" min="20" max="250" value="75" class="w-full accent-teal-400 bg-slate-800 h-2 rounded-lg appearance-none cursor-pointer">
-          <div class="relative">
-            <input type="number" id="weightInput" value="75" step="0.1" min="20" max="500" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-teal-400 transition-all text-sm">
-            <span class="absolute right-4 top-2.5 text-slate-500 text-sm" id="weightUnitLabel">kg</span>
-          </div>
-        </div>
-
-        <!-- Goal Weight Tracker Card -->
-        <div class="pt-4 border-t border-slate-800/80 space-y-3">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Goal Weight (Optional)</label>
-            <span id="goalDisplay" class="text-teal-400 font-bold text-lg font-mono">70 kg</span>
-          </div>
-          <div class="relative">
-            <input type="number" id="goalWeightInput" value="70" step="0.1" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-teal-400 transition-all text-sm" placeholder="Target Weight">
-            <span class="absolute right-4 top-2.5 text-slate-500 text-sm" id="goalWeightUnitLabel">kg</span>
-          </div>
-        </div>
-
-        <!-- Save Assessment CTA -->
-        <button id="saveRecordBtn" class="w-full bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-teal-500/10 transition-all duration-200 transform active:scale-[0.98] flex items-center justify-center gap-2 text-sm">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-          Log Current Assessment
-        </button>
-      </div>
-
-      <!-- RIGHT COLUMN: Interactive Calculations & Dynamic Dashboard (7 cols) -->
-      <div class="lg:col-span-7 space-y-6">
+      <!-- Interactive Rhyme Search Card -->
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 backdrop-blur-sm shadow-xl">
+        <h2 class="text-lg font-semibold mb-4 flex items-center space-x-2 text-slate-200">
+          <span>🔍 Find Rhymes</span>
+        </h2>
         
-        <!-- Dynamic BMI Gauge Card -->
-        <div class="bg-slate-900 border border-slate-800/80 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl shadow-slate-950/50">
-          <div class="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+        <form id="searchForm" class="space-y-4">
+          <div>
+            <label for="searchInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Enter Word</label>
+            <div class="relative">
+              <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="e.g., twilight, fire, dream..." 
+                class="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
+                required
+              />
+              <button 
+                type="submit" 
+                id="searchBtn"
+                class="absolute right-2 top-2 bottom-2 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-medium rounded-lg text-sm transition-all shadow-md active:scale-95"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Type / Relations -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="relationType" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Relation Type</label>
+              <select 
+                id="relationType" 
+                class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+              >
+                <option value="rhy" selected>Perfect Rhyme</option>
+                <option value="nry">Near Rhyme</option>
+                <option value="hom">Homophones</option>
+                <option value="cns">Consonant Match</option>
+                <option value="syn">Synonyms</option>
+                <option value="ant">Antonyms</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="syllableFilter" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Syllables</label>
+              <select 
+                id="syllableFilter" 
+                class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:ring-1 focus:ring-indigo-500 focus:outline-none"
+              >
+                <option value="all" selected>All Syllables</option>
+                <option value="1">1 Syllable</option>
+                <option value="2">2 Syllables</option>
+                <option value="3">3+ Syllables</option>
+              </select>
+            </div>
+          </div>
+        </form>
+
+        <!-- Quick Suggestion Tags -->
+        <div class="mt-4">
+          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Popular Words</p>
+          <div class="flex flex-wrap gap-1.5" id="quickSuggestTags">
+            <button class="px-2.5 py-1 rounded bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 text-xs text-slate-300 transition duration-150" onclick="quickSearch('sky')">sky</button>
+            <button class="px-2.5 py-1 rounded bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 text-xs text-slate-300 transition duration-150" onclick="quickSearch('shadow')">shadow</button>
+            <button class="px-2.5 py-1 rounded bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 text-xs text-slate-300 transition duration-150" onclick="quickSearch('night')">night</button>
+            <button class="px-2.5 py-1 rounded bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 text-xs text-slate-300 transition duration-150" onclick="quickSearch('dance')">dance</button>
+            <button class="px-2.5 py-1 rounded bg-slate-800/50 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 text-xs text-slate-300 transition duration-150" onclick="quickSearch('ocean')">ocean</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- History & Favourites Tab Switcher -->
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl flex-1 flex flex-col min-h-[250px] backdrop-blur-sm overflow-hidden">
+        <div class="flex border-b border-slate-800 bg-slate-950/40">
+          <button id="tabFavs" class="flex-1 py-3 px-4 text-sm font-semibold text-indigo-400 border-b-2 border-indigo-500 focus:outline-none flex items-center justify-center space-x-2">
+            <span>⭐ Saved Rhymes</span>
+            <span id="favCount" class="bg-indigo-950 text-indigo-300 text-xs px-2 py-0.5 rounded-full border border-indigo-800/50">0</span>
+          </button>
+          <button id="tabHistory" class="flex-1 py-3 px-4 text-sm font-semibold text-slate-400 hover:text-slate-200 border-b-2 border-transparent focus:outline-none flex items-center justify-center space-x-2">
+            <span>🕒 Recent Searches</span>
+          </button>
+        </div>
+
+        <!-- Tab Content Viewport -->
+        <div class="p-4 flex-1 overflow-y-auto max-h-[350px]">
+          <!-- Favourites List Panel -->
+          <div id="favsPanel" class="space-y-2">
+            <p id="noFavsMsg" class="text-xs text-slate-500 text-center py-8">No saved words yet. Hover and star words in the rhyme results grid!</p>
+            <div id="favsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+          </div>
+
+          <!-- History Panel -->
+          <div id="historyPanel" class="hidden space-y-2">
+            <div id="historyList" class="flex flex-col space-y-1.5"></div>
+            <p id="noHistoryMsg" class="text-xs text-slate-500 text-center py-8">Your search history is empty.</p>
+            <button id="clearHistoryBtn" class="w-full mt-2 py-1.5 rounded bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-400 transition hidden">
+              Clear Search History
+            </button>
+          </div>
+        </div>
+      </div>
+      
+    </section>
+
+    <!-- Right/Bottom Section: Results & Writing Workspace (7 Cols) -->
+    <section class="lg:col-span-7 flex flex-col space-y-6">
+      
+      <!-- Interactive Results Panel -->
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 backdrop-blur-sm flex flex-col min-h-[300px]">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
+          <div>
+            <h3 class="text-base font-semibold text-slate-200 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span id="resultsTitle">Rhyming Matches</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-1" id="resultsSummary">Enter a word above to fetch corresponding rhymes</p>
+          </div>
           
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-6">Primary Biomarker Assessment</h3>
-
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            
-            <!-- Circular/Arc Gauge representation -->
-            <div class="md:col-span-5 flex flex-col items-center justify-center relative">
-              <div class="relative w-40 h-40 flex items-center justify-center">
-                <svg class="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <!-- Track circle -->
-                  <circle cx="50" cy="50" r="42" stroke-width="6" stroke="#1e293b" fill="transparent"></circle>
-                  <!-- Dynamic Arc circle -->
-                  <circle id="bmiArc" cx="50" cy="50" r="42" stroke-width="8" stroke="url(#gradientStroke)" fill="transparent" stroke-dasharray="263.8" stroke-dashoffset="263.8" stroke-linecap="round" class="transition-all duration-500"></circle>
-                  
-                  <!-- Gradient def -->
-                  <defs>
-                    <linearGradient id="gradientStroke" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#2dd4bf" />
-                      <stop offset="100%" stop-color="#10b981" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                
-                <!-- Central BMI reading -->
-                <div class="text-center z-10">
-                  <p class="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white" id="bmiNumericValue">24.5</p>
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1">BMI Value</p>
-                </div>
-              </div>
-              
-              <span id="bmiCategoryBadge" class="mt-4 px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase transition-colors duration-300">Normal Weight</span>
-            </div>
-
-            <!-- Detailed Range breakdown with Slider pointer -->
-            <div class="md:col-span-7 space-y-4">
-              <div>
-                <h4 class="text-sm font-semibold text-slate-300" id="bmiStatusHeadline">Your weight status is healthy!</h4>
-                <p class="text-xs text-slate-400 mt-1 leading-relaxed" id="bmiStatusDescription">Maintaining a BMI in this zone reduces the risk of cardiovascular events, diabetes, and joint strain.</p>
-              </div>
-
-              <!-- Multi-zone Visual Slider Tracker -->
-              <div class="space-y-1.5 pt-2">
-                <div class="flex justify-between text-[10px] text-slate-500 font-mono">
-                  <span>15.0</span>
-                  <span>18.5</span>
-                  <span>25.0</span>
-                  <span>30.0</span>
-                  <span>40.0</span>
-                </div>
-                
-                <!-- Visual range bar -->
-                <div class="relative h-3 w-full rounded-full bg-slate-800 overflow-hidden flex">
-                  <div class="h-full bg-blue-500/70" style="width: 25%"></div>
-                  <div class="h-full bg-emerald-500/70" style="width: 25%"></div>
-                  <div class="h-full bg-amber-500/70" style="width: 20%"></div>
-                  <div class="h-full bg-red-500/70" style="width: 30%"></div>
-                  
-                  <!-- Dynamic Pointer -->
-                  <div id="bmiPointer" class="absolute top-0 bottom-0 w-1.5 bg-white border border-slate-900 shadow-md transform -translate-x-1/2 transition-all duration-500" style="left: 50%;"></div>
-                </div>
-                
-                <div class="grid grid-cols-4 text-center text-[9px] font-bold text-slate-400 pt-1">
-                  <span class="text-blue-400">Under</span>
-                  <span class="text-emerald-400">Normal</span>
-                  <span class="text-amber-400">Over</span>
-                  <span class="text-red-400">Obese</span>
-                </div>
-              </div>
-            </div>
-
+          <!-- Fast Config: Word Click Behavior -->
+          <div class="flex items-center space-x-2 bg-slate-950 border border-slate-800 rounded-lg p-1.5 self-start sm:self-auto">
+            <span class="text-xs font-semibold text-slate-400 px-1">Click action:</span>
+            <button id="modeInsertBtn" class="px-2 py-1 text-xs font-medium rounded bg-indigo-600 text-white transition">
+              ✍️ Insert
+            </button>
+            <button id="modeCopyBtn" class="px-2 py-1 text-xs font-medium rounded text-slate-400 hover:text-slate-200 transition">
+              📋 Copy
+            </button>
           </div>
         </div>
 
-        <!-- Smart Health Targets Cards & Progress -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Loading State Indicator -->
+        <div id="loadingSpinner" class="hidden flex-col items-center justify-center py-16 space-y-3">
+          <div class="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-sm text-slate-400">Digging deep into the rhyme vault...</p>
+        </div>
+
+        <!-- Grid of Rhymes & Synergy Words -->
+        <div id="rhymeResultsGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[250px] overflow-y-auto pr-1">
+          <!-- Seeded initial helper instructions -->
+          <div class="col-span-full flex flex-col items-center justify-center py-12 text-center">
+            <div class="w-12 h-12 bg-indigo-950/60 text-indigo-400 rounded-full flex items-center justify-center mb-3">
+              💡
+            </div>
+            <p class="text-sm text-slate-300 font-medium">Ready for lyricism</p>
+            <p class="text-xs text-slate-500 max-w-sm mt-1">Search a word or pick a popular quick tag to seed beautifully organized rhyming results here.</p>
+          </div>
+        </div>
+
+        <!-- Quick Legend info footer -->
+        <div id="resultsFooter" class="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-500">
+          <span>💡 Tip: Click speaker icon <span class="text-indigo-400">🔊</span> on any card to pronounce the word.</span>
+          <span id="matchCountBadge" class="hidden text-indigo-400 font-semibold">0 items found</span>
+        </div>
+      </div>
+
+      <!-- Poetry Pad & Live Syllable Sync -->
+      <div class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 backdrop-blur-sm flex flex-col space-y-4 shadow-xl relative overflow-hidden">
+        <!-- Accent blur glow -->
+        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full filter blur-xl pointer-events-none"></div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-xl">📝</span>
+            <div>
+              <h3 class="text-base font-semibold text-slate-200">The Verse Pad</h3>
+              <p class="text-xs text-slate-400">Draft your lyrics, poems, or rap bars here</p>
+            </div>
+          </div>
+
+          <!-- Pad tools/actions -->
+          <div class="flex items-center space-x-2">
+            <button id="clearPadBtn" class="p-1.5 rounded-lg border border-slate-800 hover:border-rose-500/40 bg-slate-950 hover:bg-rose-950/20 text-slate-400 hover:text-rose-400 text-xs transition duration-150" title="Clear entire canvas">
+              Clear Pad
+            </button>
+            <button id="copyAllBtn" class="p-1.5 rounded-lg border border-slate-800 hover:border-indigo-500 bg-slate-950 text-slate-300 text-xs flex items-center space-x-1.5 transition duration-150">
+              <span>Copy All</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Notepad Area -->
+        <div class="relative">
+          <textarea 
+            id="rhymePadTextArea" 
+            rows="7" 
+            placeholder="In twilight's glow, the secrets lie,
+They paint their dreams upon the sky..." 
+            class="w-full bg-slate-950/90 border border-slate-800 focus:border-indigo-500 rounded-xl p-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-mono text-sm leading-relaxed resize-y"
+          ></textarea>
           
-          <!-- Ideal Weight Target Panel -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-3">
-            <div class="flex items-center space-x-3">
-              <div class="p-2 bg-indigo-500/10 rounded-lg">
-                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              </div>
-              <div>
-                <p class="text-xs text-slate-400 font-medium">Ideal Weight Range</p>
-                <p class="text-base font-bold text-slate-150 font-mono" id="idealWeightRangeText">58.9 - 79.6 kg</p>
-              </div>
-            </div>
-            <p class="text-[11px] text-slate-400 leading-relaxed">Derived using standardized clinical algorithms (Devine & Robinson limits) calibrated for your height.</p>
+          <!-- Live counter overlays -->
+          <div class="absolute bottom-3 right-3 flex items-center space-x-3 bg-slate-900/95 border border-slate-800/80 rounded-lg px-2.5 py-1 text-[11px] font-mono select-none backdrop-blur-sm">
+            <span class="text-indigo-400 flex items-center space-x-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+              <span>Active Line Syllables: <strong id="lineSyllablesCount" class="font-bold">0</strong></span>
+            </span>
+            <span class="text-slate-500">|</span>
+            <span class="text-purple-400">Words: <strong id="totalWordsCount" class="font-bold">0</strong></span>
           </div>
+        </div>
 
-          <!-- Daily Calorie Target Panel (BMR / TDEE estimation) -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-3">
-            <div class="flex items-center space-x-3">
-              <div class="p-2 bg-orange-500/10 rounded-lg">
-                <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path></svg>
-              </div>
-              <div>
-                <p class="text-xs text-slate-400 font-medium">Estimated BMR Rate</p>
-                <p class="text-base font-bold text-slate-150 font-mono" id="bmrRateText">1,645 kcal/day</p>
-              </div>
-            </div>
-            <p class="text-[11px] text-slate-400 leading-relaxed">The baseline energy output required to maintain biological equilibrium at total rest.</p>
-          </div>
-
-          <!-- Target Water Intake -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-3">
-            <div class="flex items-center space-x-3">
-              <div class="p-2 bg-sky-500/10 rounded-lg">
-                <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-              </div>
-              <div>
-                <p class="text-xs text-slate-400 font-medium">Hydration Target</p>
-                <p class="text-base font-bold text-slate-150 font-mono" id="waterTargetText">2.6 Liters</p>
-              </div>
-            </div>
-            <p class="text-[11px] text-slate-400 leading-relaxed">Recommended daily fluid volume estimated using exact proportional biological mass calculation.</p>
-          </div>
-
-          <!-- Goal Progress Dashboard -->
-          <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-3">
-            <div class="flex items-center justify-between">
-              <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Target Progress</p>
-              <span id="goalDeltaBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">-5 kg target</span>
-            </div>
-            
-            <!-- Mini visual tracker -->
-            <div class="space-y-1.5">
-              <div class="flex justify-between text-[11px] font-mono">
-                <span id="goalStartDisplay">Current: 75kg</span>
-                <span id="goalTargetDisplay">Goal: 70kg</span>
-              </div>
-              <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
-                <div id="goalProgressBar" class="bg-teal-400 h-full rounded-full transition-all duration-500" style="width: 60%"></div>
-              </div>
-              <p id="goalMessageText" class="text-[10px] text-slate-400 italic text-right">You are within 6.7% of your milestone!</p>
+        <!-- Smart Rhyme Match Assistant Helper Grid (Matches lines) -->
+        <div class="p-3 bg-indigo-950/20 border border-indigo-900/40 rounded-xl">
+          <div class="flex items-start space-x-3">
+            <div class="text-lg mt-0.5">⚡</div>
+            <div class="text-xs text-slate-300 leading-relaxed">
+              <p class="font-semibold text-indigo-300 mb-0.5">Interactive Pad Sync</p>
+              <p>Type normally. Select any word inside your poem, then double-click it to automatically research matching perfect rhymes above instantly!</p>
             </div>
           </div>
-
         </div>
 
       </div>
-    </div>
 
-    <!-- Historical Log & Progress Logs Tracker (Full Width Below) -->
-    <div class="mt-12 bg-slate-900 border border-slate-800/80 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl shadow-slate-950/50">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
-        <div>
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            Health Metric Logbook
-          </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Your local tracking history. Preserved automatically inside your browser storage.</p>
-        </div>
-        <button id="clearAllRecordsBtn" class="text-xs font-bold text-red-400 hover:text-red-300 transition-colors bg-red-500/10 hover:bg-red-500/20 px-3.5 py-2 rounded-xl border border-red-500/20">
-          Reset Logbook
-        </button>
-      </div>
-
-      <!-- Empty State -->
-      <div id="historyEmptyState" class="py-12 flex flex-col items-center justify-center text-center space-y-3">
-        <div class="p-4 bg-slate-800/50 rounded-full text-slate-600">
-          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-        </div>
-        <p class="text-sm text-slate-400 max-w-sm">No entries found. Log your first set of weight and physical metrics using the button above to begin trending.</p>
-      </div>
-
-      <!-- Entries List -->
-      <div id="historyContainerList" class="overflow-x-auto hidden">
-        <table class="min-w-full divide-y divide-slate-800 text-left text-xs text-slate-300">
-          <thead>
-            <tr class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-              <th class="py-3 px-4">Recorded On</th>
-              <th class="py-3 px-4">Sex / Age</th>
-              <th class="py-3 px-4">Height</th>
-              <th class="py-3 px-4">Weight</th>
-              <th class="py-3 px-4 text-center">BMI Value</th>
-              <th class="py-3 px-4">Health Classification</th>
-              <th class="py-3 px-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody" class="divide-y divide-slate-800/80">
-            <!-- Dynamic contents injected here -->
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </section>
 
   </main>
 
-  <!-- Footer Info -->
-  <footer class="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-2">
-      <p>© AuraBMI Health Engine. For informational and target-planning purposes only. Not clinical diagnosis.</p>
-      <p class="text-[11px] text-slate-600">Designed for high performance, smooth fluid responsive rendering, and local-first data privacy.</p>
-    </div>
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-10 opacity-0 bg-slate-900 border border-indigo-500/30 text-slate-200 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 transition duration-300 pointer-events-none">
+    <span id="toastIcon">✨</span>
+    <span id="toastMsg" class="text-xs font-medium">Successfully added.</span>
+  </div>
+
+  <!-- App Footer -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-6 mt-12 text-center text-xs text-slate-500">
+    <p>© VerseCraft Engine. Powered by the Datamuse rhyme directory.</p>
   </footer>
 </div>
   
