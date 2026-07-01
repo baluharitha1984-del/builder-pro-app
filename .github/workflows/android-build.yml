@@ -37,15 +37,15 @@ jobs:
             npm install @capacitor/core @capacitor/cli @capacitor/android
             
             # Prepare static web assets directory
-            mkdir -p dist
+            mkdir -p www
             
-            # Copy static files to web assets directory, avoiding copying the dist directory into itself
-            find . -maxdepth 1 -type f -not -name "package.json" -not -name "package-lock.json" -not -name "yarn.lock" -not -name "package-lock.json" -exec cp {} dist/ \; || true
+            # Copy static files to web assets directory, avoiding copying the www directory into itself
+            find . -maxdepth 1 -type f -not -name "package.json" -not -name "package-lock.json" -not -name "yarn.lock" -not -name "package-lock.json" -exec cp {} www/ \; || true
             
             # Copy separate directories if present
             for dir in assets images css js static public; do
-              if [ -d "$dir" ] && [ "$dir" != "dist" ]; then
-                cp -r "$dir" dist/ || true
+              if [ -d "$dir" ] && [ "$dir" != "www" ]; then
+                cp -r "$dir" www/ || true
               fi
             done
             
@@ -54,7 +54,7 @@ jobs:
             APP_ID=$(node -p "try { require('./capacitor.config.json').appId || 'com.pwa.app' } catch { 'com.pwa.app' }")
             
             # Initialize Capacitor using dynamic values
-            npx cap init "$APP_NAME" "$APP_ID" --web-dir=dist || true
+            npx cap init "$APP_NAME" "$APP_ID" --web-dir=www || true
             npx cap add android
 
             # Patch dynamically generated Gradle files on the fly to fix Kotlin duplicate class conflicts
@@ -91,6 +91,11 @@ jobs:
             npm install
             echo "Building web assets..."
             npm run build --if-present
+            if [ -d "dist" ]; then
+              echo "Copying built assets from dist to www..."
+              mkdir -p www
+              cp -r dist/* www/ || true
+            fi
             echo "Syncing web assets to Capacitor Android..."
             npx cap sync android
           fi
@@ -133,14 +138,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: StrideFlowDynamicStepActivityTracker-debug-apk
+          name: AuraBMIAdvancedHealthSuite-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: StrideFlowDynamicStepActivityTracker-release-aab
+          name: AuraBMIAdvancedHealthSuite-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
