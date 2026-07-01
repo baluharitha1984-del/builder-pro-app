@@ -1,27 +1,78 @@
-/* Extra customizations and enhancements */
-@keyframes progress-bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-.progress-ring-active {
-  animation: progress-bounce 1s ease-in-out;
-}
-/* Custom focus overrides and map background textures */
-#sim-canvas {
-  background: radial-gradient(circle, #020617 20%, #090d16 100%);
+/* Specialized transitions and customized elements for the BMI calculations */
+
+/* Interactive scale sliders customized appearance */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2dd4bf;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
+  transition: transform 0.15s ease-in-out, background 0.15s ease-in-out;
 }
 
-/* Subtle scrollbars */
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #34d399;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: #2dd4bf;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(45, 212, 191, 0.4);
+  transition: transform 0.15s ease-in-out, background 0.15s ease-in-out;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: #34d399;
+}
+
+/* Smooth layout and backdrop-blur support */
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Custom scrollbar to match sleek theme */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: #020617;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #334155;
+}
+
+/* Highlight effects for category badges */
+.bg-bmi-underweight {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+.bg-bmi-normal {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+.bg-bmi-overweight {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+}
+.bg-bmi-obese {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
 }
