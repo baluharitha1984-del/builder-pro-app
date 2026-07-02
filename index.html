@@ -3,13 +3,366 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GradeBook Pro</title>
+  <title>PixelForge Studio</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-50 p-6 md:p-12 font-sans text-slate-900"><div class="max-w-4xl mx-auto"><header class="mb-8"><h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">GradeBook Pro</h1><p class="text-slate-500">Manage student assessments with ease.</p></header><div class="grid md:grid-cols-3 gap-8"><div class="md:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit"><h2 class="text-lg font-bold mb-4">Add New Entry</h2><div class="space-y-4"><div><label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Student Name</label><input type="text" id="studentName" class="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div><div><label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Subject</label><input type="text" id="subjectName" class="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div><div><label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Score (0-100)</label><input type="number" id="scoreValue" class="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none transition"></div><button id="addEntryBtn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition active:scale-95">Save Entry</button></div></div><div class="md:col-span-2"><div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-50"><tr><th class="p-4 text-xs font-bold text-slate-400 uppercase">Student</th><th class="p-4 text-xs font-bold text-slate-400 uppercase">Subject</th><th class="p-4 text-xs font-bold text-slate-400 uppercase">Score</th><th class="p-4 text-xs font-bold text-slate-400 uppercase">Action</th></tr></thead><tbody id="entryList"></tbody></table><div id="emptyState" class="p-12 text-center text-slate-400">No entries added yet.</div></div></div></div></div></div>
+  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
+  <!-- App Header -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+            PixelForge <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 ml-2 font-medium">Studio v1.5</span>
+          </h1>
+          <p class="text-xs text-slate-400">Advanced real-time image filter editor, generator, & watermark engine</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 flex-wrap w-full md:w-auto justify-end">
+        <!-- File Upload Selector -->
+        <label for="imageUploader" class="cursor-pointer flex items-center gap-2 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white text-xs font-semibold px-4 py-2.5 rounded-lg border border-slate-800 transition-all duration-200">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+          </svg>
+          Upload Image
+          <input id="imageUploader" type="file" accept="image/*" class="hidden">
+        </label>
+        
+        <button id="resetAllBtn" class="flex items-center gap-1.5 bg-slate-900 hover:bg-red-950 hover:text-red-200 text-slate-400 text-xs font-medium px-3.5 py-2.5 rounded-lg border border-slate-800 hover:border-red-900/50 transition-all duration-200" title="Reset all settings">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H18.5"></path>
+          </svg>
+          Reset Engine
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- LEFT PANEL: Preset, Adjustments & Layers (4 Cols) -->
+    <aside class="lg:col-span-4 flex flex-col gap-6">
+      
+      <!-- Quick Sample Loader -->
+      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Select Starter Canvas</h3>
+        <div class="grid grid-cols-4 gap-2">
+          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-indigo-500 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80">
+            <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Abstract Neon">
+          </button>
+          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-transparent hover:border-slate-700 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Valley Landscape">
+          </button>
+          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-transparent hover:border-slate-700 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Cyber Circuit">
+          </button>
+          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-transparent hover:border-slate-700 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=80">
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Portrait Vintage">
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-sm flex items-center gap-2 text-slate-200">
+            <span class="h-2 w-2 rounded-full bg-violet-400"></span>
+            Artistic Presets
+          </h2>
+          <span class="text-[10px] text-slate-500 font-mono">Instant Apply</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="presetNormal" class="preset-btn bg-indigo-600/10 border border-indigo-500/30 hover:bg-indigo-600/20 text-indigo-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">✨ Clear Classic</button>
+          <button id="presetCyber" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🔮 Cyber Synth</button>
+          <button id="presetMono" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🌑 Noir Charcoal</button>
+          <button id="presetVintage" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🍂 Retro Sepia</button>
+          <button id="presetSunset" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🌅 Warm Horizon</button>
+          <button id="presetCool" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">❄️ Arctic Ice</button>
+        </div>
+      </div>
+
+      <!-- Fine-Tuning Adjustments -->
+      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-sm flex items-center gap-2 text-slate-200">
+            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
+            Manual Tuning
+          </h2>
+          <button id="resetFiltersBtn" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Reset Sliders</button>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Brightness -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs text-slate-400">
+              <label for="filterBrightness">Brightness</label>
+              <span id="valBrightness" class="font-mono text-slate-300">100%</span>
+            </div>
+            <input type="range" id="filterBrightness" min="0" max="200" value="100" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+
+          <!-- Contrast -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs text-slate-400">
+              <label for="filterContrast">Contrast</label>
+              <span id="valContrast" class="font-mono text-slate-300">100%</span>
+            </div>
+            <input type="range" id="filterContrast" min="0" max="200" value="100" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+
+          <!-- Saturation -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs text-slate-400">
+              <label for="filterSaturation">Saturation</label>
+              <span id="valSaturation" class="font-mono text-slate-300">100%</span>
+            </div>
+            <input type="range" id="filterSaturation" min="0" max="200" value="100" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+
+          <!-- Blur -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs text-slate-400">
+              <label for="filterBlur">Blur (Gaussian)</label>
+              <span id="valBlur" class="font-mono text-slate-300">0px</span>
+            </div>
+            <input type="range" id="filterBlur" min="0" max="20" value="0" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+
+          <!-- Hue Rotate -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs text-slate-400">
+              <label for="filterHue">Hue Shift</label>
+              <span id="valHue" class="font-mono text-slate-300">0°</span>
+            </div>
+            <input type="range" id="filterHue" min="0" max="360" value="0" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+
+          <!-- Sepia -->
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs text-slate-400">
+              <label for="filterSepia">Sepia Intensity</label>
+              <span id="valSepia" class="font-mono text-slate-300">0%</span>
+            </div>
+            <input type="range" id="filterSepia" min="0" max="100" value="0" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+          </div>
+        </div>
+      </div>
+
+      <!-- Creative Watermark / Title Engine -->
+      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-sm flex items-center gap-2 text-slate-200">
+            <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
+            Stamp & Watermark
+          </h2>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="watermarkToggle" class="sr-only peer" checked>
+            <div class="relative w-8 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-400 after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500 peer-checked:after:bg-white"></div>
+          </label>
+        </div>
+
+        <div class="space-y-3" id="watermarkControls">
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1" for="watermarkText">Watermark text / Tag</label>
+            <input type="text" id="watermarkText" value="© PIXELFORGE STUDIO" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1" for="watermarkPos">Placement</label>
+              <select id="watermarkPos" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors">
+                <option value="bottom-right">Bottom Right</option>
+                <option value="bottom-left">Bottom Left</option>
+                <option value="top-right">Top Right</option>
+                <option value="top-left">Top Left</option>
+                <option value="center">Absolute Center</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1" for="watermarkColor">Hex Color</label>
+              <div class="flex gap-1">
+                <input type="color" id="watermarkColor" value="#ffffff" class="w-8 h-7 bg-slate-950 border border-slate-800 rounded cursor-pointer p-0.5">
+                <input type="text" id="watermarkColorText" value="#FFFFFF" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-1.5 text-center text-xs text-slate-300 uppercase focus:outline-none">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER & RIGHT: Studio Viewer & Meta Analytics (8 Cols) -->
+    <div class="lg:col-span-8 flex flex-col gap-6">
+      
+      <!-- Interactive Canvas Board -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-between min-h-[450px] relative">
+        
+        <!-- Canvas Toolbar Header -->
+        <div class="w-full flex items-center justify-between border-b border-slate-800/80 pb-4 mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/10 rounded text-xs font-mono font-semibold uppercase" id="canvasDimensionsInfo">800 x 533 PX</span>
+            <span class="text-[11px] text-slate-500" id="canvasModeIndicator">Active Canvas Viewport</span>
+          </div>
+
+          <!-- Transform Actions -->
+          <div class="flex items-center gap-1.5">
+            <button id="btnRotateCCW" class="p-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded transition-colors" title="Rotate 90° CCW">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.01 4.01c2.1-2.1 5.38-2.68 8.08-1.5M4 4v5h5M4.01 19.99c2.1 2.1 5.38 2.68 8.08 1.5M4 20v-5h5"></path></svg>
+            </button>
+            <button id="btnRotateCW" class="p-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded transition-colors" title="Rotate 90° CW">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.934 12.8a1 1 0 000-1.6l-5.334-4A1 1 0 005 8v8a1 1 0 001.6.8l5.334-4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.99 4.01c-2.1-2.1-5.38-2.68-8.08-1.5M20 4v5h-5M19.99 19.99c-2.1 2.1-5.38 2.68-8.08 1.5M20 20v-5h-5"></path></svg>
+            </button>
+            <button id="btnFlipH" class="p-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded transition-colors" title="Flip Horizontal">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+            </button>
+            <span class="h-4 w-px bg-slate-800 mx-1"></span>
+            <button id="fitCanvasBtn" class="text-xs bg-slate-850 hover:bg-slate-800 px-2.5 py-1.5 rounded text-slate-300 transition-colors">Reset Transform</button>
+          </div>
+        </div>
+
+        <!-- Central Sandbox Canvas Board -->
+        <div class="relative w-full flex-1 flex items-center justify-center bg-slate-950 rounded-xl overflow-hidden min-h-[300px] border border-slate-850 p-2">
+          <!-- Dynamic Canvas elements -->
+          <canvas id="mainCanvas" class="max-w-full max-h-[420px] rounded object-contain shadow-2xl transition-all duration-150"></canvas>
+          
+          <!-- Loading Indicator overlay -->
+          <div id="canvasLoader" class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 hidden">
+            <div class="relative w-12 h-12">
+              <div class="absolute inset-0 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin"></div>
+            </div>
+            <p class="text-xs text-indigo-300 font-mono tracking-wider animate-pulse">FORGING PIXELS...</p>
+          </div>
+        </div>
+
+        <!-- Canvas Bottom Status Bar -->
+        <div class="w-full flex flex-col sm:flex-row items-center justify-between mt-4 pt-3 border-t border-slate-850 gap-3">
+          <p class="text-xs text-slate-500" id="canvasActionMessage">
+            💡 Adjust sidebar sliders or apply preset filters to dynamically recompile the canvas output.
+          </p>
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button id="btnSaveToGallery" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2 px-4 rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-emerald-500/10">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"></path>
+              </svg>
+              Save Snapshot
+            </button>
+            <button id="btnDownloadPNG" class="flex-1 sm:flex-initial bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs py-2 px-4 rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-indigo-500/20">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+              </svg>
+              Export PNG
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics, Stats & Live Logs Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Technical Analysis / Image Stats -->
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
+          <h3 class="font-semibold text-sm mb-4 text-slate-300 flex items-center gap-2">
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            Canvas Diagnostics
+          </h3>
+          <div class="space-y-2.5 font-mono text-xs">
+            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+              <span class="text-slate-500">Engine Source Type</span>
+              <span id="diagSourceType" class="text-indigo-300">Curated Stock Asset</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+              <span class="text-slate-500">Color Channel Matrix</span>
+              <span id="diagColorChannels" class="text-emerald-400">RGBA 8-Bit</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
+              <span class="text-slate-500">Computed Filter Stack</span>
+              <span id="diagFiltersCount" class="text-slate-300">0 Active Filters</span>
+            </div>
+            <div class="flex justify-between pb-0.5">
+              <span class="text-slate-500">Canvas Latency</span>
+              <span id="diagSpeed" class="text-amber-400">~0.8ms (Hardware Accel)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- History Tracker / Real-time Operation Logs -->
+        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-sm text-slate-300 flex items-center gap-2">
+                <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Operation Logs
+              </h3>
+              <button id="btnClearLogs" class="text-[10px] text-slate-500 hover:text-red-400 transition-colors">Clear Trace</button>
+            </div>
+            <div id="operationLogsWrapper" class="space-y-1.5 max-h-[110px] overflow-y-auto pr-1 custom-scrollbar">
+              <!-- Generated Logs Go Here -->
+              <div class="text-[11px] font-mono text-slate-500 border-l-2 border-indigo-500/30 pl-2 py-0.5">
+                [00:00:01] Loaded Default Canvas successfully.
+              </div>
+              <div class="text-[11px] font-mono text-slate-500 border-l-2 border-indigo-500/30 pl-2 py-0.5">
+                [00:00:01] Standard RGB calibration ready.
+              </div>
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-500 font-mono text-right mt-2">
+            All actions are kept locally in virtual memory.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Grid Showcase: Created Gallery Snapshots -->
+  <section class="max-w-7xl w-full mx-auto px-4 md:px-6 pb-16 mt-6">
+    <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+              </svg>
+            </span>
+            Your Creative Gallery
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">Snapshots captured during this sandbox session (Stored temporarily)</p>
+        </div>
+        <button id="clearGalleryBtn" class="text-xs font-semibold text-slate-400 hover:text-red-400 flex items-center gap-1 bg-slate-900/80 border border-slate-850 px-3.5 py-2 rounded-lg transition-colors">
+          Delete All Snapshots
+        </button>
+      </div>
+
+      <!-- Snapshot Grid -->
+      <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <!-- Mock state / Empty State displayed when no snapshots -->
+        <div class="col-span-full py-12 flex flex-col items-center justify-center text-center" id="galleryEmptyState">
+          <div class="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 mb-3">
+            <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <p class="text-xs text-slate-400 font-medium">No snapshots saved yet.</p>
+          <p class="text-[11px] text-slate-500 max-w-xs mt-1">Click the "Save Snapshot" button on the main workspace to store and collect multiple creative revisions here.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
   
   <script src="script.js"></script>
 </body>
