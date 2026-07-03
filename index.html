@@ -3,365 +3,346 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PixelForge Studio</title>
+  <title>SAGAS: Immersive Story Forge</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col selection:bg-indigo-500 selection:text-white">
-  <!-- App Header -->
-  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 px-6 py-4">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col selection:bg-violet-600 selection:text-white">
+  <!-- Global Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-2.5 bg-gradient-to-tr from-violet-600 to-fuchsia-600 rounded-xl shadow-lg shadow-violet-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
           </svg>
         </div>
         <div>
-          <h1 class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
-            PixelForge <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 ml-2 font-medium">Studio v1.5</span>
-          </h1>
-          <p class="text-xs text-slate-400">Advanced real-time image filter editor, generator, & watermark engine</p>
+          <h1 class="text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400">SAGAS</h1>
+          <p class="text-xs text-slate-400 font-medium tracking-tight">Immersive Interactive Story Forge & Reader</p>
         </div>
       </div>
-
-      <div class="flex items-center gap-3 flex-wrap w-full md:w-auto justify-end">
-        <!-- File Upload Selector -->
-        <label for="imageUploader" class="cursor-pointer flex items-center gap-2 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white text-xs font-semibold px-4 py-2.5 rounded-lg border border-slate-800 transition-all duration-200">
-          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-          </svg>
-          Upload Image
-          <input id="imageUploader" type="file" accept="image/*" class="hidden">
-        </label>
-        
-        <button id="resetAllBtn" class="flex items-center gap-1.5 bg-slate-900 hover:bg-red-950 hover:text-red-200 text-slate-400 text-xs font-medium px-3.5 py-2.5 rounded-lg border border-slate-800 hover:border-red-900/50 transition-all duration-200" title="Reset all settings">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 15H18.5"></path>
-          </svg>
-          Reset Engine
+      
+      <!-- Top Info & Action Panel -->
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="hidden md:flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 text-xs">
+          <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+          <span class="text-slate-300" id="stats-stories-count">Active Stories: 4</span>
+        </div>
+        <button id="btn-quick-tour" class="px-3.5 py-1.5 text-xs font-semibold bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 rounded-lg transition-all duration-200">
+          Interactive Guide
+        </button>
+        <button id="btn-toggle-creative-mode" class="px-3.5 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-all duration-200 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+          <span>Write & Create</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Main Workspace -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
     
-    <!-- LEFT PANEL: Preset, Adjustments & Layers (4 Cols) -->
-    <aside class="lg:col-span-4 flex flex-col gap-6">
+    <!-- Sidebar: Controls, Library & Story Builder (5 Columns on Large screens) -->
+    <section class="lg:col-span-5 flex flex-col gap-6">
       
-      <!-- Quick Sample Loader -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-4">
-        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Select Starter Canvas</h3>
-        <div class="grid grid-cols-4 gap-2">
-          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-indigo-500 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80">
-            <img src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Abstract Neon">
-          </button>
-          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-transparent hover:border-slate-700 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80">
-            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Valley Landscape">
-          </button>
-          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-transparent hover:border-slate-700 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80">
-            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Cyber Circuit">
-          </button>
-          <button class="sample-img-btn relative rounded-lg overflow-hidden h-12 border-2 border-transparent hover:border-slate-700 focus:outline-none transition-all" data-src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=80">
-            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Portrait Vintage">
-          </button>
-        </div>
-      </div>
-
-      <!-- Quick Presets -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-sm flex items-center gap-2 text-slate-200">
-            <span class="h-2 w-2 rounded-full bg-violet-400"></span>
-            Artistic Presets
-          </h2>
-          <span class="text-[10px] text-slate-500 font-mono">Instant Apply</span>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button id="presetNormal" class="preset-btn bg-indigo-600/10 border border-indigo-500/30 hover:bg-indigo-600/20 text-indigo-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">✨ Clear Classic</button>
-          <button id="presetCyber" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🔮 Cyber Synth</button>
-          <button id="presetMono" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🌑 Noir Charcoal</button>
-          <button id="presetVintage" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🍂 Retro Sepia</button>
-          <button id="presetSunset" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">🌅 Warm Horizon</button>
-          <button id="presetCool" class="preset-btn bg-slate-850 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs py-2 px-3 rounded-lg text-left transition-all font-medium">❄️ Arctic Ice</button>
-        </div>
-      </div>
-
-      <!-- Fine-Tuning Adjustments -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-sm flex items-center gap-2 text-slate-200">
-            <span class="h-2 w-2 rounded-full bg-emerald-400"></span>
-            Manual Tuning
-          </h2>
-          <button id="resetFiltersBtn" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Reset Sliders</button>
-        </div>
-
-        <div class="space-y-4">
-          <!-- Brightness -->
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs text-slate-400">
-              <label for="filterBrightness">Brightness</label>
-              <span id="valBrightness" class="font-mono text-slate-300">100%</span>
-            </div>
-            <input type="range" id="filterBrightness" min="0" max="200" value="100" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-          </div>
-
-          <!-- Contrast -->
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs text-slate-400">
-              <label for="filterContrast">Contrast</label>
-              <span id="valContrast" class="font-mono text-slate-300">100%</span>
-            </div>
-            <input type="range" id="filterContrast" min="0" max="200" value="100" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-          </div>
-
-          <!-- Saturation -->
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs text-slate-400">
-              <label for="filterSaturation">Saturation</label>
-              <span id="valSaturation" class="font-mono text-slate-300">100%</span>
-            </div>
-            <input type="range" id="filterSaturation" min="0" max="200" value="100" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-          </div>
-
-          <!-- Blur -->
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs text-slate-400">
-              <label for="filterBlur">Blur (Gaussian)</label>
-              <span id="valBlur" class="font-mono text-slate-300">0px</span>
-            </div>
-            <input type="range" id="filterBlur" min="0" max="20" value="0" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-          </div>
-
-          <!-- Hue Rotate -->
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs text-slate-400">
-              <label for="filterHue">Hue Shift</label>
-              <span id="valHue" class="font-mono text-slate-300">0°</span>
-            </div>
-            <input type="range" id="filterHue" min="0" max="360" value="0" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-          </div>
-
-          <!-- Sepia -->
-          <div class="space-y-1">
-            <div class="flex justify-between text-xs text-slate-400">
-              <label for="filterSepia">Sepia Intensity</label>
-              <span id="valSepia" class="font-mono text-slate-300">0%</span>
-            </div>
-            <input type="range" id="filterSepia" min="0" max="100" value="0" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-          </div>
-        </div>
-      </div>
-
-      <!-- Creative Watermark / Title Engine -->
-      <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="font-semibold text-sm flex items-center gap-2 text-slate-200">
-            <span class="h-2 w-2 rounded-full bg-cyan-400"></span>
-            Stamp & Watermark
-          </h2>
-          <label class="inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="watermarkToggle" class="sr-only peer" checked>
-            <div class="relative w-8 h-4 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-slate-400 after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-cyan-500 peer-checked:after:bg-white"></div>
-          </label>
-        </div>
-
-        <div class="space-y-3" id="watermarkControls">
-          <div>
-            <label class="text-[11px] text-slate-400 block mb-1" for="watermarkText">Watermark text / Tag</label>
-            <input type="text" id="watermarkText" value="© PIXELFORGE STUDIO" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition-colors">
-          </div>
-          
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1" for="watermarkPos">Placement</label>
-              <select id="watermarkPos" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors">
-                <option value="bottom-right">Bottom Right</option>
-                <option value="bottom-left">Bottom Left</option>
-                <option value="top-right">Top Right</option>
-                <option value="top-left">Top Left</option>
-                <option value="center">Absolute Center</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-[11px] text-slate-400 block mb-1" for="watermarkColor">Hex Color</label>
-              <div class="flex gap-1">
-                <input type="color" id="watermarkColor" value="#ffffff" class="w-8 h-7 bg-slate-950 border border-slate-800 rounded cursor-pointer p-0.5">
-                <input type="text" id="watermarkColorText" value="#FFFFFF" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-1.5 text-center text-xs text-slate-300 uppercase focus:outline-none">
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- CENTER & RIGHT: Studio Viewer & Meta Analytics (8 Cols) -->
-    <div class="lg:col-span-8 flex flex-col gap-6">
-      
-      <!-- Interactive Canvas Board -->
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col items-center justify-between min-h-[450px] relative">
-        
-        <!-- Canvas Toolbar Header -->
-        <div class="w-full flex items-center justify-between border-b border-slate-800/80 pb-4 mb-4 flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/10 rounded text-xs font-mono font-semibold uppercase" id="canvasDimensionsInfo">800 x 533 PX</span>
-            <span class="text-[11px] text-slate-500" id="canvasModeIndicator">Active Canvas Viewport</span>
-          </div>
-
-          <!-- Transform Actions -->
-          <div class="flex items-center gap-1.5">
-            <button id="btnRotateCCW" class="p-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded transition-colors" title="Rotate 90° CCW">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.01 4.01c2.1-2.1 5.38-2.68 8.08-1.5M4 4v5h5M4.01 19.99c2.1 2.1 5.38 2.68 8.08 1.5M4 20v-5h5"></path></svg>
-            </button>
-            <button id="btnRotateCW" class="p-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded transition-colors" title="Rotate 90° CW">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.934 12.8a1 1 0 000-1.6l-5.334-4A1 1 0 005 8v8a1 1 0 001.6.8l5.334-4z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.99 4.01c-2.1-2.1-5.38-2.68-8.08-1.5M20 4v5h-5M19.99 19.99c-2.1 2.1-5.38 2.68-8.08 1.5M20 20v-5h-5"></path></svg>
-            </button>
-            <button id="btnFlipH" class="p-1.5 bg-slate-800 hover:bg-slate-750 text-slate-300 rounded transition-colors" title="Flip Horizontal">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-            </button>
-            <span class="h-4 w-px bg-slate-800 mx-1"></span>
-            <button id="fitCanvasBtn" class="text-xs bg-slate-850 hover:bg-slate-800 px-2.5 py-1.5 rounded text-slate-300 transition-colors">Reset Transform</button>
-          </div>
-        </div>
-
-        <!-- Central Sandbox Canvas Board -->
-        <div class="relative w-full flex-1 flex items-center justify-center bg-slate-950 rounded-xl overflow-hidden min-h-[300px] border border-slate-850 p-2">
-          <!-- Dynamic Canvas elements -->
-          <canvas id="mainCanvas" class="max-w-full max-h-[420px] rounded object-contain shadow-2xl transition-all duration-150"></canvas>
-          
-          <!-- Loading Indicator overlay -->
-          <div id="canvasLoader" class="absolute inset-0 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center gap-3 hidden">
-            <div class="relative w-12 h-12">
-              <div class="absolute inset-0 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin"></div>
-            </div>
-            <p class="text-xs text-indigo-300 font-mono tracking-wider animate-pulse">FORGING PIXELS...</p>
-          </div>
-        </div>
-
-        <!-- Canvas Bottom Status Bar -->
-        <div class="w-full flex flex-col sm:flex-row items-center justify-between mt-4 pt-3 border-t border-slate-850 gap-3">
-          <p class="text-xs text-slate-500" id="canvasActionMessage">
-            💡 Adjust sidebar sliders or apply preset filters to dynamically recompile the canvas output.
-          </p>
-          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <button id="btnSaveToGallery" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs py-2 px-4 rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-emerald-500/10">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"></path>
-              </svg>
-              Save Snapshot
-            </button>
-            <button id="btnDownloadPNG" class="flex-1 sm:flex-initial bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-xs py-2 px-4 rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-indigo-500/20">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-              </svg>
-              Export PNG
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Analytics, Stats & Live Logs Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Technical Analysis / Image Stats -->
-        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5">
-          <h3 class="font-semibold text-sm mb-4 text-slate-300 flex items-center gap-2">
-            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-            Canvas Diagnostics
-          </h3>
-          <div class="space-y-2.5 font-mono text-xs">
-            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
-              <span class="text-slate-500">Engine Source Type</span>
-              <span id="diagSourceType" class="text-indigo-300">Curated Stock Asset</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
-              <span class="text-slate-500">Color Channel Matrix</span>
-              <span id="diagColorChannels" class="text-emerald-400">RGBA 8-Bit</span>
-            </div>
-            <div class="flex justify-between border-b border-slate-800/60 pb-1.5">
-              <span class="text-slate-500">Computed Filter Stack</span>
-              <span id="diagFiltersCount" class="text-slate-300">0 Active Filters</span>
-            </div>
-            <div class="flex justify-between pb-0.5">
-              <span class="text-slate-500">Canvas Latency</span>
-              <span id="diagSpeed" class="text-amber-400">~0.8ms (Hardware Accel)</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- History Tracker / Real-time Operation Logs -->
-        <div class="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-semibold text-sm text-slate-300 flex items-center gap-2">
-                <svg class="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Operation Logs
-              </h3>
-              <button id="btnClearLogs" class="text-[10px] text-slate-500 hover:text-red-400 transition-colors">Clear Trace</button>
-            </div>
-            <div id="operationLogsWrapper" class="space-y-1.5 max-h-[110px] overflow-y-auto pr-1 custom-scrollbar">
-              <!-- Generated Logs Go Here -->
-              <div class="text-[11px] font-mono text-slate-500 border-l-2 border-indigo-500/30 pl-2 py-0.5">
-                [00:00:01] Loaded Default Canvas successfully.
-              </div>
-              <div class="text-[11px] font-mono text-slate-500 border-l-2 border-indigo-500/30 pl-2 py-0.5">
-                [00:00:01] Standard RGB calibration ready.
-              </div>
-            </div>
-          </div>
-          <div class="text-[10px] text-slate-500 font-mono text-right mt-2">
-            All actions are kept locally in virtual memory.
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </main>
-
-  <!-- Bottom Grid Showcase: Created Gallery Snapshots -->
-  <section class="max-w-7xl w-full mx-auto px-4 md:px-6 pb-16 mt-6">
-    <div class="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
+      <!-- Interactive Builder panel -->
+      <div id="panel-creator" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
+        <div class="flex justify-between items-center">
           <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <span class="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
-              </svg>
-            </span>
-            Your Creative Gallery
+            <span class="text-violet-500">✦</span> Story Forge
           </h2>
-          <p class="text-xs text-slate-400 mt-1">Snapshots captured during this sandbox session (Stored temporarily)</p>
+          <button id="btn-roll-inspiration" class="text-xs bg-slate-800 hover:bg-violet-900/40 text-violet-400 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-violet-500/50 transition duration-200 flex items-center gap-1.5">
+            <span>🎲</span> Spin Fate (Randomize)
+          </button>
         </div>
-        <button id="clearGalleryBtn" class="text-xs font-semibold text-slate-400 hover:text-red-400 flex items-center gap-1 bg-slate-900/80 border border-slate-850 px-3.5 py-2 rounded-lg transition-colors">
-          Delete All Snapshots
+
+        <!-- Genre Selector -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Select Universe Genre</label>
+          <div class="grid grid-cols-3 gap-2" id="genre-grid">
+            <button data-genre="fantasy" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-violet-600/30 border-2 border-violet-500 text-violet-200 shadow-md shadow-violet-500/10 transition duration-200">
+              🔮 Fantasy
+            </button>
+            <button data-genre="scifi" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
+              🚀 Sci-Fi
+            </button>
+            <button data-genre="cyberpunk" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
+              ⚡ Cyberpunk
+            </button>
+            <button data-genre="mystery" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
+              🕵️ Mystery
+            </button>
+            <button data-genre="horror" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
+              💀 Horror
+            </button>
+            <button data-genre="custom" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
+              ✨ Surreal
+            </button>
+          </div>
+        </div>
+
+        <!-- Core Setup Form -->
+        <div class="space-y-4">
+          <div>
+            <label for="story-title-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Story Title</label>
+            <input type="text" id="story-title-input" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none transition duration-200" placeholder="e.g., The Lost Archives of Neo-Tokyo">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="story-hero-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Protagonist</label>
+              <input type="text" id="story-hero-input" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition" placeholder="Hero name...">
+            </div>
+            <div>
+              <label for="story-companion-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Key Companion</label>
+              <input type="text" id="story-companion-input" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition" placeholder="Companion...">
+            </div>
+          </div>
+
+          <div>
+            <label for="story-hook-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Starting Plot Hook (Choice A & B will branch from here)</label>
+            <textarea id="story-hook-input" rows="3" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-4 py-2 text-sm outline-none transition resize-none" placeholder="Describe the opening of the adventure or input custom paragraphs..."></textarea>
+          </div>
+
+          <!-- Branch Setup -->
+          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-3">
+            <p class="text-xs font-bold text-violet-400 uppercase tracking-wide">Branch Options (Choice Path Setup)</p>
+            <div>
+              <label for="branch-a-text" class="block text-[10px] font-semibold text-slate-500 mb-1">Choice A Action Button text:</label>
+              <input type="text" id="branch-a-text" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none" placeholder="Explore the dark laboratory">
+              <label for="branch-a-outcome" class="block text-[10px] font-semibold text-slate-500 mt-2 mb-1">Outcome Text when Choice A is taken:</label>
+              <textarea id="branch-a-outcome" rows="2" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none resize-none" placeholder="You discover glowing stasis chambers containing... "></textarea>
+            </div>
+            <div class="border-t border-slate-800/60 pt-2">
+              <label for="branch-b-text" class="block text-[10px] font-semibold text-slate-500 mb-1">Choice B Action Button text:</label>
+              <input type="text" id="branch-b-text" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none" placeholder="Flee to the atmospheric rooftop">
+              <label for="branch-b-outcome" class="block text-[10px] font-semibold text-slate-500 mt-2 mb-1">Outcome Text when Choice B is taken:</label>
+              <textarea id="branch-b-outcome" rows="2" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none resize-none" placeholder="Rain lashes down as the synth-copters home in on your location..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-compile-story" class="w-full py-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white font-bold rounded-xl transition duration-300 transform active:scale-[0.98] shadow-lg shadow-violet-900/30 text-sm flex items-center justify-center gap-2">
+          <span>⚔️</span> Forge Story & Load to Sanctuary
         </button>
       </div>
 
-      <!-- Snapshot Grid -->
-      <div id="galleryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        <!-- Mock state / Empty State displayed when no snapshots -->
-        <div class="col-span-full py-12 flex flex-col items-center justify-center text-center" id="galleryEmptyState">
-          <div class="h-12 w-12 rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 mb-3">
-            <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-          </div>
-          <p class="text-xs text-slate-400 font-medium">No snapshots saved yet.</p>
-          <p class="text-[11px] text-slate-500 max-w-xs mt-1">Click the "Save Snapshot" button on the main workspace to store and collect multiple creative revisions here.</p>
+      <!-- Interactive Library Drawer -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+        <div class="flex justify-between items-center">
+          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+            Saved Manuscripts
+          </h2>
+          <span class="text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded-full font-semibold" id="library-counter">4 Ready</span>
+        </div>
+
+        <!-- Library list -->
+        <div id="library-list" class="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          <!-- Dynamic list loaded from script -->
+        </div>
+
+        <!-- File actions -->
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60">
+          <button id="btn-export-library" class="py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5">
+            📤 Export JSON
+          </button>
+          <label for="file-import-library" class="py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer text-center">
+            📥 Import JSON
+            <input type="file" id="file-import-library" class="hidden" accept=".json">
+          </label>
         </div>
       </div>
+    </section>
+
+    <!-- Right Side: The Interactive Reading Sanctuary (7 Columns on Large screens) -->
+    <section class="lg:col-span-7 flex flex-col gap-6">
+      
+      <!-- Interactive Desk Customizer Toolbar -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Sanctuary Aesthetics:</span>
+          <div class="flex gap-1.5" id="theme-pills">
+            <button data-theme="midnight" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-slate-950 border border-violet-500 text-violet-400" title="Midnight Magic">Obsidian</button>
+            <button data-theme="parchment" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-[#F4EFEB] border border-transparent text-[#2C241E]" title="Vintage Parchment">Parchment</button>
+            <button data-theme="matrix" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-black border border-transparent text-emerald-400 font-mono" title="Green Terminal">Synth-Grid</button>
+            <button data-theme="neon" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-fuchsia-950/20 border border-transparent text-fuchsia-400" title="Cyber Sunset">Neon Cyber</button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs text-slate-400">Text Scale:</span>
+            <button id="btn-zoom-out" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-bold">A-</button>
+            <button id="btn-zoom-in" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-bold">A+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actual Immersive Reading Desk Container -->
+      <div id="reading-desk" class="flex-1 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl flex flex-col min-h-[500px] overflow-hidden transition-all duration-300">
+        
+        <!-- Header of current story -->
+        <div class="px-6 py-4 bg-slate-950/40 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span id="story-badge-genre" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-violet-900 text-violet-200 border border-violet-700/60">Fantasy</span>
+            <span id="story-read-time" class="text-xs text-slate-400 font-medium">📖 2 min read</span>
+          </div>
+          
+          <!-- TTS Speech Controls -->
+          <div class="flex items-center gap-2 bg-slate-950/60 px-3 py-1 rounded-xl border border-slate-800">
+            <button id="btn-tts-toggle" class="text-slate-400 hover:text-violet-400 transition-colors p-1 flex items-center gap-1" title="Read Aloud Narrator">
+              <span id="tts-icon">🔊</span> 
+              <span class="text-[11px] font-medium hidden sm:inline">Read Narrative</span>
+            </button>
+            <div class="hidden sm:flex items-center gap-1 border-l border-slate-800 pl-2">
+              <select id="tts-voice-select" class="bg-transparent text-slate-400 text-[10px] max-w-[80px] outline-none cursor-pointer">
+                <!-- Dynamically Populated -->
+                <option value="">Default Voice</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story Ambient Audio Waves (Simulated Audio Feedback Visualizer) -->
+        <div class="bg-slate-950/20 px-6 py-2 flex items-center justify-between border-b border-slate-800/40">
+          <div class="flex items-center gap-1.5">
+            <span id="ambient-sound-indicator" class="text-xs text-slate-500 flex items-center gap-2">
+              <span class="flex space-x-0.5 items-end h-3 w-4" id="sound-bars">
+                <span class="bg-slate-700 w-0.5 h-1 animate-pulse"></span>
+                <span class="bg-slate-700 w-0.5 h-2 animate-pulse"></span>
+                <span class="bg-slate-700 w-0.5 h-3 animate-pulse"></span>
+                <span class="bg-slate-700 w-0.5 h-1.5 animate-pulse"></span>
+              </span>
+              <span id="ambient-genre-soundtext">Ambient: Celestial Winds (Muted)</span>
+            </span>
+          </div>
+          <button id="btn-toggle-sound-ambient" class="text-[11px] text-violet-400 hover:text-violet-300 font-medium underline cursor-pointer">
+            Toggle Pulse Effect
+          </button>
+        </div>
+
+        <!-- Main Text Viewport (Immersive Story text) -->
+        <div class="flex-1 p-6 sm:p-8 overflow-y-auto max-h-[480px] flex flex-col justify-between scroll-smooth" id="story-viewport">
+          
+          <!-- Active Screen Title & Body paragraphs -->
+          <div class="space-y-6">
+            <div class="text-center max-w-xl mx-auto">
+              <h3 id="viewport-story-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100 font-serif leading-tight">
+                The Chronicles of Arcana
+              </h3>
+              <div class="w-16 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto mt-3 rounded-full"></div>
+            </div>
+
+            <!-- Story Text Content Paragraphs (Supports custom font scaling) -->
+            <div id="viewport-story-body" class="space-y-4 text-base sm:text-lg text-slate-300 font-serif leading-relaxed text-justify max-w-2xl mx-auto transition-all duration-200">
+              <!-- Script loads here. Example: -->
+              <p>For centuries, the cosmic key had remained locked deep within the obsidian chambers of the Elder Citadel. You stand before the final gateway, feeling the vibration of pure space-time magic humming against your fingertips.</p>
+              <p>Beside you, your trusty companion glances up nervously, checking the mechanical gauge on their glove. "The security systems are waking up," they whisper, voice cracking in the dim light. "We have moments before the runes lock down permanently."</p>
+            </div>
+          </div>
+
+          <!-- Interactive Choices Panel (Generates Branch options dynamically) -->
+          <div class="mt-10 border-t border-slate-800/60 pt-6 max-w-2xl mx-auto w-full">
+            <p class="text-xs font-bold text-slate-500 tracking-wider uppercase mb-3 text-center">Make Your Destiny Choice</p>
+            <div id="viewport-choices-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button class="choice-card-btn text-left p-4 rounded-xl border border-violet-500/20 hover:border-violet-500/80 bg-violet-950/20 hover:bg-violet-950/40 text-violet-200 text-sm font-medium transition duration-300 group flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded bg-violet-900/40 text-violet-300 font-mono text-xs mt-0.5 group-hover:bg-violet-700">A</span>
+                <span>Attempt to decode the ancient locks using the mechanical forge key.</span>
+              </button>
+              <button class="choice-card-btn text-left p-4 rounded-xl border border-fuchsia-500/20 hover:border-fuchsia-500/80 bg-fuchsia-950/20 hover:bg-fuchsia-950/40 text-fuchsia-200 text-sm font-medium transition duration-300 group flex items-start gap-3">
+                <span class="px-2 py-0.5 rounded bg-fuchsia-900/40 text-fuchsia-300 font-mono text-xs mt-0.5 group-hover:bg-fuchsia-700">B</span>
+                <span>Channel raw elemental magic directly into the gate seal.</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Desk Footer / Interactive Notes Tool -->
+        <div class="px-6 py-3 bg-slate-950/80 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">Interactive Companion State:</span>
+            <span id="badge-companion-morale" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60 font-semibold">Ready for Adventure</span>
+          </div>
+          
+          <!-- Quick Action Buttons -->
+          <div class="flex gap-2 w-full sm:w-auto justify-end">
+            <button id="btn-open-notes" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition flex items-center gap-1">
+              📓 Write Notes
+            </button>
+            <button id="btn-restart-story" class="px-3 py-1 bg-rose-950/40 text-rose-400 hover:bg-rose-950 border border-rose-900/60 rounded transition">
+              Reset Path
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Interactive Note Pad Drawer (Slide-down toggleable) -->
+      <div id="drawer-notes" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl transition-all duration-300">
+        <div class="flex justify-between items-center mb-3">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+            <span>✍️</span> Quick Story Journal & Notes (Auto-saved)
+          </h4>
+          <button id="btn-close-notes" class="text-slate-400 hover:text-slate-100 text-lg">&times;</button>
+        </div>
+        <textarea id="textarea-user-notes" rows="4" class="w-full bg-slate-950 text-slate-200 p-3 rounded-lg border border-slate-800 focus:border-violet-500 outline-none text-xs leading-relaxed" placeholder="Write your theories, map coordinates, custom lore characters, or draft novel prompts here..."></textarea>
+        <p class="text-[10px] text-slate-500 mt-1 text-right">Stored locally for your next reading session.</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Quick Interactive Guide Modal / Toast Info -->
+  <div id="tour-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative animate-fade-in">
+      <button id="btn-close-tour" class="absolute top-4 right-4 text-slate-400 hover:text-slate-100 text-lg font-bold">&times;</button>
+      <h3 class="text-lg font-bold text-violet-400 mb-2 flex items-center gap-2">
+        <span>🧙</span> Welcome to SAGAS Forge!
+      </h3>
+      <p class="text-xs text-slate-300 leading-relaxed mb-4">
+        SAGAS is a sandbox interactive workspace designed to generate, format, read, and listen to multi-path storytelling. 
+      </p>
+      <div class="space-y-3 text-xs">
+        <div class="flex gap-2">
+          <span class="text-violet-400 font-bold">1.</span>
+          <span class="text-slate-300"><strong class="text-slate-100">Roll & Build:</strong> Use the Left panel to write characters and hooks, or click <strong>🎲 Spin Fate</strong> to instantly generate a narrative idea.</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-violet-400 font-bold">2.</span>
+          <span class="text-slate-300"><strong class="text-slate-100">Interactive Desk:</strong> Read through passages, choose outcomes, adjust themes (like parchment or green matrix screen), text size, and narration.</span>
+        </div>
+        <div class="flex gap-2">
+          <span class="text-violet-400 font-bold">3.</span>
+          <span class="text-slate-300"><strong class="text-slate-100">Speech Narrator:</strong> Play live audio text-to-speech built seamlessly using Web Speech Synthesis engine.</span>
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end">
+        <button id="btn-dismiss-tour" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition duration-200">
+          Step Into the Void
+        </button>
+      </div>
     </div>
-  </section>
+  </div>
+
+  <!-- Sticky Notification Alert (Toast) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+  <!-- Global Interactive Canvas Footer -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-6 px-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <p>Created as an elite Immersive Story sandbox. Crafted with dynamic branch outcome state persistence.</p>
+      <div class="flex items-center gap-4">
+        <span class="hover:text-slate-300 cursor-pointer transition">Saga Engine v2.4</span>
+        <span class="hover:text-slate-300 cursor-pointer transition">Terms of Legend</span>
+      </div>
+    </div>
+  </footer>
 </div>
   
   <script src="script.js"></script>
