@@ -3,346 +3,482 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SAGAS: Immersive Story Forge</title>
+  <title>CognitiveLab: Mind Gym</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans flex flex-col selection:bg-violet-600 selection:text-white">
-  <!-- Global Header -->
-  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30 px-6 py-4">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+  <!-- Premium Ambient Light Glows -->
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-10 right-1/4 w-96 h-96 bg-fuchsia-600/15 rounded-full blur-[120px] pointer-events-none"></div>
+
+  <!-- Audio Toggle & Top Navigation Bar -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-slate-950/75 border-b border-slate-800/80 px-4 py-3 sm:px-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="p-2.5 bg-gradient-to-tr from-violet-600 to-fuchsia-600 rounded-xl shadow-lg shadow-violet-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        <div class="p-2 bg-gradient-to-tr from-indigo-500 to-fuchsia-500 rounded-xl shadow-lg shadow-indigo-500/20">
+          <svg class="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
           </svg>
         </div>
         <div>
-          <h1 class="text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400">SAGAS</h1>
-          <p class="text-xs text-slate-400 font-medium tracking-tight">Immersive Interactive Story Forge & Reader</p>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">COGNITIVE LAB</h1>
+          <p class="text-[10px] text-indigo-400 uppercase tracking-widest font-semibold">Neuro-Performance Station</p>
         </div>
       </div>
-      
-      <!-- Top Info & Action Panel -->
-      <div class="flex items-center gap-3 flex-wrap">
-        <div class="hidden md:flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60 text-xs">
-          <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-          <span class="text-slate-300" id="stats-stories-count">Active Stories: 4</span>
-        </div>
-        <button id="btn-quick-tour" class="px-3.5 py-1.5 text-xs font-semibold bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-500/30 rounded-lg transition-all duration-200">
-          Interactive Guide
+
+      <div class="flex items-center space-x-4">
+        <!-- Audio Toggle Button -->
+        <button id="toggle-sound-btn" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-indigo-500/50 transition-all text-xs text-slate-300 hover:text-white">
+          <span id="sound-icon" class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span id="sound-text">Synth FX: ON</span>
         </button>
-        <button id="btn-toggle-creative-mode" class="px-3.5 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition-all duration-200 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-          <span>Write & Create</span>
+
+        <!-- Reset Stats -->
+        <button id="reset-stats-btn" class="text-xs text-slate-400 hover:text-red-400 transition-colors bg-slate-900/40 px-3 py-1.5 rounded-lg border border-slate-800/60 hover:border-red-500/20">
+          Reset Profile
         </button>
       </div>
     </div>
   </header>
 
   <!-- Main Content Layout -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-    
-    <!-- Sidebar: Controls, Library & Story Builder (5 Columns on Large screens) -->
-    <section class="lg:col-span-5 flex flex-col gap-6">
+  <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
-      <!-- Interactive Builder panel -->
-      <div id="panel-creator" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
-        <div class="flex justify-between items-center">
-          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <span class="text-violet-500">✦</span> Story Forge
-          </h2>
-          <button id="btn-roll-inspiration" class="text-xs bg-slate-800 hover:bg-violet-900/40 text-violet-400 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-violet-500/50 transition duration-200 flex items-center gap-1.5">
-            <span>🎲</span> Spin Fate (Randomize)
-          </button>
-        </div>
-
-        <!-- Genre Selector -->
-        <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Select Universe Genre</label>
-          <div class="grid grid-cols-3 gap-2" id="genre-grid">
-            <button data-genre="fantasy" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-violet-600/30 border-2 border-violet-500 text-violet-200 shadow-md shadow-violet-500/10 transition duration-200">
-              🔮 Fantasy
-            </button>
-            <button data-genre="scifi" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
-              🚀 Sci-Fi
-            </button>
-            <button data-genre="cyberpunk" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
-              ⚡ Cyberpunk
-            </button>
-            <button data-genre="mystery" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
-              🕵️ Mystery
-            </button>
-            <button data-genre="horror" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
-              💀 Horror
-            </button>
-            <button data-genre="custom" class="genre-btn py-2 px-3 text-xs font-semibold rounded-lg bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 transition duration-200">
-              ✨ Surreal
-            </button>
-          </div>
-        </div>
-
-        <!-- Core Setup Form -->
-        <div class="space-y-4">
-          <div>
-            <label for="story-title-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Story Title</label>
-            <input type="text" id="story-title-input" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none transition duration-200" placeholder="e.g., The Lost Archives of Neo-Tokyo">
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label for="story-hero-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Protagonist</label>
-              <input type="text" id="story-hero-input" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition" placeholder="Hero name...">
-            </div>
-            <div>
-              <label for="story-companion-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Key Companion</label>
-              <input type="text" id="story-companion-input" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-3 py-2 text-sm outline-none transition" placeholder="Companion...">
-            </div>
-          </div>
-
-          <div>
-            <label for="story-hook-input" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Starting Plot Hook (Choice A & B will branch from here)</label>
-            <textarea id="story-hook-input" rows="3" class="w-full bg-slate-950/90 border border-slate-800 hover:border-slate-700 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 text-slate-200 rounded-xl px-4 py-2 text-sm outline-none transition resize-none" placeholder="Describe the opening of the adventure or input custom paragraphs..."></textarea>
-          </div>
-
-          <!-- Branch Setup -->
-          <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 space-y-3">
-            <p class="text-xs font-bold text-violet-400 uppercase tracking-wide">Branch Options (Choice Path Setup)</p>
-            <div>
-              <label for="branch-a-text" class="block text-[10px] font-semibold text-slate-500 mb-1">Choice A Action Button text:</label>
-              <input type="text" id="branch-a-text" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none" placeholder="Explore the dark laboratory">
-              <label for="branch-a-outcome" class="block text-[10px] font-semibold text-slate-500 mt-2 mb-1">Outcome Text when Choice A is taken:</label>
-              <textarea id="branch-a-outcome" rows="2" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none resize-none" placeholder="You discover glowing stasis chambers containing... "></textarea>
-            </div>
-            <div class="border-t border-slate-800/60 pt-2">
-              <label for="branch-b-text" class="block text-[10px] font-semibold text-slate-500 mb-1">Choice B Action Button text:</label>
-              <input type="text" id="branch-b-text" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none" placeholder="Flee to the atmospheric rooftop">
-              <label for="branch-b-outcome" class="block text-[10px] font-semibold text-slate-500 mt-2 mb-1">Outcome Text when Choice B is taken:</label>
-              <textarea id="branch-b-outcome" rows="2" class="w-full bg-slate-900 border border-slate-800 focus:border-violet-500 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs outline-none resize-none" placeholder="Rain lashes down as the synth-copters home in on your location..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <button id="btn-compile-story" class="w-full py-3 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 hover:from-violet-500 hover:to-pink-500 text-white font-bold rounded-xl transition duration-300 transform active:scale-[0.98] shadow-lg shadow-violet-900/30 text-sm flex items-center justify-center gap-2">
-          <span>⚔️</span> Forge Story & Load to Sanctuary
-        </button>
-      </div>
-
-      <!-- Interactive Library Drawer -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-        <div class="flex justify-between items-center">
-          <h2 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
-            Saved Manuscripts
-          </h2>
-          <span class="text-[11px] bg-emerald-950 text-emerald-400 border border-emerald-800/60 px-2 py-0.5 rounded-full font-semibold" id="library-counter">4 Ready</span>
-        </div>
-
-        <!-- Library list -->
-        <div id="library-list" class="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-          <!-- Dynamic list loaded from script -->
-        </div>
-
-        <!-- File actions -->
-        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/60">
-          <button id="btn-export-library" class="py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5">
-            📤 Export JSON
-          </button>
-          <label for="file-import-library" class="py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition flex items-center justify-center gap-1.5 cursor-pointer text-center">
-            📥 Import JSON
-            <input type="file" id="file-import-library" class="hidden" accept=".json">
-          </label>
-        </div>
-      </div>
-    </section>
-
-    <!-- Right Side: The Interactive Reading Sanctuary (7 Columns on Large screens) -->
-    <section class="lg:col-span-7 flex flex-col gap-6">
-      
-      <!-- Interactive Desk Customizer Toolbar -->
-      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Sanctuary Aesthetics:</span>
-          <div class="flex gap-1.5" id="theme-pills">
-            <button data-theme="midnight" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-slate-950 border border-violet-500 text-violet-400" title="Midnight Magic">Obsidian</button>
-            <button data-theme="parchment" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-[#F4EFEB] border border-transparent text-[#2C241E]" title="Vintage Parchment">Parchment</button>
-            <button data-theme="matrix" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-black border border-transparent text-emerald-400 font-mono" title="Green Terminal">Synth-Grid</button>
-            <button data-theme="neon" class="theme-pill px-2.5 py-1 text-xs font-semibold rounded bg-fuchsia-950/20 border border-transparent text-fuchsia-400" title="Cyber Sunset">Neon Cyber</button>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-1.5">
-            <span class="text-xs text-slate-400">Text Scale:</span>
-            <button id="btn-zoom-out" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-bold">A-</button>
-            <button id="btn-zoom-in" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-bold">A+</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Actual Immersive Reading Desk Container -->
-      <div id="reading-desk" class="flex-1 bg-slate-900/95 border border-slate-800 rounded-2xl shadow-2xl flex flex-col min-h-[500px] overflow-hidden transition-all duration-300">
-        
-        <!-- Header of current story -->
-        <div class="px-6 py-4 bg-slate-950/40 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span id="story-badge-genre" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest bg-violet-900 text-violet-200 border border-violet-700/60">Fantasy</span>
-            <span id="story-read-time" class="text-xs text-slate-400 font-medium">📖 2 min read</span>
-          </div>
+      <!-- Left: Neuro-Profile Dashboard Card -->
+      <aside class="lg:col-span-4 space-y-6">
+        <div class="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none"></div>
           
-          <!-- TTS Speech Controls -->
-          <div class="flex items-center gap-2 bg-slate-950/60 px-3 py-1 rounded-xl border border-slate-800">
-            <button id="btn-tts-toggle" class="text-slate-400 hover:text-violet-400 transition-colors p-1 flex items-center gap-1" title="Read Aloud Narrator">
-              <span id="tts-icon">🔊</span> 
-              <span class="text-[11px] font-medium hidden sm:inline">Read Narrative</span>
-            </button>
-            <div class="hidden sm:flex items-center gap-1 border-l border-slate-800 pl-2">
-              <select id="tts-voice-select" class="bg-transparent text-slate-400 text-[10px] max-w-[80px] outline-none cursor-pointer">
-                <!-- Dynamically Populated -->
-                <option value="">Default Voice</option>
-              </select>
+          <div class="flex items-center space-x-4 mb-6">
+            <div class="w-12 h-12 rounded-full bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-lg font-bold text-indigo-400" id="avatar-initials">CL</div>
+            <div>
+              <h2 class="font-bold text-slate-100 text-lg" id="player-username">Cognitive Explorer</h2>
+              <p class="text-xs text-slate-400 flex items-center">
+                <span class="inline-block w-2 h-2 rounded-full bg-indigo-500 mr-2"></span>
+                Subject Tier: <span id="brain-tier-label" class="ml-1 font-semibold text-indigo-400">Aptitude Trainee</span>
+              </p>
             </div>
           </div>
-        </div>
 
-        <!-- Story Ambient Audio Waves (Simulated Audio Feedback Visualizer) -->
-        <div class="bg-slate-950/20 px-6 py-2 flex items-center justify-between border-b border-slate-800/40">
-          <div class="flex items-center gap-1.5">
-            <span id="ambient-sound-indicator" class="text-xs text-slate-500 flex items-center gap-2">
-              <span class="flex space-x-0.5 items-end h-3 w-4" id="sound-bars">
-                <span class="bg-slate-700 w-0.5 h-1 animate-pulse"></span>
-                <span class="bg-slate-700 w-0.5 h-2 animate-pulse"></span>
-                <span class="bg-slate-700 w-0.5 h-3 animate-pulse"></span>
-                <span class="bg-slate-700 w-0.5 h-1.5 animate-pulse"></span>
+          <!-- Score Metrics Grid -->
+          <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Global Cognitive IQ</span>
+              <div class="flex items-baseline space-x-1.5 mt-1">
+                <span class="text-2xl font-black text-indigo-400" id="global-score-val">100</span>
+                <span class="text-xs text-slate-500">pts</span>
+              </div>
+            </div>
+            <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800/80">
+              <span class="text-[10px] text-slate-400 uppercase tracking-wider block">Focus Streak</span>
+              <div class="flex items-baseline space-x-1.5 mt-1">
+                <span class="text-2xl font-black text-fuchsia-400" id="streak-val">0</span>
+                <span class="text-xs text-slate-500">days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Stats Breakdown -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider">High Scores Registry</h3>
+            
+            <div class="flex items-center justify-between p-2.5 bg-slate-950/40 rounded-lg border border-slate-800/40">
+              <span class="text-xs text-slate-300 flex items-center">
+                <span class="w-2.5 h-2.5 rounded bg-emerald-500 mr-2"></span> Memory Matrix
               </span>
-              <span id="ambient-genre-soundtext">Ambient: Celestial Winds (Muted)</span>
-            </span>
+              <span class="text-xs font-bold text-white" id="matrix-high-val">0 <span class="text-slate-500 font-normal">Lvl</span></span>
+            </div>
+
+            <div class="flex items-center justify-between p-2.5 bg-slate-950/40 rounded-lg border border-slate-800/40">
+              <span class="text-xs text-slate-300 flex items-center">
+                <span class="w-2.5 h-2.5 rounded bg-amber-500 mr-2"></span> Stroop Focus
+              </span>
+              <span class="text-xs font-bold text-white" id="stroop-high-val">0 <span class="text-slate-500 font-normal">pts</span></span>
+            </div>
+
+            <div class="flex items-center justify-between p-2.5 bg-slate-950/40 rounded-lg border border-slate-800/40">
+              <span class="text-xs text-slate-300 flex items-center">
+                <span class="w-2.5 h-2.5 rounded bg-pink-500 mr-2"></span> Math Rush
+              </span>
+              <span class="text-xs font-bold text-white" id="math-high-val">0 <span class="text-slate-500 font-normal">pts</span></span>
+            </div>
           </div>
-          <button id="btn-toggle-sound-ambient" class="text-[11px] text-violet-400 hover:text-violet-300 font-medium underline cursor-pointer">
-            Toggle Pulse Effect
-          </button>
+
+          <!-- Daily Brain Tips -->
+          <div class="mt-6 p-4 rounded-xl bg-gradient-to-br from-indigo-950/50 to-slate-900 border border-indigo-500/10 text-xs text-slate-300">
+            <div class="flex items-center space-x-2 text-indigo-400 font-semibold mb-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Neural Insight</span>
+            </div>
+            <p id="daily-tip-text">Stroop challenge strengthens anterior cingulate cortex activity by forcing decision-making under high cognitive interference!</p>
+          </div>
         </div>
 
-        <!-- Main Text Viewport (Immersive Story text) -->
-        <div class="flex-1 p-6 sm:p-8 overflow-y-auto max-h-[480px] flex flex-col justify-between scroll-smooth" id="story-viewport">
+        <!-- Interactive Live Console -->
+        <div class="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-4 shadow-xl">
+          <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-3 flex items-center">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 mr-2 animate-ping"></span>
+            System Activity Feed
+          </h3>
+          <div id="console-log-box" class="space-y-1.5 max-h-[140px] overflow-y-auto text-[11px] font-mono text-slate-400 bg-slate-950 p-2.5 rounded-lg border border-slate-850">
+            <div>[00:00:00] Cognitive Core online.</div>
+            <div>[00:00:01] Select a stimulus module below to commence.</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right: Main Activity Arena -->
+      <section class="lg:col-span-8 space-y-6">
+        
+        <!-- Dynamic Module Switcher Screen -->
+        <div id="game-arena-wrapper" class="bg-slate-900/90 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden relative min-h-[500px] flex flex-col justify-between">
           
-          <!-- Active Screen Title & Body paragraphs -->
-          <div class="space-y-6">
-            <div class="text-center max-w-xl mx-auto">
-              <h3 id="viewport-story-title" class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-100 font-serif leading-tight">
-                The Chronicles of Arcana
-              </h3>
-              <div class="w-16 h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 mx-auto mt-3 rounded-full"></div>
+          <!-- ================= MODULE SELECTOR HUB ================= -->
+          <div id="hub-screen" class="p-6 sm:p-8 space-y-6 flex flex-col justify-between h-full">
+            <div>
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Phase 1: Stimulus Selection</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold mt-3 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">Select Training Stimulus</h2>
+              <p class="text-slate-400 text-sm mt-1">Challenge different sections of your cognitive reserve. High frequency sessions are recommended.</p>
             </div>
 
-            <!-- Story Text Content Paragraphs (Supports custom font scaling) -->
-            <div id="viewport-story-body" class="space-y-4 text-base sm:text-lg text-slate-300 font-serif leading-relaxed text-justify max-w-2xl mx-auto transition-all duration-200">
-              <!-- Script loads here. Example: -->
-              <p>For centuries, the cosmic key had remained locked deep within the obsidian chambers of the Elder Citadel. You stand before the final gateway, feeling the vibration of pure space-time magic humming against your fingertips.</p>
-              <p>Beside you, your trusty companion glances up nervously, checking the mechanical gauge on their glove. "The security systems are waking up," they whisper, voice cracking in the dim light. "We have moments before the runes lock down permanently."</p>
+            <!-- Game Selection Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+              
+              <!-- Game Card 1: Pattern Memory Matrix -->
+              <div class="group relative p-5 bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl border border-slate-800 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 cursor-pointer flex flex-col justify-between" id="matrix-card">
+                <div class="absolute top-3 right-3 text-emerald-500/20 group-hover:text-emerald-400/80 transition-colors">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="text-[10px] text-emerald-400 tracking-wider font-bold uppercase block mb-1">Spatial Memory</span>
+                  <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">Memory Matrix</h3>
+                  <p class="text-xs text-slate-400 mt-2 line-clamp-3">Memorize and replicate illuminated grids. Escalates in size as performance sharpens.</p>
+                </div>
+                <button class="mt-4 w-full py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 font-bold text-xs border border-emerald-500/20 group-hover:border-transparent transition-all">
+                  Initialize
+                </button>
+              </div>
+
+              <!-- Game Card 2: Stroop Interference -->
+              <div class="group relative p-5 bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl border border-slate-800 hover:border-amber-500/50 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-300 cursor-pointer flex flex-col justify-between" id="stroop-card">
+                <div class="absolute top-3 right-3 text-amber-500/20 group-hover:text-amber-400/80 transition-colors">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="text-[10px] text-amber-400 tracking-wider font-bold uppercase block mb-1">Focus & Reaction</span>
+                  <h3 class="text-base font-bold text-white group-hover:text-amber-300 transition-colors">Stroop Focus</h3>
+                  <p class="text-xs text-slate-400 mt-2 line-clamp-3">Decide if semantic word meanings align with color representations under time constraints.</p>
+                </div>
+                <button class="mt-4 w-full py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-slate-950 font-bold text-xs border border-amber-500/20 group-hover:border-transparent transition-all">
+                  Initialize
+                </button>
+              </div>
+
+              <!-- Game Card 3: Math Rush -->
+              <div class="group relative p-5 bg-gradient-to-b from-slate-900 to-slate-950 rounded-xl border border-slate-800 hover:border-pink-500/50 hover:shadow-lg hover:shadow-pink-500/5 transition-all duration-300 cursor-pointer flex flex-col justify-between" id="math-card">
+                <div class="absolute top-3 right-3 text-pink-500/20 group-hover:text-pink-400/80 transition-colors">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span class="text-[10px] text-pink-400 tracking-wider font-bold uppercase block mb-1">Quantitative Speed</span>
+                  <h3 class="text-base font-bold text-white group-hover:text-pink-300 transition-colors">Math Rush</h3>
+                  <p class="text-xs text-slate-400 mt-2 line-clamp-3">Evaluate rapid arithmetic equations. Tests your left hemisphere under tight clock schedules.</p>
+                </div>
+                <button class="mt-4 w-full py-2 rounded-lg bg-pink-500/10 hover:bg-pink-500 text-pink-400 hover:text-slate-950 font-bold text-xs border border-pink-500/20 group-hover:border-transparent transition-all">
+                  Initialize
+                </button>
+              </div>
+
+            </div>
+
+            <!-- User statistics summary info -->
+            <div class="pt-4 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2">
+              <div class="flex items-center space-x-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                <span>Aptitude Tier depends on global cognitive score threshold levels.</span>
+              </div>
+              <span class="text-slate-500">Engine: v3.2 Web Audio-Activated</span>
             </div>
           </div>
 
-          <!-- Interactive Choices Panel (Generates Branch options dynamically) -->
-          <div class="mt-10 border-t border-slate-800/60 pt-6 max-w-2xl mx-auto w-full">
-            <p class="text-xs font-bold text-slate-500 tracking-wider uppercase mb-3 text-center">Make Your Destiny Choice</p>
-            <div id="viewport-choices-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button class="choice-card-btn text-left p-4 rounded-xl border border-violet-500/20 hover:border-violet-500/80 bg-violet-950/20 hover:bg-violet-950/40 text-violet-200 text-sm font-medium transition duration-300 group flex items-start gap-3">
-                <span class="px-2 py-0.5 rounded bg-violet-900/40 text-violet-300 font-mono text-xs mt-0.5 group-hover:bg-violet-700">A</span>
-                <span>Attempt to decode the ancient locks using the mechanical forge key.</span>
-              </button>
-              <button class="choice-card-btn text-left p-4 rounded-xl border border-fuchsia-500/20 hover:border-fuchsia-500/80 bg-fuchsia-950/20 hover:bg-fuchsia-950/40 text-fuchsia-200 text-sm font-medium transition duration-300 group flex items-start gap-3">
-                <span class="px-2 py-0.5 rounded bg-fuchsia-900/40 text-fuchsia-300 font-mono text-xs mt-0.5 group-hover:bg-fuchsia-700">B</span>
-                <span>Channel raw elemental magic directly into the gate seal.</span>
-              </button>
+          <!-- ================= GAME SCREEN 1: MEMORY MATRIX ================= -->
+          <div id="matrix-screen" class="p-6 sm:p-8 hidden flex-col justify-between h-full">
+            <!-- Game Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div class="flex items-center space-x-3">
+                <button class="back-to-hub-btn p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 hover:text-white text-slate-400 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                </button>
+                <div>
+                  <h3 class="font-extrabold text-white text-lg">Memory Matrix</h3>
+                  <p class="text-[10px] text-slate-400">Recall the location of active grid cells</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 text-right">
+                <div>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-500 block">Level Score</span>
+                  <span id="matrix-score" class="text-sm font-bold text-emerald-400">1</span>
+                </div>
+                <div>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-500 block">Highest</span>
+                  <span id="matrix-highest-record" class="text-sm font-bold text-white">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Game Workspace -->
+            <div class="my-8 flex flex-col items-center justify-center">
+              <!-- Phase/Action Indicator Box -->
+              <div id="matrix-status-banner" class="mb-6 px-4 py-1.5 rounded-full text-xs font-bold bg-indigo-950 border border-indigo-500/20 text-indigo-300 transition-all duration-300">
+                Initializing Simulation...
+              </div>
+
+              <!-- Playable Grid -->
+              <div id="matrix-grid-container" class="grid gap-2 p-4 bg-slate-950 rounded-2xl border border-slate-850 shadow-inner max-w-[320px] w-full aspect-square justify-center items-center transition-all duration-300">
+                <!-- Cells dynamically injected here -->
+              </div>
+            </div>
+
+            <!-- Actions / Info footer -->
+            <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+              <span>Avoid clicking non-illuminated nodes.</span>
+              <button id="start-matrix-btn" class="px-5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition-all shadow-lg shadow-emerald-500/10">Start Level 1</button>
+            </div>
+          </div>
+
+          <!-- ================= GAME SCREEN 2: STROOP INTERFERENCE ================= -->
+          <div id="stroop-screen" class="p-6 sm:p-8 hidden flex-col justify-between h-full">
+            <!-- Game Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div class="flex items-center space-x-3">
+                <button class="back-to-hub-btn p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 hover:text-white text-slate-400 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                </button>
+                <div>
+                  <h3 class="font-extrabold text-white text-lg">Stroop Focus</h3>
+                  <p class="text-[10px] text-slate-400">Decide: Does meaning match printed color?</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-4 text-right">
+                <div>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-500 block">Timer</span>
+                  <span id="stroop-timer" class="text-sm font-mono font-bold text-amber-400">30s</span>
+                </div>
+                <div>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-500 block">Score</span>
+                  <span id="stroop-score" class="text-sm font-bold text-white">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Game Workspace -->
+            <div class="my-8 flex flex-col items-center justify-center min-h-[200px] text-center">
+              <!-- Informative/State Board overlay before start -->
+              <div id="stroop-lobby" class="space-y-4 max-w-sm">
+                <p class="text-xs text-slate-400">In this cognitive control task, a color word is shown. Its physical color might differ from what the letters spell out.</p>
+                <p class="text-xs text-indigo-300 font-semibold">Goal: Rapidly click YES if meaning matches color, NO if they conflict.</p>
+                <button id="start-stroop-btn" class="px-6 py-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition-all shadow-lg shadow-amber-500/10">Commence Test</button>
+              </div>
+
+              <!-- Active Arena elements (hidden initially) -->
+              <div id="stroop-arena" class="hidden space-y-8 w-full">
+                <!-- Main Stroop Text Display -->
+                <div class="p-8 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner flex items-center justify-center">
+                  <span id="stroop-word" class="text-5xl font-extrabold tracking-wider filter drop-shadow-lg select-none transition-all duration-100 transform scale-100">RED</span>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                  <button id="stroop-btn-false" class="py-3.5 px-6 rounded-xl bg-slate-900 border border-slate-800 hover:bg-red-950/40 hover:border-red-500/50 text-red-400 font-bold transition-all text-sm uppercase tracking-wide">
+                    No (Different)
+                  </button>
+                  <button id="stroop-btn-true" class="py-3.5 px-6 rounded-xl bg-slate-900 border border-slate-800 hover:bg-emerald-950/40 hover:border-emerald-500/50 text-emerald-400 font-bold transition-all text-sm uppercase tracking-wide">
+                    Yes (Match)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions / Info footer -->
+            <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+              <span>Focus on the printed color versus literal word meaning.</span>
+              <span class="text-[10px] text-slate-500">Mode: Multi-interference Stroop</span>
+            </div>
+          </div>
+
+          <!-- ================= GAME SCREEN 3: MATH RUSH ================= -->
+          <div id="math-screen" class="p-6 sm:p-8 hidden flex-col justify-between h-full">
+            <!-- Game Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div class="flex items-center space-x-3">
+                <button class="back-to-hub-btn p-2 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 hover:text-white text-slate-400 transition-colors">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                </button>
+                <div>
+                  <h3 class="font-extrabold text-white text-lg">Math Rush</h3>
+                  <p class="text-[10px] text-slate-400">Evaluate quantitative operations under tight bounds</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-4 text-right">
+                <div>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-500 block">Timer</span>
+                  <span id="math-timer" class="text-sm font-mono font-bold text-pink-400">30s</span>
+                </div>
+                <div>
+                  <span class="text-[9px] uppercase tracking-wider text-slate-500 block">Score</span>
+                  <span id="math-score" class="text-sm font-bold text-white">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Game Workspace -->
+            <div class="my-8 flex flex-col items-center justify-center min-h-[200px] text-center">
+              <!-- Informative/State Board overlay before start -->
+              <div id="math-lobby" class="space-y-4 max-w-sm">
+                <p class="text-xs text-slate-400">Quickly verify arithmetic equations. Some are simple additions; some are divisions or multiplications.</p>
+                <p class="text-xs text-pink-300 font-semibold">Decide as fast as humanly possible.</p>
+                <button id="start-math-btn" class="px-6 py-2.5 rounded-lg bg-pink-500 hover:bg-pink-400 text-slate-950 font-bold transition-all shadow-lg shadow-pink-500/10">Start Math Module</button>
+              </div>
+
+              <!-- Active Arena elements (hidden initially) -->
+              <div id="math-arena" class="hidden space-y-8 w-full">
+                <!-- Main Math Display -->
+                <div class="p-8 bg-slate-950 rounded-2xl border border-slate-800 shadow-inner flex flex-col items-center justify-center">
+                  <span id="math-expr" class="text-4xl font-extrabold tracking-wider select-none text-white">23 + 14 = 37</span>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                  <button id="math-btn-false" class="py-3.5 px-6 rounded-xl bg-slate-900 border border-slate-800 hover:bg-red-950/40 hover:border-red-500/50 text-red-400 font-bold transition-all text-sm uppercase tracking-wide">
+                    Incorrect (✖)
+                  </button>
+                  <button id="math-btn-true" class="py-3.5 px-6 rounded-xl bg-slate-900 border border-slate-800 hover:bg-emerald-950/40 hover:border-emerald-500/50 text-emerald-400 font-bold transition-all text-sm uppercase tracking-wide">
+                    Correct (✔)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions / Info footer -->
+            <div class="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+              <span>Double points awarded if reaction occurs under 1 second!</span>
+              <span class="text-[10px] text-slate-500">Mode: Rapid Mental Math</span>
             </div>
           </div>
 
         </div>
 
-        <!-- Desk Footer / Interactive Notes Tool -->
-        <div class="px-6 py-3 bg-slate-950/80 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="text-slate-400">Interactive Companion State:</span>
-            <span id="badge-companion-morale" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60 font-semibold">Ready for Adventure</span>
-          </div>
+        <!-- Global Performance Insight Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           
-          <!-- Quick Action Buttons -->
-          <div class="flex gap-2 w-full sm:w-auto justify-end">
-            <button id="btn-open-notes" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition flex items-center gap-1">
-              📓 Write Notes
-            </button>
-            <button id="btn-restart-story" class="px-3 py-1 bg-rose-950/40 text-rose-400 hover:bg-rose-950 border border-rose-900/60 rounded transition">
-              Reset Path
-            </button>
+          <!-- Daily Challenges progress check list -->
+          <div class="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-xl">
+            <h3 class="text-sm font-bold text-slate-200 mb-4 flex items-center justify-between">
+              <span>Daily Cognitive Quotas</span>
+              <span class="text-xs text-indigo-400" id="quota-tracker-pct">0% done</span>
+            </h3>
+            
+            <div class="space-y-3">
+              <label class="flex items-start space-x-3 cursor-pointer p-1.5 hover:bg-slate-950/40 rounded transition-colors">
+                <input type="checkbox" id="quota-play-any" disabled class="mt-0.5 rounded border-slate-800 bg-slate-950 text-indigo-500 focus:ring-0 focus:ring-offset-0">
+                <div class="text-xs">
+                  <p class="font-medium text-slate-300" id="lbl-quota-1">Trigger memory receptors (Play Memory Matrix)</p>
+                  <p class="text-slate-500 text-[10px]">Award: +10 pts to Global IQ</p>
+                </div>
+              </label>
+
+              <label class="flex items-start space-x-3 cursor-pointer p-1.5 hover:bg-slate-950/40 rounded transition-colors">
+                <input type="checkbox" id="quota-stroop-15" disabled class="mt-0.5 rounded border-slate-800 bg-slate-950 text-indigo-500 focus:ring-0 focus:ring-offset-0">
+                <div class="text-xs">
+                  <p class="font-medium text-slate-300" id="lbl-quota-2">Stroop accuracy peak (Achieve 15+ in Stroop Focus)</p>
+                  <p class="text-slate-500 text-[10px]">Award: +15 pts to Global IQ</p>
+                </div>
+              </label>
+
+              <label class="flex items-start space-x-3 cursor-pointer p-1.5 hover:bg-slate-950/40 rounded transition-colors">
+                <input type="checkbox" id="quota-math-15" disabled class="mt-0.5 rounded border-slate-800 bg-slate-950 text-indigo-500 focus:ring-0 focus:ring-offset-0">
+                <div class="text-xs">
+                  <p class="font-medium text-slate-300" id="lbl-quota-3">Numerical overdrive (Score 15+ in Math Rush)</p>
+                  <p class="text-slate-500 text-[10px]">Award: +20 pts to Global IQ</p>
+                </div>
+              </label>
+            </div>
           </div>
+
+          <!-- Simulated performance mapping analysis (using dynamic SVG graph visualization) -->
+          <div class="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-slate-200 mb-1">Cognitive Profile Analytics</h3>
+              <p class="text-xs text-slate-400">A quantitative visualization of sensory/calculation skills based on test outputs.</p>
+            </div>
+            
+            <!-- Interactive SVG Diagram representing brain lobes capabilities -->
+            <div class="my-4 flex justify-center items-center relative">
+              <svg viewBox="0 0 100 100" class="w-36 h-36 drop-shadow-[0_0_8px_rgba(99,102,241,0.2)]">
+                <circle cx="50" cy="50" r="40" class="stroke-slate-800 fill-none" stroke-width="1" stroke-dasharray="2" />
+                <circle cx="50" cy="50" r="25" class="stroke-slate-800 fill-none" stroke-width="1" stroke-dasharray="2" />
+                
+                <!-- Graph Spoke Lines -->
+                <line x1="50" y1="10" x2="50" y2="90" class="stroke-slate-800" stroke-width="1" />
+                <line x1="10" y1="50" x2="90" y2="50" class="stroke-slate-800" stroke-width="1" />
+                
+                <!-- Dynamic Polygon generated via profile status -->
+                <polygon id="skills-polygon" points="50,25 70,50 50,75 30,50" class="fill-indigo-500/20 stroke-indigo-500" stroke-width="2" />
+                
+                <!-- Captions inside SVG -->
+                <text x="50" y="8" text-anchor="middle" class="fill-slate-500 text-[6px] font-bold uppercase tracking-wide">Memory</text>
+                <text x="92" y="52" text-anchor="end" class="fill-slate-500 text-[6px] font-bold uppercase tracking-wide">Speed</text>
+                <text x="50" y="98" text-anchor="middle" class="fill-slate-500 text-[6px] font-bold uppercase tracking-wide">Math</text>
+                <text x="8" y="52" text-anchor="start" class="fill-slate-500 text-[6px] font-bold uppercase tracking-wide">Focus</text>
+              </svg>
+              
+              <div class="absolute text-center bg-slate-950/80 backdrop-blur px-2.5 py-1 rounded-md border border-slate-800/80 text-[10px] text-indigo-300 font-semibold">
+                Active State: Ready
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 text-center italic">Run assessments above to expand performance map nodes dynamically.</p>
+          </div>
+
         </div>
 
-      </div>
-
-      <!-- Interactive Note Pad Drawer (Slide-down toggleable) -->
-      <div id="drawer-notes" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl transition-all duration-300">
-        <div class="flex justify-between items-center mb-3">
-          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-            <span>✍️</span> Quick Story Journal & Notes (Auto-saved)
-          </h4>
-          <button id="btn-close-notes" class="text-slate-400 hover:text-slate-100 text-lg">&times;</button>
-        </div>
-        <textarea id="textarea-user-notes" rows="4" class="w-full bg-slate-950 text-slate-200 p-3 rounded-lg border border-slate-800 focus:border-violet-500 outline-none text-xs leading-relaxed" placeholder="Write your theories, map coordinates, custom lore characters, or draft novel prompts here..."></textarea>
-        <p class="text-[10px] text-slate-500 mt-1 text-right">Stored locally for your next reading session.</p>
-      </div>
-
-    </section>
-
+      </section>
+    </div>
   </main>
 
-  <!-- Quick Interactive Guide Modal / Toast Info -->
-  <div id="tour-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative animate-fade-in">
-      <button id="btn-close-tour" class="absolute top-4 right-4 text-slate-400 hover:text-slate-100 text-lg font-bold">&times;</button>
-      <h3 class="text-lg font-bold text-violet-400 mb-2 flex items-center gap-2">
-        <span>🧙</span> Welcome to SAGAS Forge!
-      </h3>
-      <p class="text-xs text-slate-300 leading-relaxed mb-4">
-        SAGAS is a sandbox interactive workspace designed to generate, format, read, and listen to multi-path storytelling. 
-      </p>
-      <div class="space-y-3 text-xs">
-        <div class="flex gap-2">
-          <span class="text-violet-400 font-bold">1.</span>
-          <span class="text-slate-300"><strong class="text-slate-100">Roll & Build:</strong> Use the Left panel to write characters and hooks, or click <strong>🎲 Spin Fate</strong> to instantly generate a narrative idea.</span>
-        </div>
-        <div class="flex gap-2">
-          <span class="text-violet-400 font-bold">2.</span>
-          <span class="text-slate-300"><strong class="text-slate-100">Interactive Desk:</strong> Read through passages, choose outcomes, adjust themes (like parchment or green matrix screen), text size, and narration.</span>
-        </div>
-        <div class="flex gap-2">
-          <span class="text-violet-400 font-bold">3.</span>
-          <span class="text-slate-300"><strong class="text-slate-100">Speech Narrator:</strong> Play live audio text-to-speech built seamlessly using Web Speech Synthesis engine.</span>
-        </div>
-      </div>
-      <div class="mt-5 flex justify-end">
-        <button id="btn-dismiss-tour" class="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-lg transition duration-200">
-          Step Into the Void
-        </button>
-      </div>
+  <!-- Audio Alert Confirmation Toast -->
+  <div id="toast-message" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 border border-slate-800 text-xs px-4 py-3 rounded-xl flex items-center space-x-3 shadow-2xl max-w-sm pointer-events-none">
+    <div class="p-1 bg-indigo-500 rounded-lg text-white" id="toast-icon-wrapper">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <div>
+      <p class="font-bold text-slate-200" id="toast-title">System Loaded</p>
+      <p class="text-slate-400 text-[10px]" id="toast-desc">Sensory variables synced</p>
     </div>
   </div>
-
-  <!-- Sticky Notification Alert (Toast) -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 pointer-events-none flex flex-col gap-2"></div>
-
-  <!-- Global Interactive Canvas Footer -->
-  <footer class="border-t border-slate-900 bg-slate-950 py-6 px-6 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-      <p>Created as an elite Immersive Story sandbox. Crafted with dynamic branch outcome state persistence.</p>
-      <div class="flex items-center gap-4">
-        <span class="hover:text-slate-300 cursor-pointer transition">Saga Engine v2.4</span>
-        <span class="hover:text-slate-300 cursor-pointer transition">Terms of Legend</span>
-      </div>
-    </div>
-  </footer>
 </div>
   
   <script src="script.js"></script>
