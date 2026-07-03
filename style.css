@@ -1,105 +1,65 @@
-/* Tailored interactive styles for the Sagas Application */
+/* Tailored premium cybernetic fonts & effects */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
-/* Theme Styling Injections for the Reading Sanctuary viewport */
-.theme-midnight {
-  background-color: rgb(2 6 23 / 95%) !important;
-  color: rgb(241 245 249) !important;
-  border-color: rgb(76 29 149) !important;
-}
-
-.theme-parchment {
-  background-color: #f7f4ef !important;
-  color: #2b221a !important;
-  border-color: #dcd4c9 !important;
-}
-.theme-parchment #viewport-story-title,
-.theme-parchment #viewport-story-body {
-  color: #2b221a !important;
-  font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
-}
-.theme-parchment #viewport-choices-container button {
-  border-color: #d4c8b6 !important;
-  background-color: #ede7dd !important;
-  color: #3d3126 !important;
-}
-.theme-parchment #viewport-choices-container button:hover {
-  background-color: #e4dacb !important;
-  border-color: #8b7765 !important;
+#console-log-box {
+  font-family: 'JetBrains Mono', monospace;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.2) transparent;
 }
 
-.theme-matrix {
-  background-color: #000000 !important;
-  color: #10b981 !important;
-  border-color: #047857 !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+#console-log-box::-webkit-scrollbar {
+  width: 4px;
 }
-.theme-matrix #viewport-story-title,
-.theme-matrix #viewport-story-body {
-  color: #34d399 !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-}
-.theme-matrix #viewport-choices-container button {
-  border-color: #064e3b !important;
-  background-color: #022c22 !important;
-  color: #34d399 !important;
-}
-.theme-matrix #viewport-choices-container button:hover {
-  background-color: #064e3b !important;
-  border-color: #10b981 !important;
+#console-log-box::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 2px;
 }
 
-.theme-neon {
-  background-color: #12011a !important;
-  color: #f472b6 !important;
-  border-color: #db2777 !important;
-}
-.theme-neon #viewport-story-title,
-.theme-neon #viewport-story-body {
-  color: #f472b6 !important;
-}
-.theme-neon #viewport-choices-container button {
-  border-color: #831843 !important;
-  background-color: #500724/40 !important;
-  color: #f472b6 !important;
-}
-.theme-neon #viewport-choices-container button:hover {
-  background-color: #831843 !important;
-  border-color: #f472b6 !important;
+/* Interactive cell styling with dynamic glowing borders and active state variables */
+.matrix-cell {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  aspect-ratio: 1;
 }
 
-/* Interactive scale animation for Fate Roll */
-@keyframes dice-roll {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.2); }
-  100% { transform: rotate(360deg) scale(1); }
+.matrix-cell.active-show {
+  background: radial-gradient(circle, rgba(16,185,129,1) 0%, rgba(4,120,87,1) 100%);
+  box-shadow: 0 0 16px rgba(16,185,129,0.8), inset 0 0 6px rgba(255,255,255,0.4);
+  border-color: #34d399;
 }
 
-.dice-spinning {
-  animation: dice-roll 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+.matrix-cell.correct-click {
+  background: radial-gradient(circle, rgba(16,185,129,1) 0%, rgba(6,78,59,1) 100%);
+  box-shadow: 0 0 20px rgba(16,185,129,0.9);
+  border-color: #10b981;
+  transform: scale(0.95);
 }
 
-/* High contrast dynamic custom scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.4);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.6);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(236, 72, 153, 0.8);
+.matrix-cell.incorrect-click {
+  background: radial-gradient(circle, rgba(239,68,68,1) 0%, rgba(127,29,29,1) 100%);
+  box-shadow: 0 0 25px rgba(239,68,68,1);
+  border-color: #ef4444;
+  animation: error-shake 0.3s ease-in-out;
 }
 
-/* Custom Toast Transition effect */
-@keyframes slide-in-toast {
-  0% { transform: translateY(1rem); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
-.toast-animate {
-  animation: slide-in-toast 0.25s ease-out forwards;
+/* Interactive scale pulses */
+.stroop-glow-red {
+  text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
+}
+.stroop-glow-green {
+  text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+}
+.stroop-glow-blue {
+  text-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+}
+.stroop-glow-yellow {
+  text-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+}
+.stroop-glow-pink {
+  text-shadow: 0 0 15px rgba(236, 72, 153, 0.6);
 }
