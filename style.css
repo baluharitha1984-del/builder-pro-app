@@ -1,43 +1,105 @@
-/* Custom Scrollbar for sleek aesthetic */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+/* Tailored interactive styles for the Sagas Application */
+
+/* Theme Styling Injections for the Reading Sanctuary viewport */
+.theme-midnight {
+  background-color: rgb(2 6 23 / 95%) !important;
+  color: rgb(241 245 249) !important;
+  border-color: rgb(76 29 149) !important;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+
+.theme-parchment {
+  background-color: #f7f4ef !important;
+  color: #2b221a !important;
+  border-color: #dcd4c9 !important;
+}
+.theme-parchment #viewport-story-title,
+.theme-parchment #viewport-story-body {
+  color: #2b221a !important;
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif !important;
+}
+.theme-parchment #viewport-choices-container button {
+  border-color: #d4c8b6 !important;
+  background-color: #ede7dd !important;
+  color: #3d3126 !important;
+}
+.theme-parchment #viewport-choices-container button:hover {
+  background-color: #e4dacb !important;
+  border-color: #8b7765 !important;
+}
+
+.theme-matrix {
+  background-color: #000000 !important;
+  color: #10b981 !important;
+  border-color: #047857 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+.theme-matrix #viewport-story-title,
+.theme-matrix #viewport-story-body {
+  color: #34d399 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+.theme-matrix #viewport-choices-container button {
+  border-color: #064e3b !important;
+  background-color: #022c22 !important;
+  color: #34d399 !important;
+}
+.theme-matrix #viewport-choices-container button:hover {
+  background-color: #064e3b !important;
+  border-color: #10b981 !important;
+}
+
+.theme-neon {
+  background-color: #12011a !important;
+  color: #f472b6 !important;
+  border-color: #db2777 !important;
+}
+.theme-neon #viewport-story-title,
+.theme-neon #viewport-story-body {
+  color: #f472b6 !important;
+}
+.theme-neon #viewport-choices-container button {
+  border-color: #831843 !important;
+  background-color: #500724/40 !important;
+  color: #f472b6 !important;
+}
+.theme-neon #viewport-choices-container button:hover {
+  background-color: #831843 !important;
+  border-color: #f472b6 !important;
+}
+
+/* Interactive scale animation for Fate Roll */
+@keyframes dice-roll {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.dice-spinning {
+  animation: dice-roll 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* High contrast dynamic custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.4);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.6);
   border-radius: 4px;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
-  border-radius: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(236, 72, 153, 0.8);
 }
 
-/* Range slider styling enhancements */
-input[type="range"]::-webkit-slider-thumb {
-  box-shadow: 0 0 8px rgba(99, 102, 241, 0.8);
+/* Custom Toast Transition effect */
+@keyframes slide-in-toast {
+  0% { transform: translateY(1rem); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
 }
 
-/* Subtle glowing active presets */
-.preset-active {
-  background-color: rgba(99, 102, 241, 0.15) !important;
-  border-color: rgba(99, 102, 241, 0.6) !important;
-  color: #a5b4fc !important;
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.1) inset;
-}
-
-/* Animation for newly added gallery cards */
-@keyframes cardAppear {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.animate-card {
-  animation: cardAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.toast-animate {
+  animation: slide-in-toast 0.25s ease-out forwards;
 }
