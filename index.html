@@ -3,39 +3,302 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retro Neon Clock</title>
+  <title>ScribeFlow: Visual Sentence Architect</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Retro Digital Glowing Neon Clock -->
-<div class="clock-container">
-  <div class="glow-orb"></div>
-  <div class="glow-orb secondary"></div>
-  
-  <div class="glass-board">
-    <div class="app-header">
-      <span class="status-dot"></span>
-      <span class="header-title">LIVE NEON CLOCK</span>
+  <div class="min-h-screen bg-slate-900 text-slate-100 font-sans pb-12 transition-colors duration-300">
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-4 lg:px-8 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-gradient-to-tr from-cyan-500 to-indigo-600 rounded-xl shadow-lg shadow-indigo-500/20">
+          <!-- Graphic Icon of Dot and Arrow -->
+          <svg class="w-6 h-6 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <circle cx="4" cy="4" r="2" fill="currentColor" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            ScribeFlow <span class="text-xs bg-indigo-500/20 text-indigo-300 font-medium px-2.5 py-0.5 rounded-full border border-indigo-500/30">Syntactic Architect</span>
+          </h1>
+          <p class="text-xs text-slate-400">Visualizing English grammar, syntax transitions, and sentence coherence using interactive dots and arrows</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-reset-app" class="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-white border border-slate-700 hover:border-slate-600 rounded-lg transition-all">
+          Reset Canvas
+        </button>
+        <a href="#guide-section" class="px-3 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all shadow-md shadow-indigo-600/10">
+          How to Write with Dots &amp; Arrows
+        </a>
+      </div>
     </div>
-    
-    <div class="time-display">
-      <span id="hours">00</span>
-      <span class="colon">:</span>
-      <span id="minutes">00</span>
-      <span class="colon">:</span>
-      <span id="seconds">00</span>
-      <span id="ampm" class="ampm">AM</span>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 lg:px-8 mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <!-- LEFT SIDEBAR: Sentence Selector, Presets, and Controls -->
+    <section class="lg:col-span-4 space-y-6">
+      
+      <!-- Presets / Quick Loaders -->
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 backdrop-blur-sm shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Load English Syntactic Presets
+          </h2>
+        </div>
+        <div class="space-y-2">
+          <button id="preset-1" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500/40 transition group">
+            <div class="flex justify-between text-xs text-indigo-400 font-semibold mb-1">
+              <span>Simple Subject-Verb-Object</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <p class="text-sm text-slate-200 truncate font-mono">The quick brown fox jumps over the lazy dog.</p>
+          </button>
+          
+          <button id="preset-2" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-pink-500/40 transition group">
+            <div class="flex justify-between text-xs text-pink-400 font-semibold mb-1">
+              <span>Complex Clause Linkage</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <p class="text-sm text-slate-200 truncate font-mono">Although it rained heavily, we enjoyed the long walk.</p>
+          </button>
+
+          <button id="preset-3" class="w-full text-left p-3 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-amber-500/40 transition group">
+            <div class="flex justify-between text-xs text-amber-400 font-semibold mb-1">
+              <span>Parallel Structural Flow</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <p class="text-sm text-slate-200 truncate font-mono">Writing requires clarity, and editing demands discipline.</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Sentence Creator -->
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 backdrop-blur-sm shadow-xl">
+        <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-blue-400"></span> Write Custom Sentence
+        </h2>
+        <p class="text-xs text-slate-400 mb-4">Type any English sentence below to convert it into clickable token words for custom annotation.</p>
+        
+        <div class="space-y-3">
+          <textarea id="custom-sentence-input" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-sans resize-none" placeholder="Type or paste your sentence here...">The diligent author drafted a masterpiece, and she revised it with meticulous care.</textarea>
+          
+          <button id="btn-process-sentence" class="w-full py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold rounded-xl text-sm shadow-lg shadow-indigo-600/15 transition-all flex items-center justify-center gap-2">
+            <span>Generate Tokens &amp; Clear Canvas</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Annotation Toolbox Controls (Dynamically contextualized) -->
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 backdrop-blur-sm shadow-xl space-y-4">
+        <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping"></span> Toolbox Controls
+        </h2>
+        
+        <!-- Dot Annotation Picker -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 mb-2">1. CHOOSE DOT COLOR (GRAMMAR ROLE)</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button data-role="subject" class="role-dot-btn flex items-center gap-2 p-2 rounded-lg bg-slate-900 border-2 border-indigo-500 text-left text-xs text-slate-200 transition-all">
+              <span class="w-3.5 h-3.5 rounded-full bg-indigo-500 block"></span>
+              <span>Subject (Blue)</span>
+            </button>
+            <button data-role="verb" class="role-dot-btn flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-700 text-left text-xs text-slate-200 transition-all">
+              <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 block"></span>
+              <span>Verb (Green)</span>
+            </button>
+            <button data-role="object" class="role-dot-btn flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-700 text-left text-xs text-slate-200 transition-all">
+              <span class="w-3.5 h-3.5 rounded-full bg-amber-500 block"></span>
+              <span>Object (Amber)</span>
+            </button>
+            <button data-role="modifier" class="role-dot-btn flex items-center gap-2 p-2 rounded-lg bg-slate-900 border border-slate-700 text-left text-xs text-slate-200 transition-all">
+              <span class="w-3.5 h-3.5 rounded-full bg-fuchsia-500 block"></span>
+              <span>Modifier (Pink)</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">Click any word on the right canvas to stamp the selected grammatical dot.</p>
+        </div>
+
+        <!-- Arrow Linker Info/Control -->
+        <div class="border-t border-slate-700/60 pt-4">
+          <label class="block text-xs font-semibold text-slate-400 mb-2">2. DRAW TRANSITION ARROW (FLOW)</label>
+          <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700/50 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Source Word:</span>
+              <span id="arrow-source-badge" class="text-indigo-400 font-mono font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">[None]</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Target Word:</span>
+              <span id="arrow-target-badge" class="text-emerald-400 font-mono font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">[None]</span>
+            </div>
+            
+            <div class="flex gap-2 pt-1">
+              <button id="btn-create-arrow" disabled class="flex-1 py-1.5 bg-indigo-600 disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition-all">
+                Connect with Arrow →
+              </button>
+              <button id="btn-clear-selection" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold transition-all">
+                Clear Sel
+              </button>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">
+            <span class="font-semibold text-slate-300">How:</span> Shift-Click word to set Source. Alt-Click (or Option) to set Target. Click "Connect" to draw the flow arrow!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT WORKSPACE: Live Diagram Visualizer -->
+    <section class="lg:col-span-8 space-y-6">
+      
+      <!-- Interactive Live Canvas Card -->
+      <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col min-h-[460px]">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500"></div>
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-700/60 pb-4 mb-6">
+          <div>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
+              Interactive Syntactic Canvas
+            </h2>
+            <p class="text-xs text-slate-400">Click words to paint DOTS. Shift-Click &amp; Alt-Click to create flow ARROWS.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-clear-dots" class="text-xs text-red-400 hover:text-red-300 bg-red-900/20 hover:bg-red-900/40 border border-red-500/20 px-2.5 py-1 rounded transition">
+              Clear All Dots
+            </button>
+            <button id="btn-clear-arrows" class="text-xs text-amber-400 hover:text-amber-300 bg-amber-900/20 hover:bg-amber-900/40 border border-amber-500/20 px-2.5 py-1 rounded transition">
+              Clear All Arrows
+            </button>
+          </div>
+        </div>
+
+        <!-- The Diagramming Area Container -->
+        <div id="diagram-workspace-container" class="relative flex-1 bg-slate-950 rounded-xl p-8 border border-slate-800 flex flex-col justify-center min-h-[300px]">
+          
+          <!-- Arrow SVG Layer -->
+          <svg id="arrow-svg-layer" class="absolute inset-0 pointer-events-none w-full h-full z-10">
+            <defs>
+              <marker id="arrowhead-blue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 z" fill="#6366f1" />
+              </marker>
+              <marker id="arrowhead-emerald" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 z" fill="#10b981" />
+              </marker>
+              <marker id="arrowhead-amber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 z" fill="#f59e0b" />
+              </marker>
+              <marker id="arrowhead-pink" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 z" fill="#d946ef" />
+              </marker>
+              <marker id="arrowhead-default" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                <path d="M 0 0 L 8 4 L 0 8 z" fill="#a855f7" />
+              </marker>
+            </defs>
+            <g id="arrows-group"></g>
+          </svg>
+
+          <!-- Sentence Words Wrapper -->
+          <div id="sentence-words-wrapper" class="relative z-20 flex flex-wrap gap-x-3 gap-y-16 items-center justify-center py-10">
+            <!-- Dynamic Word Elements go here -->
+          </div>
+
+          <!-- Empty Slate Alert -->
+          <div id="canvas-empty-state" class="hidden text-center text-slate-500 py-10">
+            <p>No sentence tokens loaded. Type a sentence on the left to begin.</p>
+          </div>
+        </div>
+
+        <!-- Active Elements Legenda / Live Status Log -->
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs border-t border-slate-700/60 pt-4">
+          <div class="space-y-1">
+            <span class="text-slate-400 block font-semibold">Active Sentence Annotation Stats:</span>
+            <div class="flex items-center gap-4 text-slate-300">
+              <span id="stat-dots-count" class="bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-900">0 Dots Applied</span>
+              <span id="stat-arrows-count" class="bg-pink-950 text-pink-300 px-2 py-0.5 rounded border border-pink-900">0 Arrows Active</span>
+            </div>
+          </div>
+          <div class="flex flex-col justify-end text-slate-400">
+            <span class="text-right block font-semibold">Interactive Hotkeys:</span>
+            <span class="text-right block text-[11px]">Shift + Click = Source Word | Alt/Option + Click = Target Word</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Feedback & Analysis Report Card -->
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 backdrop-blur-sm shadow-xl">
+        <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3 flex items-center gap-2">
+          <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Syntactic Flow Insight
+        </h3>
+        
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+          <p id="coherence-analysis-text" class="text-xs text-slate-300 leading-relaxed">
+            Sentence parsed successfully. Highlight key logical connections using transition arrows to track sentence rhythm, modifiers, and cohesive patterns.
+          </p>
+          <div class="flex flex-wrap gap-2 pt-1">
+            <span class="text-[11px] bg-indigo-500/10 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/20">Subject ➔ Verb Flow</span>
+            <span class="text-[11px] bg-emerald-500/10 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/20">Relative Clause Modifier</span>
+            <span class="text-[11px] bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/20">Coordinating Conjunction Hub</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Writing Philosophy Guide & Rules (How to use dots and arrows in English writing) -->
+  <section id="guide-section" class="max-w-7xl mx-auto px-4 lg:px-8 mt-12">
+    <div class="bg-slate-800/40 border border-slate-700/60 rounded-3xl p-6 lg:p-8 backdrop-blur-sm">
+      <div class="text-center max-w-3xl mx-auto mb-10">
+        <h2 class="text-2xl font-bold text-white mb-2">
+          The Method of Dots and Arrows in English Writing
+        </h2>
+        <p class="text-sm text-slate-300">
+          Visual syntactic diagramming helps master sentence rhythm, avoid run-ons, make modifiers transparent, and guarantee logical sequence transitions.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+        <!-- Point 1 -->
+        <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center border border-indigo-500/30">🔵</span>
+            <h3 class="font-bold text-slate-100">Anchor Dots (The Nouns)</h3>
+          </div>
+          <p class="text-slate-300 text-xs leading-relaxed">
+            Place structural dots below subjects and objects to anchor your reader's attention. Ensure there is a balance between the primary actors (subjects) and patient receptors of actions (objects).
+          </p>
+        </div>
+
+        <!-- Point 2 -->
+        <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center border border-emerald-500/30">🟢</span>
+            <h3 class="font-bold text-slate-100">Action Links &amp; Modifiers</h3>
+          </div>
+          <p class="text-slate-300 text-xs leading-relaxed">
+            A well-placed modifier should always point directly to the word it changes. Using arrows from modifiers to target words prevents "dangling/misplaced modifiers" instantly!
+          </p>
+        </div>
+
+        <!-- Point 3 -->
+        <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700/50 space-y-3">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-full bg-pink-500/20 text-pink-400 font-bold flex items-center justify-center border border-pink-500/30">➡️</span>
+            <h3 class="font-bold text-slate-100">Transition Flow Arrows</h3>
+          </div>
+          <p class="text-slate-300 text-xs leading-relaxed">
+            Syntactic coherence happens when clauses flow organically. Drawing lines from causal clauses (like "Although...") to their primary outcomes reveals the physical path your reader's eyes take.
+          </p>
+        </div>
+      </div>
     </div>
-    
-    <div class="date-display" id="date">Loading Today's Date...</div>
-    
-    <div class="controls-row">
-      <button class="interactive-btn" onclick="toggleAnimation()">Toggle Neon Swirl</button>
-      <button class="interactive-btn accent" onclick="changeTheme()">Switch Mood</button>
-    </div>
-  </div>
+  </section>
 </div>
   
   <script src="script.js"></script>
