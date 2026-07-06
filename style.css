@@ -1,198 +1,50 @@
-/* Custom Glassmorphic Styling for the Neon Clock */
-:root {
-  --neon-cyan: #00f0ff;
-  --neon-pink: #ff007f;
-  --neon-purple: #9d4edd;
-  --bg-dark: #0a0e17;
-  --glass-bg: rgba(15, 23, 42, 0.65);
+/* Customized visual animations and line transitions for diagram words */
+#sentence-words-wrapper {
+  perspective: 1000px;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--bg-dark);
-  color: #f8fafc;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  overflow: hidden;
-  transition: background 0.8s ease, color 0.5s ease;
+.word-token {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
 }
 
-/* Alternate light mood preset */
-body.light-theme {
-  --bg-dark: #f1f5f9;
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --neon-cyan: #0284c7;
-  --neon-pink: #db2777;
-  --neon-purple: #7c3aed;
-  color: #0f172a;
-}
-
-.clock-container {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-/* Floating background glow effects */
-.glow-orb {
-  position: absolute;
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--neon-cyan) 0%, transparent 70%);
-  top: -40px;
-  left: -40px;
-  opacity: 0.35;
-  filter: blur(40px);
-  animation: floatOrb 12s infinite alternate ease-in-out;
-}
-
-.glow-orb.secondary {
-  background: radial-gradient(circle, var(--neon-pink) 0%, transparent 70%);
-  bottom: -40px;
-  right: -40px;
-  top: auto;
-  left: auto;
-  opacity: 0.3;
-  animation: floatOrb 15s infinite alternate-reverse ease-in-out;
-}
-
-@keyframes floatOrb {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(30px, 40px) scale(1.15); }
-}
-
-/* Glassmorphic card frame */
-.glass-board {
-  position: relative;
-  background: var(--glass-bg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
-  padding: 35px 25px;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  transition: all 0.3s ease;
-}
-
-body.light-theme .glass-board {
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
-}
-
-.app-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 25px;
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--neon-cyan);
-  box-shadow: 0 0 8px var(--neon-cyan);
-  animation: pulse 1.5s infinite;
-}
-
-.header-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  color: var(--neon-cyan);
-  transition: color 0.3s ease;
-}
-
-/* Clock numbers styles */
-.time-display {
-  font-size: 52px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2px;
-  text-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-}
-
-.colon {
-  color: var(--neon-purple);
-  animation: pulse 1s infinite;
-}
-
-.ampm {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--neon-pink);
-  margin-left: 8px;
-  align-self: flex-end;
-  padding-bottom: 8px;
-}
-
-.date-display {
-  font-size: 14px;
-  font-weight: 500;
-  opacity: 0.65;
-  letter-spacing: 0.5px;
-  margin-bottom: 30px;
-}
-
-/* Custom interactive inputs */
-.controls-row {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.interactive-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: inherit;
-  padding: 10px 18px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.interactive-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+.word-token:hover {
   transform: translateY(-2px);
-  border-color: var(--neon-cyan);
+  background-color: rgba(71, 85, 105, 0.4);
 }
 
-.interactive-btn.accent {
-  background: var(--neon-purple);
-  border-color: transparent;
-  color: white;
+.word-token.selected-source {
+  border-color: #6366f1 !important;
+  background-color: rgba(99, 102, 241, 0.15) !important;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
 }
 
-.interactive-btn.accent:hover {
-  background: var(--neon-pink);
-  box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+.word-token.selected-target {
+  border-color: #10b981 !important;
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
 }
 
-body.light-theme .interactive-btn {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+/* Subtle dotted background grid effect for visual mapping workspace */
+#diagram-workspace-container {
+  background-image: radial-gradient(#334155 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-body.light-theme .interactive-btn:hover {
-  background: rgba(0, 0, 0, 0.07);
+/* SVG line design styles */
+.arrow-line {
+  stroke-dasharray: 8 4;
+  animation: flowLine 30s linear infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+@keyframes flowLine {
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.role-dot-btn.active-picker {
+  border-color: #a855f7 !important;
+  background-color: rgba(168, 85, 247, 0.15) !important;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
 }
