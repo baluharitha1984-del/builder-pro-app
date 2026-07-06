@@ -1,59 +1,198 @@
-/* Tailored stylesheet custom parameters for Telugu Letter Drawing Board */
-
-/* Custom scrollbar config for the list panel */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(30, 41, 59, 0.2);
-  border-radius: 8px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(245, 158, 11, 0.2);
-  border-radius: 8px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.4);
+/* Custom Glassmorphic Styling for the Neon Clock */
+:root {
+  --neon-cyan: #00f0ff;
+  --neon-pink: #ff007f;
+  --neon-purple: #9d4edd;
+  --bg-dark: #0a0e17;
+  --glass-bg: rgba(15, 23, 42, 0.65);
 }
 
-/* Subtle animations */
-@keyframes celebrateProgress {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); text-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
-  100% { transform: scale(1); }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: #f8fafc;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  transition: background 0.8s ease, color 0.5s ease;
 }
 
-.score-pulse {
-  animation: celebrateProgress 0.6s ease-in-out;
+/* Alternate light mood preset */
+body.light-theme {
+  --bg-dark: #f1f5f9;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --neon-cyan: #0284c7;
+  --neon-pink: #db2777;
+  --neon-purple: #7c3aed;
+  color: #0f172a;
 }
 
-/* Letter button tracing specific styles */
-.letter-card {
+.clock-container {
   position: relative;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.letter-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 0.75rem;
-  padding: 1px;
-  background: linear-gradient(to bottom right, rgba(245, 158, 11, 0.4), transparent);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0.3;
-  transition: opacity 0.2s;
-}
-.letter-card:hover::before {
-  opacity: 1;
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* Grid alignment template backdrop lines background */
-.canvas-grid-bg {
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+/* Floating background glow effects */
+.glow-orb {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--neon-cyan) 0%, transparent 70%);
+  top: -40px;
+  left: -40px;
+  opacity: 0.35;
+  filter: blur(40px);
+  animation: floatOrb 12s infinite alternate ease-in-out;
+}
+
+.glow-orb.secondary {
+  background: radial-gradient(circle, var(--neon-pink) 0%, transparent 70%);
+  bottom: -40px;
+  right: -40px;
+  top: auto;
+  left: auto;
+  opacity: 0.3;
+  animation: floatOrb 15s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(30px, 40px) scale(1.15); }
+}
+
+/* Glassmorphic card frame */
+.glass-board {
+  position: relative;
+  background: var(--glass-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 35px 25px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+body.light-theme .glass-board {
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+}
+
+.app-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 25px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--neon-cyan);
+  box-shadow: 0 0 8px var(--neon-cyan);
+  animation: pulse 1.5s infinite;
+}
+
+.header-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--neon-cyan);
+  transition: color 0.3s ease;
+}
+
+/* Clock numbers styles */
+.time-display {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+}
+
+.colon {
+  color: var(--neon-purple);
+  animation: pulse 1s infinite;
+}
+
+.ampm {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--neon-pink);
+  margin-left: 8px;
+  align-self: flex-end;
+  padding-bottom: 8px;
+}
+
+.date-display {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.65;
+  letter-spacing: 0.5px;
+  margin-bottom: 30px;
+}
+
+/* Custom interactive inputs */
+.controls-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.interactive-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: inherit;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.interactive-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  border-color: var(--neon-cyan);
+}
+
+.interactive-btn.accent {
+  background: var(--neon-purple);
+  border-color: transparent;
+  color: white;
+}
+
+.interactive-btn.accent:hover {
+  background: var(--neon-pink);
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+}
+
+body.light-theme .interactive-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .interactive-btn:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
