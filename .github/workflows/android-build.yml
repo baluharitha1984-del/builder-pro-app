@@ -138,14 +138,14 @@ jobs:
       - name: Upload Debug APK Binary
         uses: actions/upload-artifact@v4
         with:
-          name: LipiMitraTeluguTracingSandbox-debug-apk
+          name: RetroNeonClock-debug-apk
           path: |-
             **/*.apk
             !**/node_modules/**
       - name: Upload Release Play Store Bundle (AAB)
         uses: actions/upload-artifact@v4
         with:
-          name: LipiMitraTeluguTracingSandbox-release-aab
+          name: RetroNeonClock-release-aab
           path: |-
             **/*.aab
             !**/node_modules/**
