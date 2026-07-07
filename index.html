@@ -3,280 +3,299 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HabitSprout Tracker</title>
+  <title>Vanquish: Habit Wave Rider</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800&family=JetBrains+Mono:wght@400;700&display=swap">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500 selection:text-white">
-  <!-- Header Section -->
-  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <div class="p-2.5 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl shadow-lg shadow-indigo-500/20">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  <div class="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-rose-500 selection:text-white">
+  <!-- Header Banner -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2.5 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-xl shadow-lg shadow-rose-500/20">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
         </div>
         <div>
-          <h1 class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-violet-300 to-emerald-400">HabitSprout</h1>
-          <p class="text-xs text-slate-400 font-medium tracking-wide">BUILD THE LIFE YOU ACTUALLY WANT</p>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-rose-400 via-amber-400 to-emerald-400 bg-clip-text text-transparent">Vanquish</h1>
+          <p class="text-xs text-slate-400">Surf the Urges & Build Positive Replacements</p>
         </div>
       </div>
-
-      <!-- Gamified Level & XP System -->
-      <div class="flex items-center gap-4 bg-slate-800/80 px-4 py-2.5 rounded-2xl border border-slate-700/50 shadow-inner w-full sm:w-auto">
-        <div class="text-right">
-          <div class="text-xs font-bold text-slate-400 tracking-wider uppercase">Sprout Level</div>
-          <div class="text-lg font-black text-indigo-400" id="user-level">Level 1</div>
-        </div>
-        <div class="h-10 w-[1px] bg-slate-700"></div>
-        <div class="flex-1 sm:w-48">
-          <div class="flex justify-between text-[10px] text-slate-400 font-semibold mb-1">
-            <span id="xp-text">0 / 100 XP</span>
-            <span class="text-indigo-300">Next Level</span>
-          </div>
-          <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-700/50">
-            <div id="xp-bar" class="bg-gradient-to-r from-indigo-500 to-violet-500 h-full rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
-          </div>
-        </div>
+      <div class="flex items-center space-x-3">
+        <span id="streak-badge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          🔥 0 Day Streak
+        </span>
+        <button id="trigger-panic-btn" class="px-4 py-2 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white rounded-xl text-sm font-semibold shadow-lg shadow-rose-600/30 transition duration-200 flex items-center gap-1">
+          <span>🚨</span> Active Urge Help
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Grid Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <!-- Toast Container -->
+    <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-2xl flex items-center space-x-3 max-w-sm transition-all duration-300 transform translate-y-10">
+      <div id="toast-icon-wrapper" class="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </div>
+      <div class="flex-1">
+        <p id="toast-message" class="text-sm font-medium text-slate-200">Action completed successfully!</p>
+      </div>
+    </div>
+
+    <!-- Quick Insights Board -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center space-x-4">
+        <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total Urges Recorded</p>
+          <p id="stat-total-urges" class="text-2xl font-bold text-slate-100">0</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center space-x-4">
+        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Resisted Successfully</p>
+          <p id="stat-resisted" class="text-2xl font-bold text-slate-100">0</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center space-x-4">
+        <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Resist Rate</p>
+          <p id="stat-resist-rate" class="text-2xl font-bold text-slate-100">0%</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center space-x-4">
+        <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Primary Trigger</p>
+          <p id="stat-top-trigger" class="text-2xl font-bold text-slate-100">None</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      
-      <!-- Left & Middle: Habit Central (2 Cols) -->
-      <div class="lg:col-span-2 space-y-8">
-        
-        <!-- Today's Highlight & Interactive Streak Tracker -->
-        <div class="relative bg-gradient-to-br from-indigo-950/80 via-slate-900 to-slate-900 rounded-3xl p-6 sm:p-8 border border-indigo-500/20 shadow-2xl overflow-hidden">
-          <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div class="absolute -left-12 -top-12 w-48 h-48 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- Left Column: Add & Manage Habits -->
+      <section class="space-y-6 lg:col-span-1">
+        <!-- Add Habit Panel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <span>🎯</span> Define Habit Breakout
+            </h2>
+            <span class="text-xs text-rose-400 font-semibold uppercase tracking-widest">Step 1</span>
+          </div>
+          <p class="text-xs text-slate-400">To break a bad habit, define it along with a replacement constructive trigger-action loop.</p>
           
-          <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="space-y-2">
-              <span class="px-3 py-1 bg-indigo-500/10 text-indigo-300 rounded-full text-xs font-bold tracking-wider uppercase border border-indigo-500/20">
-                Today's Overview
-              </span>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" id="date-string">Today</h2>
-              <p class="text-slate-400 text-sm max-w-md">Small daily gains compound to magnificent heights. Complete your habits to sustain your momentum streak.</p>
-            </div>
-            
-            <!-- Circular Progress Dashboard -->
-            <div class="flex items-center gap-4 bg-slate-900/80 p-4 rounded-2xl border border-slate-800/80 self-start md:self-auto">
-              <div class="relative flex items-center justify-center w-16 h-16">
-                <svg class="absolute w-full h-full transform -rotate-90">
-                  <circle class="text-slate-800" stroke-width="4" stroke="currentColor" fill="transparent" r="26" cx="32" cy="32" />
-                  <circle class="text-indigo-500 transition-all duration-500 ease-out" stroke-width="5" stroke-dasharray="163.3" id="progress-circle" stroke-dashoffset="163.3" stroke-linecap="round" stroke="currentColor" fill="transparent" r="26" cx="32" cy="32" />
-                </svg>
-                <span class="text-sm font-black text-white" id="progress-percentage">0%</span>
-              </div>
-              <div>
-                <div class="text-xs text-slate-400 font-semibold">Daily Complete</div>
-                <div class="text-lg font-black text-slate-100" id="progress-ratio">0/4 Habits</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Filters & Add Habit Button -->
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="flex flex-wrap gap-2" id="category-filters">
-            <button data-filter="all" class="filter-btn active-filter px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">All Habits</button>
-            <button data-filter="Mind" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200">🧠 Mind</button>
-            <button data-filter="Body" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200">💪 Body</button>
-            <button data-filter="Work" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200">💼 Work</button>
-            <button data-filter="Custom" class="filter-btn px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200">✨ Custom</button>
-          </div>
-
-          <button id="toggle-add-btn" class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all border border-emerald-400/20 active:scale-95">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
-            </svg>
-            CREATE NEW HABIT
-          </button>
-        </div>
-
-        <!-- Add Habit Panel (Hidden by default, styled beautifully) -->
-        <div id="add-habit-drawer" class="hidden transition-all duration-300 ease-in-out bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div class="flex items-center gap-2">
-              <span class="p-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </span>
-              <h3 class="text-lg font-bold text-white">Design a Brand New Habit</h3>
-            </div>
-            <button id="close-add-drawer" class="text-slate-400 hover:text-slate-200 text-sm font-semibold">&times; Close</button>
-          </div>
-
-          <form id="habit-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form id="habit-form" class="space-y-4">
             <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Habit Title</label>
-              <input type="text" id="habit-title" required placeholder="e.g., Read 15 pages of philosophy" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all">
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="bad-habit-input">What is the bad habit?</label>
+              <input type="text" id="bad-habit-input" required placeholder="e.g., Doomscrolling in bed" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500 transition">
             </div>
-            
+
             <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Category</label>
-              <select id="habit-cat" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all">
-                <option value="Mind">🧠 Mind</option>
-                <option value="Body">💪 Body</option>
-                <option value="Work">💼 Work</option>
-                <option value="Custom">✨ Custom</option>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="replacement-habit-input">What is the healthy replacement?</label>
+              <input type="text" id="replacement-habit-input" required placeholder="e.g., Reading physical book for 5 mins" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="trigger-type-input">Primary Trigger Catalyst</label>
+              <select id="trigger-type-input" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition">
+                <option value="Stress">Stress & Anxiety</option>
+                <option value="Boredom">Boredom & Inertia</option>
+                <option value="Fatigue">Fatigue & Late Nights</option>
+                <option value="Social">Social Environment / Pressure</option>
+                <option value="Routine">Routine / Automatic Habit Loop</option>
               </select>
             </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Icon Choice</label>
-              <select id="habit-icon" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all">
-                <option value="💧">💧 Hydration</option>
-                <option value="🧘">🧘 Mindfulness / Yoga</option>
-                <option value="📚">📚 Learning / Reading</option>
-                <option value="🏃">🏃 Gym / Workout</option>
-                <option value="🍎">🍎 Nutrition</option>
-                <option value="💻">💻 Deep Work / Code</option>
-                <option value="🛌">🛌 Sleep Quality</option>
-                <option value="✍️">✍️ Journaling</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Target Frequency</label>
-              <select id="habit-freq" class="w-full bg-slate-950 border border-slate-800 focus:border-indigo-500 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all">
-                <option value="Everyday">Every day</option>
-                <option value="Weekdays">Weekdays only</option>
-                <option value="Weekends">Weekends only</option>
-              </select>
-            </div>
-
-            <div class="md:col-span-2 pt-2">
-              <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-400 hover:to-violet-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all text-sm">Create Custom Habit (+25 Seed XP)</button>
-            </div>
+            <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl text-sm shadow-md shadow-emerald-950 transition duration-150">
+              + Track This Habit Loop
+            </button>
           </form>
         </div>
 
-        <!-- Habits Grid/List Container -->
-        <div class="space-y-4" id="habits-container">
-          <!-- Dynamic habits injected here -->
-        </div>
-
-        <!-- Simulator Utility Bar -->
-        <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="text-xs text-slate-400">
-            <strong class="text-slate-200">Development Sandbox:</strong> Feel free to clear data or simulate a new calendar day to test habit progress persistence!
+        <!-- Tracked Habits Active List -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Active Habits Map</h3>
+            <span id="habit-count" class="text-xs text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">0 listed</span>
           </div>
-          <div class="flex gap-2 w-full sm:w-auto">
-            <button id="btn-simulate-day" class="text-xs font-semibold px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl border border-slate-700/50 transition-all whitespace-nowrap active:scale-95 flex-1 sm:flex-none">
-              ☀️ Simulate New Day
-            </button>
-            <button id="btn-reset-app" class="text-xs font-semibold px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl border border-rose-500/20 transition-all whitespace-nowrap active:scale-95 flex-1 sm:flex-none">
-              Reset All Habits
-            </button>
+          
+          <div id="habits-list-container" class="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+            <!-- Habit cards rendered here dynamically -->
           </div>
         </div>
+      </section>
 
-      </div>
-
-      <!-- Right Sidebar: Interactive stats, tips, achievements (1 Col) -->
-      <div class="space-y-8">
+      <!-- Middle Column: Urge Surfing Station & Logger -->
+      <section class="space-y-6 lg:col-span-2">
         
-        <!-- Streak Progress Hall -->
-        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-4">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <span class="text-xl">🏆</span>
-            Streaks & Statistics
-          </h3>
-          
-          <div class="grid grid-cols-2 gap-3">
-            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800/60">
-              <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Total Done</div>
-              <div class="text-2xl font-black text-emerald-400" id="stat-total-completions">14</div>
-              <div class="text-[10px] text-slate-500">All time checks</div>
-            </div>
-            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800/60">
-              <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Perfect Days</div>
-              <div class="text-2xl font-black text-amber-400" id="stat-perfect-days">2</div>
-              <div class="text-[10px] text-slate-500">100% completion</div>
-            </div>
+        <!-- Urge Surfing Station (Interactive Breath-work and Calmer) -->
+        <div id="urge-surfing-card" class="relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-rose-950/20 border border-rose-500/20 rounded-2xl p-6 space-y-6 transition duration-300">
+          <div class="absolute top-0 right-0 p-3 opacity-20">
+            <span class="text-7xl font-bold select-none">🌊</span>
           </div>
 
-          <!-- Interactive Trophy Goal Track -->
-          <div class="bg-indigo-950/30 rounded-2xl p-4 border border-indigo-500/10 space-y-2">
-            <div class="flex justify-between text-xs font-semibold text-slate-200">
-              <span>Sprout Seedling Challenge</span>
-              <span class="text-indigo-400" id="challenge-progress">1 / 5 Done</span>
+          <div class="relative z-10">
+            <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <span>🌊</span> Urge Surfer Station
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Urges usually peak for only 10 to 15 minutes before dissolving. Ride the wave instead of fighting it with our rhythmized box-breathing.
+            </p>
+          </div>
+
+          <!-- Breathing Exercise Canvas -->
+          <div class="bg-slate-950/60 border border-slate-800/80 rounded-xl p-8 flex flex-col items-center justify-center text-center space-y-6 relative">
+            <div id="breath-circle-outer" class="w-36 h-36 rounded-full border border-rose-500/30 flex items-center justify-center relative">
+              <div id="breath-circle-inner" class="w-24 h-24 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-full opacity-60 transition-all duration-[4000ms] ease-in-out flex items-center justify-center">
+                <span id="breather-indicator" class="text-slate-950 text-xs font-black tracking-widest uppercase">READY</span>
+              </div>
             </div>
-            <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
-              <div id="challenge-bar" class="bg-gradient-to-r from-amber-400 to-indigo-500 h-full rounded-full transition-all duration-300" style="width: 20%"></div>
+
+            <div class="space-y-2">
+              <h4 id="breather-caption" class="text-sm font-semibold text-rose-300">Click Start to Surf the urge!</h4>
+              <p id="breather-instructions" class="text-xs text-slate-400 max-w-sm">
+                Deep breathing resets your autonomic nervous system, helping you gain space between stimulus and response.
+              </p>
             </div>
-            <p class="text-[10px] text-slate-400">Earn levels to bloom your digital habitat sprout and unlock healthy bonuses.</p>
+
+            <div class="flex items-center space-x-3">
+              <button id="start-breather-btn" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 font-semibold text-xs rounded-lg transition">
+                Start Box Breath (1 Min)
+              </button>
+              <button id="stop-breather-btn" class="hidden px-5 py-2 bg-rose-950 text-rose-400 hover:bg-rose-900 border border-rose-800 font-semibold text-xs rounded-lg transition">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Atomic Habit Mindsets / Scientific Micro-Tips -->
-        <div class="bg-gradient-to-tr from-slate-900 to-slate-900/50 border border-slate-800 rounded-3xl p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-md font-bold text-white flex items-center gap-2">
-              <span>💡</span>
-              Atomic Wisdom
-            </h3>
-            <button id="btn-next-tip" class="text-indigo-400 hover:text-indigo-300 text-xs font-semibold flex items-center gap-1">
-              Next Tip
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
+        <!-- Quick Urge / Slip Log Form -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <span>✍️</span> Quick Urge / Slip Logger
+          </h2>
+          <p class="text-xs text-slate-400">
+            Log slips honestly or mark urges as "resisted" to reinforce the progress loop.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="log-habit-select">Which habit was targeted?</label>
+              <select id="log-habit-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition">
+                <!-- Rendered Dynamically -->
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="log-action-type">What happened?</label>
+              <select id="log-action-type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition">
+                <option value="resisted" class="text-emerald-400 font-medium">🛡️ Resisted the urge successfully</option>
+                <option value="slipped" class="text-rose-400 font-medium">⚠️ Slipped up (It is a lesson, not a failure)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="log-trigger-select">Main trigger this moment?</label>
+              <select id="log-trigger-select" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition">
+                <option value="Stress">Stress & Anxiety</option>
+                <option value="Boredom">Boredom & Inertia</option>
+                <option value="Fatigue">Fatigue & Tiredness</option>
+                <option value="Social">Social Cues / Friends</option>
+                <option value="Routine">Routine Automation</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="log-notes">Quick notes or feelings (Optional)</label>
+              <input type="text" id="log-notes" placeholder="e.g., Felt tired after a hard meeting..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition">
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button id="submit-log-btn" class="px-6 py-2.5 bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-slate-950 font-bold rounded-xl text-xs tracking-wider uppercase shadow-md transition duration-150">
+              Log Urge Instantaneously
             </button>
           </div>
-          
-          <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
-            <p id="wise-quote" class="text-sm italic text-slate-300 font-medium leading-relaxed">"You do not rise to the level of your goals. You fall to the level of your systems."</p>
-            <p id="wise-author" class="text-xs text-indigo-400 font-semibold mt-3">— James Clear, Atomic Habits</p>
+        </div>
+
+        <!-- Urge History Feed & Lessons Panel -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Urge Incident Feed</h3>
+            <button id="clear-logs-btn" class="text-xs text-rose-400 hover:underline">Clear History</button>
           </div>
-          
-          <!-- Cue-Craving-Response Card -->
-          <div class="space-y-2 text-xs">
-            <div class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Habit Loop Recipe</div>
-            <div class="grid grid-cols-4 gap-1 text-center font-bold text-[10px]">
-              <div class="p-1.5 bg-slate-950 rounded border border-slate-800 text-indigo-300">1. Cue</div>
-              <div class="p-1.5 bg-slate-950 rounded border border-slate-800 text-pink-300">2. Craving</div>
-              <div class="p-1.5 bg-slate-950 rounded border border-slate-800 text-amber-300">3. Action</div>
-              <div class="p-1.5 bg-slate-950 rounded border border-slate-800 text-emerald-300">4. Reward</div>
+
+          <div id="logs-feed-container" class="space-y-3 max-h-[350px] overflow-y-auto">
+            <!-- Render logs dynamically -->
+            <div class="text-center text-xs text-slate-500 py-6">
+              No urge instances logged yet. Build your habit list and track when you resist or slip!
             </div>
           </div>
         </div>
 
-        <!-- Global Live Log Activity -->
-        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-md font-bold text-white flex items-center gap-2">
-              <span>📋</span>
-              Quest Log
-            </h3>
-            <span class="px-2 py-0.5 bg-slate-950 border border-slate-800 rounded text-[10px] text-slate-400 uppercase font-semibold">Realtime</span>
-          </div>
-          <div class="space-y-3 max-h-48 overflow-y-auto pr-1" id="activity-log-list">
-            <!-- Dynamic logs inserted here -->
-          </div>
-        </div>
-
-      </div>
+      </section>
     </div>
+
+    <!-- Interactive FAQ/Motivation Corner -->
+    <section class="bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6">
+      <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-4">The Psychology of Urge Surfing</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-400 leading-relaxed">
+        <div class="space-y-2">
+          <h4 class="font-semibold text-slate-200 flex items-center gap-1.5">
+            <span class="text-rose-500">1.</span> Don't Suppress, Surf
+          </h4>
+          <p>Suppressing an urge only causes dynamic tension to grow. Urge Surfing teaches you to accept the feeling as a wave that crests, diminishes, and washes ashore without having to yield to it.</p>
+        </div>
+        <div class="space-y-2">
+          <h4 class="font-semibold text-slate-200 flex items-center gap-1.5">
+            <span class="text-amber-500">2.</span> Replace with friction
+          </h4>
+          <p>Every bad habit must have a replacement habit that delivers similar stimulus but works productively. Set up physical friction so your bad habit takes at least 20 seconds to begin.</p>
+        </div>
+        <div class="space-y-2">
+          <h4 class="font-semibold text-slate-200 flex items-center gap-1.5">
+            <span class="text-emerald-500">3.</span> Non-Judgmental Reflection
+          </h4>
+          <p>Slipping up is rich psychological data. It reveals your triggers (Stress, fatigue, routines). Do not self-flagellate; log the trigger, adjust your replacement, and start again.</p>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- Audio / Visual Celebration Toast Notification -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-indigo-600 text-white font-semibold py-3.5 px-5 rounded-2xl shadow-xl flex items-center gap-3 border border-indigo-400">
-    <div class="bg-indigo-700 p-1 rounded-full">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M6.267 3.455a.75.75 0 00-.708.523L4.547 7.25H3a.75.75 0 000 1.5h1.129l1.1 3.3a2.25 2.25 0 002.137 1.538h6.136a2.25 2.25 0 002.137-1.538l1.1-3.3H17a.75.75 0 000-1.5h-1.547l-1.012-3.272a.75.75 0 00-.708-.523H6.267zm2.463 6.045a1 1 0 100-2 1 1 0 000 2zm3.75 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-      </svg>
-    </div>
-    <span id="toast-message">Habit checked! +10 XP earned</span>
-  </div>
+  <footer class="border-t border-slate-800 bg-slate-950 py-8 mt-12 text-center text-xs text-slate-500">
+    <p>© <span id="current-year"></span> Vanquish Self-Mastery Engine. Engineered for neuroplasticity and cognitive reframing.</p>
+  </footer>
 </div>
   
   <script src="script.js"></script>
