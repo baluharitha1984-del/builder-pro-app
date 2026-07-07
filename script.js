@@ -1,436 +1,454 @@
-// Real client-side logic with deep local storage capability & robust dynamic calculations.
-(function () {
-  // Default Starting Good Habits
-  const DEFAULT_HABITS = [
-    { id: "h1", name: "Hydrate Fully (3 Liters)", category: "Body", streak: 3, completedToday: true, icon: "💧", freq: "Everyday" },
-    { id: "h2", name: "Read 10-15 Pages of Literature", category: "Mind", streak: 5, completedToday: false, icon: "📚", freq: "Everyday" },
-    { id: "h3", name: "30-min Deep Focus & Code Work", category: "Work", streak: 2, completedToday: false, icon: "💻", freq: "Weekdays" },
-    { id: "h4", name: "Meditate / Calm Reflection", category: "Mind", streak: 0, completedToday: false, icon: "🧘", freq: "Everyday" }
+document.addEventListener('DOMContentLoaded', () => {
+  // --- Initial Data / State Management ---
+  let habits = JSON.parse(localStorage.getItem('vanquish_habits')) || [
+    {
+      id: '1',
+      badHabit: 'Bedtime Infinite Scroll',
+      replacement: 'Read 2 pages of a non-fiction book',
+      primaryTrigger: 'Boredom',
+      streakDays: 4
+    },
+    {
+      id: '2',
+      badHabit: 'Reaching for processed sugar mid-work',
+      replacement: 'Drink sparkling water with a lime twist',
+      primaryTrigger: 'Stress',
+      streakDays: 2
+    }
   ];
 
-  const WISE_QUOTES = [
-    { quote: "You do not rise to the level of your goals. You fall to the level of your systems.", author: "James Clear" },
-    { quote: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
-    { quote: "It is easier to prevent bad habits than to break them.", author: "Benjamin Franklin" },
-    { quote: "Small daily improvements over time lead to stunning results.", author: "Robin Sharma" },
-    { quote: "Motivation is what gets you started. Habit is what keeps you going.", author: "Jim Ryun" }
+  let logs = JSON.parse(localStorage.getItem('vanquish_logs')) || [
+    { id: 'l1', habitId: '1', type: 'resisted', trigger: 'Boredom', notes: 'Resisted with urge surfer!', date: new Date(Date.now() - 86400000).toISOString() },
+    { id: 'l2', habitId: '2', type: 'slipped', trigger: 'Stress', notes: 'Very tight deadline pressure.', date: new Date(Date.now() - 172800000).toISOString() }
   ];
 
-  // State definition with local storage safe retrieval
-  let state = {
-    habits: JSON.parse(localStorage.getItem("sprout_habits")) || DEFAULT_HABITS,
-    xp: parseInt(localStorage.getItem("sprout_xp")) || 30,
-    level: parseInt(localStorage.getItem("sprout_lvl")) || 1,
-    totalChecks: parseInt(localStorage.getItem("sprout_total_checks")) || 12,
-    perfectDays: parseInt(localStorage.getItem("sprout_perfect_days")) || 1,
-    activeFilter: "all",
-    tipIndex: 0
-  };
+  // State Variables
+  let breathingInterval = null;
+  let breathingStep = 0; // 0: Idle, 1: Inhale, 2: Hold Full, 3: Exhale, 4: Hold Empty
+  let breathingTimer = null;
+  let breathingTotalSecondsLeft = 60;
 
-  // DOM Elements cache
-  const habitsContainer = document.getElementById("habits-container");
-  const dateString = document.getElementById("date-string");
-  const progressCircle = document.getElementById("progress-circle");
-  const progressPercentage = document.getElementById("progress-percentage");
-  const progressRatio = document.getElementById("progress-ratio");
-  
-  const userLevel = document.getElementById("user-level");
-  const xpText = document.getElementById("xp-text");
-  const xpBar = document.getElementById("xp-bar");
+  // --- DOM Elements ---
+  const habitForm = document.getElementById('habit-form');
+  const badHabitInput = document.getElementById('bad-habit-input');
+  const replacementHabitInput = document.getElementById('replacement-habit-input');
+  const triggerTypeInput = document.getElementById('trigger-type-input');
 
-  const statTotalCompletions = document.getElementById("stat-total-completions");
-  const statPerfectDays = document.getElementById("stat-perfect-days");
-  const challengeProgress = document.getElementById("challenge-progress");
-  const challengeBar = document.getElementById("challenge-bar");
+  const habitsListContainer = document.getElementById('habits-list-container');
+  const habitCountSpan = document.getElementById('habit-count');
 
-  const toastElement = document.getElementById("toast");
-  const toastMessage = document.getElementById("toast-message");
+  const logHabitSelect = document.getElementById('log-habit-select');
+  const logActionType = document.getElementById('log-action-type');
+  const logTriggerSelect = document.getElementById('log-trigger-select');
+  const logNotes = document.getElementById('log-notes');
+  const submitLogBtn = document.getElementById('submit-log-btn');
+  const clearLogsBtn = document.getElementById('clear-logs-btn');
+  const logsFeedContainer = document.getElementById('logs-feed-container');
 
-  const toggleAddBtn = document.getElementById("toggle-add-btn");
-  const addHabitDrawer = document.getElementById("add-habit-drawer");
-  const closeAddDrawer = document.getElementById("close-add-drawer");
-  const habitForm = document.getElementById("habit-form");
+  // Stats DOM
+  const statTotalUrges = document.getElementById('stat-total-urges');
+  const statResisted = document.getElementById('stat-resisted');
+  const statResistRate = document.getElementById('stat-resist-rate');
+  const statTopTrigger = document.getElementById('stat-top-trigger');
+  const streakBadge = document.getElementById('streak-badge');
 
-  const simulateDayBtn = document.getElementById("btn-simulate-day");
-  const resetAppBtn = document.getElementById("btn-reset-app");
-  
-  const wiseQuote = document.getElementById("wise-quote");
-  const wiseAuthor = document.getElementById("wise-author");
-  const nextTipBtn = document.getElementById("btn-next-tip");
-  
-  const activityLogList = document.getElementById("activity-log-list");
+  // Breather DOM
+  const startBreatherBtn = document.getElementById('start-breather-btn');
+  const stopBreatherBtn = document.getElementById('stop-breather-btn');
+  const breatherCircleInner = document.getElementById('breath-circle-inner');
+  const breatherIndicator = document.getElementById('breather-indicator');
+  const breatherCaption = document.getElementById('breather-caption');
+  const breatherInstructions = document.getElementById('breather-instructions');
+  const triggerPanicBtn = document.getElementById('trigger-panic-btn');
+  const urgeSurfingCard = document.getElementById('urge-surfing-card');
 
-  // Initialize Date presentation
-  function renderDate() {
-    const options = { weekday: 'long', month: 'short', day: 'numeric' };
-    const today = new Date();
-    dateString.textContent = today.toLocaleDateString('en-US', options);
+  // Toast DOM
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toast-message');
+  const currentYearSpan = document.getElementById('current-year');
+
+  // Set Footer Year
+  if (currentYearSpan) {
+    currentYearSpan.textContent = new Date().getFullYear();
   }
 
-  // Save helper
+  // --- Helper: Save States ---
   function saveState() {
-    localStorage.setItem("sprout_habits", JSON.stringify(state.habits));
-    localStorage.setItem("sprout_xp", state.xp);
-    localStorage.setItem("sprout_lvl", state.level);
-    localStorage.setItem("sprout_total_checks", state.totalChecks);
-    localStorage.setItem("sprout_perfect_days", state.perfectDays);
+    localStorage.setItem('vanquish_habits', JSON.stringify(habits));
+    localStorage.setItem('vanquish_logs', JSON.stringify(logs));
   }
 
-  // Show premium bottom-right notification
-  function showToast(message, isLevelUp = false) {
+  // --- Helper: Toast Notification ---
+  function showToast(message, isAlert = false) {
     toastMessage.textContent = message;
-    if (isLevelUp) {
-      toastElement.className = "fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 transition-all duration-300 ease-out bg-gradient-to-r from-amber-500 to-indigo-600 text-white font-extrabold py-4 px-6 rounded-2xl shadow-2xl flex items-center gap-3 border border-amber-300 animate-bounce";
+    const iconWrapper = document.getElementById('toast-icon-wrapper');
+    if (isAlert) {
+      iconWrapper.className = 'p-1.5 rounded-lg bg-rose-500/20 text-rose-400';
     } else {
-      toastElement.className = "fixed bottom-6 right-6 z-50 transform translate-y-0 opacity-100 transition-all duration-300 ease-out bg-slate-900 text-indigo-300 font-semibold py-3.5 px-5 rounded-2xl shadow-xl flex items-center gap-3 border border-indigo-500/30";
+      iconWrapper.className = 'p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400';
     }
     
+    toast.classList.remove('hidden', 'translate-y-10');
+    toast.classList.add('flex', 'translate-y-0');
+
     setTimeout(() => {
-      toastElement.className = "fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-indigo-600 text-white font-semibold py-3.5 px-5 rounded-2xl shadow-xl flex items-center gap-3 border border-indigo-400";
-    }, 2800);
-  }
-
-  // Realtime Logger
-  function logActivity(text, badgeClass = "bg-indigo-500/10 text-indigo-400") {
-    const logItem = document.createElement("div");
-    logItem.className = "flex items-start gap-2.5 text-xs text-slate-300 animate-fade-in-down border-b border-slate-900 pb-2";
-    
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    logItem.innerHTML = `
-      <span class="text-[10px] text-slate-500 font-mono mt-0.5">${time}</span>
-      <span class="px-1.5 py-0.5 text-[9px] font-bold rounded ${badgeClass} shrink-0">LOG</span>
-      <span class="leading-relaxed">${text}</span>
-    `;
-    activityLogList.insertBefore(logItem, activityLogList.firstChild);
-  }
-
-  // XP addition helper with Level calculation logic
-  function addXP(amount) {
-    state.xp += amount;
-    logActivity(`Earned +${amount} Seed XP!`, "bg-emerald-500/10 text-emerald-400");
-    
-    let levelUpped = false;
-    while (state.xp >= 100) {
-      state.xp -= 100;
-      state.level += 1;
-      levelUpped = true;
-    }
-    
-    if (levelUpped) {
-      showToast(`✨ LEVEL UP! You reached Sprout Level ${state.level}!`, true);
-      logActivity(`🎉 Levelled up to Level ${state.level}!`, "bg-amber-500/10 text-amber-400");
-      // Simple UI Level effect animation
-      userLevel.classList.add("text-amber-300", "scale-110");
+      toast.classList.add('translate-y-10');
       setTimeout(() => {
-        userLevel.classList.remove("text-amber-300", "scale-110");
-      }, 1000);
-    }
-    
-    updateXPUI();
-    saveState();
+        toast.classList.add('hidden');
+      }, 300);
+    }, 3000);
   }
 
-  function updateXPUI() {
-    userLevel.textContent = `Level ${state.level}`;
-    xpText.textContent = `${state.xp} / 100 XP`;
-    xpBar.style.width = `${state.xp}%`;
+  // --- Render Functions ---
+
+  function renderAll() {
+    renderHabitList();
+    renderLogOptions();
+    renderLogsFeed();
+    calculateStats();
   }
 
-  // Dynamic Habit Render Logic
-  function renderHabits() {
-    habitsContainer.innerHTML = "";
-    
-    const filteredHabits = state.habits.filter(h => {
-      if (state.activeFilter === "all") return true;
-      return h.category.toLowerCase() === state.activeFilter.toLowerCase();
-    });
+  // 1. Habits List Rendering
+  function renderHabitList() {
+    habitsListContainer.innerHTML = '';
+    habitCountSpan.textContent = `${habits.length} tracked`;
 
-    if (filteredHabits.length === 0) {
-      habitsContainer.innerHTML = `
-        <div class="text-center py-12 px-4 bg-slate-900/40 rounded-2xl border border-slate-800/80">
-          <span class="text-4xl block mb-2">🌱</span>
-          <h4 class="text-md font-bold text-slate-300">No habits tracked here yet</h4>
-          <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Create a custom habit or clear filters to start seeding progress.</p>
+    if (habits.length === 0) {
+      habitsListContainer.innerHTML = `
+        <div class="text-center text-xs text-slate-500 py-6 border border-dashed border-slate-800 rounded-xl">
+          No habits tracked yet. Use the form above to add your first bad habit mapping.
         </div>
       `;
       return;
     }
 
-    filteredHabits.forEach(habit => {
-      const card = document.createElement("div");
-      
-      // Setup conditional styling based on completion
-      const completedClass = habit.completedToday 
-        ? "border-emerald-500/30 bg-emerald-950/10 hover:bg-emerald-950/20" 
-        : "border-slate-800/80 bg-slate-900/60 hover:bg-slate-900/90";
-      
-      const titleClass = habit.completedToday 
-        ? "line-through text-slate-500 font-normal" 
-        : "text-slate-100 font-bold";
-
-      const checkBtnClass = habit.completedToday
-        ? "bg-emerald-500 text-slate-950 ring-4 ring-emerald-500/20"
-        : "border-2 border-slate-700 text-transparent hover:border-indigo-400 hover:bg-indigo-500/10";
-
-      card.className = `habit-card-transition p-5 rounded-2.5xl border flex items-center justify-between gap-4 shadow-sm relative overflow-hidden ${completedClass}`;
+    habits.forEach(habit => {
+      const card = document.createElement('div');
+      card.className = 'group relative bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-xl p-4 transition duration-150 space-y-2';
       
       card.innerHTML = `
-        <div class="flex items-center gap-4">
-          <!-- Interactive Checkbox -->
-          <button id="check-${habit.id}" class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${checkBtnClass}" aria-label="Toggle Completion">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 stroke-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-            </svg>
-          </button>
-
-          <!-- Description -->
+        <div class="flex items-start justify-between">
           <div>
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-lg select-none">${habit.icon || "🌱"}</span>
-              <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-widest rounded bg-slate-950 text-slate-400 border border-slate-800/60">${habit.category}</span>
-              <span class="text-[10px] text-slate-500 font-medium">${habit.freq}</span>
-            </div>
-            <h3 class="text-sm sm:text-base ${titleClass} transition-all duration-200">${habit.name}</h3>
+            <span class="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 text-[10px] font-bold uppercase">
+              ${habit.primaryTrigger}
+            </span>
+            <h4 class="text-sm font-semibold text-slate-200 mt-1.5 group-hover:text-rose-400 transition-colors">${habit.badHabit}</h4>
           </div>
-        </div>
-
-        <!-- Streak Pill & Action -->
-        <div class="flex items-center gap-3 shrink-0">
-          <div class="text-right">
-            <div class="flex items-center gap-1 bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded-xl text-xs font-black border border-amber-500/20" title="Current Streak">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-amber-500 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span id="streak-count-${habit.id}">${habit.streak}d</span>
-            </div>
-          </div>
-
-          <button id="del-${habit.id}" class="p-1.5 text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors" title="Delete Habit">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button class="delete-habit-btn text-slate-500 hover:text-rose-400 transition text-xs p-1" data-id="${habit.id}" title="Remove Habit">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
         </div>
+        <div class="bg-slate-900/60 p-2 rounded-lg border border-slate-800/80 mt-1">
+          <p class="text-[10px] uppercase font-bold tracking-widest text-emerald-400">Constructive replacement</p>
+          <p class="text-xs text-slate-300">${habit.replacement}</p>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+          <span>Streak: <b class="text-emerald-400">${habit.streakDays} days</b></span>
+          <button class="increment-streak-btn bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-slate-600 px-2 py-1 rounded text-[10px] font-medium text-slate-300" data-id="${habit.id}">
+            🔥 Increment Day
+          </button>
+        </div>
       `;
 
-      habitsContainer.appendChild(card);
+      habitsListContainer.appendChild(card);
+    });
 
-      // Event Listeners for completion toggles
-      document.getElementById(`check-${habit.id}`).addEventListener("click", (e) => {
-        e.stopPropagation();
-        toggleHabitCompletion(habit.id);
-      });
-
-      // Event Listeners for habit deletions
-      document.getElementById(`del-${habit.id}`).addEventListener("click", (e) => {
-        e.stopPropagation();
-        deleteHabit(habit.id);
+    // Event Listeners for deletion
+    document.querySelectorAll('.delete-habit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const habitId = btn.getAttribute('data-id');
+        habits = habits.filter(h => h.id !== habitId);
+        // Clean up logs associated?
+        saveState();
+        renderAll();
+        showToast('Habit loop removed.', true);
       });
     });
 
-    calculateProgress();
+    // Event Listeners for increments
+    document.querySelectorAll('.increment-streak-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const habitId = btn.getAttribute('data-id');
+        const habit = habits.find(h => h.id === habitId);
+        if (habit) {
+          habit.streakDays = (habit.streakDays || 0) + 1;
+          saveState();
+          renderAll();
+          showToast(`Awesome! Streak updated to ${habit.streakDays} days.`);
+        }
+      });
+    });
   }
 
-  // Calculate statistics
-  function calculateProgress() {
-    const total = state.habits.length;
-    if (total === 0) {
-      progressPercentage.textContent = "0%";
-      progressCircle.setAttribute("stroke-dashoffset", 163.3);
-      progressRatio.textContent = "0/0 Habits";
+  // 2. Refresh Select Dropdowns with current habits
+  function renderLogOptions() {
+    logHabitSelect.innerHTML = '';
+    if (habits.length === 0) {
+      logHabitSelect.innerHTML = `<option value="">-- No habits tracked --</option>`;
+      return;
+    }
+    habits.forEach(habit => {
+      const opt = document.createElement('option');
+      opt.value = habit.id;
+      opt.textContent = habit.badHabit;
+      logHabitSelect.appendChild(opt);
+    });
+  }
+
+  // 3. Render Incident Feed
+  function renderLogsFeed() {
+    logsFeedContainer.innerHTML = '';
+    if (logs.length === 0) {
+      logsFeedContainer.innerHTML = `
+        <div class="text-center text-xs text-slate-500 py-6">
+          No urges tracked yet. Begin with mindful tracking.
+        </div>
+      `;
       return;
     }
 
-    const completedCount = state.habits.filter(h => h.completedToday).length;
-    const percentage = Math.round((completedCount / total) * 100);
+    // Sort by recent first
+    const sortedLogs = [...logs].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // Progress wheel rendering
-    progressPercentage.textContent = `${percentage}%`;
-    progressRatio.textContent = `${completedCount}/${total} Habits`;
-    
-    // SVG circle math: r=26, Circumference = 2 * PI * 26 = 163.3
-    const strokeOffset = 163.3 - (163.3 * percentage) / 100;
-    progressCircle.setAttribute("stroke-dashoffset", strokeOffset);
+    sortedLogs.forEach(log => {
+      const linkedHabit = habits.find(h => h.id === log.habitId);
+      const habitName = linkedHabit ? linkedHabit.badHabit : 'General Trigger';
+      
+      const item = document.createElement('div');
+      item.className = `p-3.5 rounded-xl border ${log.type === 'resisted' ? 'bg-emerald-950/20 border-emerald-950 hover:border-emerald-800' : 'bg-rose-950/20 border-rose-950 hover:border-rose-900'} transition duration-150 space-y-1.5`;
 
-    // Stats updating
-    statTotalCompletions.textContent = state.totalChecks;
-    statPerfectDays.textContent = state.perfectDays;
-    
-    // Update challenge progress target metrics dynamically
-    const challengeLevelGoal = 5;
-    challengeProgress.textContent = `Lvl ${state.level} / Lvl ${challengeLevelGoal}`;
-    const challengePercent = Math.min((state.level / challengeLevelGoal) * 100, 100);
-    challengeBar.style.width = `${challengePercent}%`;
-  }
+      const dateObj = new Date(log.date);
+      const formattedDate = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' @ ' + dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
-  // Complete Action Toggle
-  function toggleHabitCompletion(id) {
-    const habit = state.habits.find(h => h.id === id);
-    if (!habit) return;
-
-    habit.completedToday = !habit.completedToday;
-
-    if (habit.completedToday) {
-      habit.streak += 1;
-      state.totalChecks += 1;
-      showToast(`Nice! "${habit.name}" done. +15 XP!`);
-      logActivity(`Checked off "${habit.name}"`, "bg-emerald-500/10 text-emerald-400");
-      addXP(15);
-
-      // Visual flash on streak dynamic badge
-      const streakEl = document.getElementById(`streak-count-${habit.id}`);
-      if (streakEl) {
-        streakEl.classList.add("streak-pulse");
-      }
-    } else {
-      habit.streak = Math.max(0, habit.streak - 1);
-      state.totalChecks = Math.max(0, state.totalChecks - 1);
-      logActivity(`Unchecked "${habit.name}"`, "bg-rose-500/10 text-rose-400");
-      addXP(-10); // small deduction to discourage unchecking
-    }
-
-    // Auto perfect day checker trigger
-    const allCompletedNow = state.habits.length > 0 && state.habits.every(h => h.completedToday);
-    if (allCompletedNow && habit.completedToday) {
-      state.perfectDays += 1;
-      showToast(`🔥 Perfect Day Achieved! +50 XP Bonus!`, true);
-      logActivity(`🏆 Perfect Score! All current habits completed.`, "bg-amber-500/10 text-amber-400");
-      addXP(50);
-    }
-
-    saveState();
-    renderHabits();
-  }
-
-  // Delete Single Habit
-  function deleteHabit(id) {
-    const index = state.habits.findIndex(h => h.id === id);
-    if (index !== -1) {
-      const name = state.habits[index].name;
-      state.habits.splice(index, 1);
-      logActivity(`Deleted habit "${name}"`, "bg-slate-700/50 text-slate-400");
-      saveState();
-      renderHabits();
-    }
-  }
-
-  // Category Filter triggers
-  document.getElementById("category-filters").addEventListener("click", (e) => {
-    const btn = e.target.closest(".filter-btn");
-    if (!btn) return;
-
-    // Reset all filter buttons visual styles
-    document.querySelectorAll(".filter-btn").forEach(b => {
-      b.className = "filter-btn px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200";
+      item.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold ${log.type === 'resisted' ? 'text-emerald-400' : 'text-rose-400'} flex items-center gap-1">
+            ${log.type === 'resisted' ? '🛡️ Resisted Urge' : '⚠️ Slipped Habit'}
+          </span>
+          <span class="text-[10px] text-slate-500 font-mono">${formattedDate}</span>
+        </div>
+        <p class="text-xs text-slate-200 font-medium">${habitName}</p>
+        <div class="flex items-center justify-between text-[11px] text-slate-400">
+          <span>Trigger: <b class="text-slate-300">${log.trigger}</b></span>
+          ${log.notes ? `<span class="italic text-slate-400">"${log.notes}"</span>` : ''}
+        </div>
+      `;
+      logsFeedContainer.appendChild(item);
     });
+  }
 
-    btn.className = "filter-btn active-filter px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20";
-    state.activeFilter = btn.dataset.filter;
-    renderHabits();
-  });
+  // 4. Calculate Analytics Cards
+  function calculateStats() {
+    const total = logs.length;
+    statTotalUrges.textContent = total;
 
-  // Open Create Habit Panel
-  toggleAddBtn.addEventListener("click", () => {
-    addHabitDrawer.classList.toggle("hidden");
-  });
+    const resistedCount = logs.filter(l => l.type === 'resisted').length;
+    statResisted.textContent = resistedCount;
 
-  closeAddDrawer.addEventListener("click", () => {
-    addHabitDrawer.classList.add("hidden");
-  });
+    const rate = total > 0 ? Math.round((resistedCount / total) * 100) : 0;
+    statResistRate.textContent = `${rate}%`;
 
-  // Create New Habit form submission
-  habitForm.addEventListener("submit", (e) => {
+    // Top Trigger
+    const triggersCount = {};
+    logs.forEach(l => {
+      triggersCount[l.trigger] = (triggersCount[l.trigger] || 0) + 1;
+    });
+    let topTrigger = 'None';
+    let maxVal = 0;
+    for (const [key, val] of Object.entries(triggersCount)) {
+      if (val > maxVal) {
+        maxVal = val;
+        topTrigger = key;
+      }
+    }
+    statTopTrigger.textContent = topTrigger !== 'None' ? `${topTrigger} (${maxVal}x)` : 'None';
+
+    // Overall Streak calculation (approximate by looking at maximum streak in habits or general days)
+    const maxHabitStreak = habits.reduce((max, h) => h.streakDays > max ? h.streakDays : max, 0);
+    streakBadge.textContent = `🔥 ${maxHabitStreak} Day Streak`;
+  }
+
+  // --- Core Actions ---
+
+  // Habit Form Submission
+  habitForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const name = document.getElementById("habit-title").value.trim();
-    const category = document.getElementById("habit-cat").value;
-    const icon = document.getElementById("habit-icon").value;
-    const freq = document.getElementById("habit-freq").value;
+    const badHabit = badHabitInput.value.trim();
+    const replacement = replacementHabitInput.value.trim();
+    const primaryTrigger = triggerTypeInput.value;
 
-    if (!name) return;
+    if (!badHabit || !replacement) return;
 
     const newHabit = {
-      id: "h_custom_" + Date.now(),
-      name,
-      category,
-      streak: 0,
-      completedToday: false,
-      icon,
-      freq
+      id: Date.now().toString(),
+      badHabit,
+      replacement,
+      primaryTrigger,
+      streakDays: 0
     };
 
-    state.habits.push(newHabit);
-    addXP(25); // Create reward XP
-    showToast(`Successfully created "${name}"! +25 Seed XP.`);
-    logActivity(`Created habit "${name}" in category: ${category}`, "bg-indigo-500/10 text-indigo-400");
-
-    // Reset form & drawer
-    habitForm.reset();
-    addHabitDrawer.classList.add("hidden");
-
+    habits.push(newHabit);
     saveState();
-    renderHabits();
-  });
+    renderAll();
 
-  // Interactive Tips Engine
-  nextTipBtn.addEventListener("click", () => {
-    state.tipIndex = (state.tipIndex + 1) % WISE_QUOTES.length;
-    wiseQuote.textContent = `"${WISE_QUOTES[state.tipIndex].quote}"`;
-    wiseAuthor.textContent = `— ${WISE_QUOTES[state.tipIndex].author}`;
-  });
-
-  // Sandbox Simulation Tools
-  simulateDayBtn.addEventListener("click", () => {
-    // Simulation logic: reset completions, increment streaks if met or break them otherwise
-    state.habits.forEach(h => {
-      if (!h.completedToday) {
-        // Streak reset to 0 if not completed
-        h.streak = 0;
-      }
-      h.completedToday = false;
-    });
+    // Reset form fields
+    badHabitInput.value = '';
+    replacementHabitInput.value = '';
     
-    showToast("🌅 A new day has dawned! Untracked habit streaks reset.");
-    logActivity("☀️ Simulated new day. Completed statuses cleared, streaks compiled.", "bg-violet-500/10 text-violet-400");
-    saveState();
-    renderHabits();
+    showToast('New dynamic replacement mapped!');
   });
 
-  resetAppBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to reset all habits back to their default tracking values?")) {
-      state.habits = [
-        { id: "h1", name: "Hydrate Fully (3 Liters)", category: "Body", streak: 3, completedToday: true, icon: "💧", freq: "Everyday" },
-        { id: "h2", name: "Read 10-15 Pages of Literature", category: "Mind", streak: 5, completedToday: false, icon: "📚", freq: "Everyday" },
-        { id: "h3", name: "30-min Deep Focus & Code Work", category: "Work", streak: 2, completedToday: false, icon: "💻", freq: "Weekdays" },
-        { id: "h4", name: "Meditate / Calm Reflection", category: "Mind", streak: 0, completedToday: false, icon: "🧘", freq: "Everyday" }
-      ];
-      state.xp = 30;
-      state.level = 1;
-      state.totalChecks = 12;
-      state.perfectDays = 1;
-      state.activeFilter = "all";
+  // Submit Manual Urge Log
+  submitLogBtn.addEventListener('click', () => {
+    const habitId = logHabitSelect.value;
+    const type = logActionType.value;
+    const trigger = logTriggerSelect.value;
+    const notes = logNotes.value.trim();
 
-      // Reset active filter buttons UI
-      document.querySelectorAll(".filter-btn").forEach(b => {
-        if (b.dataset.filter === "all") {
-          b.className = "filter-btn active-filter px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/20";
-        } else {
-          b.className = "filter-btn px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all bg-slate-800/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200";
-        }
-      });
+    if (!habitId) {
+      showToast('Please register at least one habit first!', true);
+      return;
+    }
 
-      showToast("🔄 App reset successfully.");
-      logActivity("🔄 Reset app tracking statistics and loaded core defaults.", "bg-rose-500/10 text-rose-400");
-      
-      updateXPUI();
+    const newLog = {
+      id: Date.now().toString(),
+      habitId,
+      type,
+      trigger,
+      notes,
+      date: new Date().toISOString()
+    };
+
+    logs.push(newLog);
+
+    // Dynamic impact on habit streak if it was a slip
+    if (type === 'slipped') {
+      const matchedHabit = habits.find(h => h.id === habitId);
+      if (matchedHabit) {
+        matchedHabit.streakDays = 0;
+        showToast(`Habit streak reset. It's okay, analyze your trigger!`, true);
+      }
+    } else {
+      // Succeeded in resisting, increment streak option dynamically
+      const matchedHabit = habits.find(h => h.id === habitId);
+      if (matchedHabit) {
+        matchedHabit.streakDays = (matchedHabit.streakDays || 0) + 1;
+        showToast(`Outstanding! Urge resisted. Streak grows to ${matchedHabit.streakDays}!`);
+      }
+    }
+
+    saveState();
+    renderAll();
+
+    // Clear inputs
+    logNotes.value = '';
+  });
+
+  // Clear All Log History
+  clearLogsBtn.addEventListener('click', () => {
+    if (confirm('Are you sure you want to reset your urge log history? This action is permanent.')) {
+      logs = [];
       saveState();
-      renderHabits();
+      renderAll();
+      showToast('All logged history cleared successfully.', true);
     }
   });
 
-  // Run startup procedures
-  renderDate();
-  updateXPUI();
-  renderHabits();
-  logActivity("⚡ Welcome to HabitSprout. Happy habit cultivation!", "bg-emerald-500/10 text-emerald-400");
-})();
+  // --- The Interactive "Urge Surfing" Box Breather ---
+  
+  function updateBreathingCycle() {
+    if (breathingTotalSecondsLeft <= 0) {
+      stopBreather();
+      showToast('Wonderful work! Wave survived. Urge level should have dramatically receded.');
+      return;
+    }
+
+    // Box breathing is 4 phases: Inhale 4s, Hold 4s, Exhale 4s, Hold empty 4s
+    const cycleOffset = (60 - breathingTotalSecondsLeft) % 16;
+    let currentPhase = '';
+    let directive = '';
+    let colorClass = '';
+
+    if (cycleOffset < 4) {
+      currentPhase = 'Inhale';
+      directive = 'Breathe in slowly. Fill your lungs with light...';
+      colorClass = 'breath-inhale';
+    } else if (cycleOffset < 8) {
+      currentPhase = 'Hold Full';
+      directive = 'Hold your breath. Observe the raw energetic sensation without fear.';
+      colorClass = 'breath-hold';
+    } else if (cycleOffset < 12) {
+      currentPhase = 'Exhale';
+      directive = 'Exhale completely. Let the urge dissolve with the air.';
+      colorClass = 'breath-exhale';
+    } else {
+      currentPhase = 'Hold Empty';
+      directive = 'Rest in peace. Realize you are stronger than temporary neural waves.';
+      colorClass = 'breath-hold-empty';
+    }
+
+    // Visual adjustments
+    breatherCircleInner.className = `w-24 h-24 rounded-full opacity-90 transition-all duration-1000 ease-in-out flex items-center justify-center ${colorClass}`;
+    breatherIndicator.textContent = currentPhase;
+    breatherCaption.textContent = `Surfing... (${breathingTotalSecondsLeft}s left)`;
+    breatherInstructions.textContent = directive;
+
+    breathingTotalSecondsLeft--;
+  }
+
+  function startBreather() {
+    stopBreather(); // Safe clean
+    breathingTotalSecondsLeft = 60;
+    startBreatherBtn.classList.add('hidden');
+    stopBreatherBtn.classList.remove('hidden');
+    
+    // Visual glowing container
+    urgeSurfingCard.classList.remove('border-rose-500/20');
+    urgeSurfingCard.classList.add('border-emerald-500/50', 'ring-2', 'ring-emerald-500/20');
+
+    // Execute first run immediately, then interval
+    updateBreathingCycle();
+    breathingInterval = setInterval(updateBreathingCycle, 1000);
+  }
+
+  function stopBreather() {
+    if (breathingInterval) {
+      clearInterval(breathingInterval);
+      breathingInterval = null;
+    }
+    startBreatherBtn.classList.remove('hidden');
+    stopBreatherBtn.classList.add('hidden');
+    
+    // Reset visuals
+    breatherCircleInner.className = 'w-24 h-24 bg-gradient-to-tr from-rose-500 to-amber-500 rounded-full opacity-60 transition-all duration-[4000ms] ease-in-out flex items-center justify-center';
+    breatherIndicator.textContent = 'READY';
+    breatherCaption.textContent = 'Click Start to Surf the urge!';
+    breatherInstructions.textContent = 'Deep breathing resets your autonomic nervous system, helping you gain space between stimulus and response.';
+    
+    urgeSurfingCard.classList.remove('border-emerald-500/50', 'ring-2', 'ring-emerald-500/20');
+    urgeSurfingCard.classList.add('border-rose-500/20');
+  }
+
+  // Event Listeners for Breather Controls
+  startBreatherBtn.addEventListener('click', startBreather);
+  stopBreatherBtn.addEventListener('click', stopBreather);
+  
+  // Panic Button - Scrolls to and highlights the Urge Surfer Station instantly
+  triggerPanicBtn.addEventListener('click', () => {
+    urgeSurfingCard.scrollIntoView({ behavior: 'smooth' });
+    // Give a transient glow attention effect
+    urgeSurfingCard.classList.add('ring-4', 'ring-rose-500/40');
+    setTimeout(() => {
+      urgeSurfingCard.classList.remove('ring-4', 'ring-rose-500/40');
+    }, 1500);
+    
+    // Auto-launch the breather to capture the attention
+    startBreather();
+    showToast('🚨 Breathing tool activated! Focus on the circle.');
+  });
+
+  // Initialize on Load
+  renderAll();
+});
