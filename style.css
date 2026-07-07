@@ -1,50 +1,41 @@
-/* Customized visual animations and line transitions for diagram words */
-#sentence-words-wrapper {
-  perspective: 1000px;
+/* Elegant custom scrollbar for active feed */
+#activity-log-list::-webkit-scrollbar {
+  width: 5px;
+}
+#activity-log-list::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+#activity-log-list::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 9999px;
 }
 
-.word-token {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
+/* High-quality UI transitions */
+.habit-card-transition {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.word-token:hover {
-  transform: translateY(-2px);
-  background-color: rgba(71, 85, 105, 0.4);
+.active-filter {
+  background-image: linear-gradient(to right, rgb(79, 70, 229), rgb(124, 58, 237)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3) !important;
 }
 
-.word-token.selected-source {
-  border-color: #6366f1 !important;
-  background-color: rgba(99, 102, 241, 0.15) !important;
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.3);
+/* Sparkle or level up flash animations */
+@keyframes levelUpFlash {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+  50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(99, 102, 241, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
 }
 
-.word-token.selected-target {
-  border-color: #10b981 !important;
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+.level-up-animate {
+  animation: levelUpFlash 0.8s ease-out-in;
 }
 
-/* Subtle dotted background grid effect for visual mapping workspace */
-#diagram-workspace-container {
-  background-image: radial-gradient(#334155 1px, transparent 1px);
-  background-size: 20px 20px;
+@keyframes pulseStreak {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); color: #fbbf24; }
 }
-
-/* SVG line design styles */
-.arrow-line {
-  stroke-dasharray: 8 4;
-  animation: flowLine 30s linear infinite;
-}
-
-@keyframes flowLine {
-  to {
-    stroke-dashoffset: -1000;
-  }
-}
-
-.role-dot-btn.active-picker {
-  border-color: #a855f7 !important;
-  background-color: rgba(168, 85, 247, 0.15) !important;
-  box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
+.streak-pulse {
+  animation: pulseStreak 0.6s ease-in-out 1;
 }
