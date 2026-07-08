@@ -1,68 +1,42 @@
-/* Specialized custom styles for comparison slider & paper overlay textures */
-
+/* Style for split compare slider wrapper */
 #preview-container {
-  touch-action: none;
+  position: relative;
 }
 
-#slider-handle {
-  transition: left 0.05s ease-out;
-}
-
-/* Parchment custom generated paper pattern background */
-.paper-parchment {
-  background-color: #f1ebd9;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0) 100%),
-    repeating-linear-gradient(45deg, rgba(139, 90, 43, 0.03) 0px, rgba(139, 90, 43, 0.03) 2px,transparent 2px, transparent 10px),
-    repeating-linear-gradient(-45deg, rgba(139, 90, 43, 0.03) 0px, rgba(139, 90, 43, 0.03) 2px,transparent 2px, transparent 10px);
-}
-
-/* Fine grain paper noise texture */
-.paper-noise {
-  background-color: #fafaf9;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0) 40%),
-    radial-gradient(circle at 90% 80%, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0) 40%);
-}
-.paper-noise::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.12;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-/* Canvas weave pattern */
-.paper-canvas {
-  background-color: #f5f4f0;
-  background-image: 
-    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(0,0,0,0.04) 1px, transparent 1px);
-  background-size: 4px 4px;
-}
-
-/* Styling standard range sliders cleanly */
-input[type="range"]::-webkit-slider-thumb {
+#range-split {
   -webkit-appearance: none;
   appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #6366f1;
-  cursor: pointer;
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
-  transition: transform 0.15s, background-color 0.15s;
+  background: transparent;
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  background: #4f46e5;
+/* Ensure mouse interaction for split screen feels natural */
+#range-split::-webkit-slider-runnable-track {
+  background: transparent;
 }
 
-/* Transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
+#range-split::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 4px;
+  height: 500px; /* high enough to cover preview block */
+  background: transparent;
+  cursor: ew-resize;
+}
+
+#range-split:focus {
+  outline: none;
+}
+
+/* Custom scrollbar for beautiful console logs */
+#activity-logs::-webkit-scrollbar {
+  width: 6px;
+}
+#activity-logs::-webkit-scrollbar-track {
+  background: #020617;
+}
+#activity-logs::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+#activity-logs::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
