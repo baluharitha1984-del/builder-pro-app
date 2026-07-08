@@ -1,584 +1,781 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // State variables
-  let sourceImage = null;
-  let sketchResultCanvas = null;
-  let currentFormat = 'png'; // or 'jpeg'
-  let sliderPercentage = 50;
-  let isDraggingSlider = false;
-  let showFullSketch = false;
-
-  // Elements
-  const dropZone = document.getElementById('drop-zone');
-  const fileInput = document.getElementById('file-input');
-  const sampleBtns = document.querySelectorAll('.sample-btn');
-  const presetBtns = document.querySelectorAll('.preset-btn');
+  // --- Elements ---
+  const fileUpload = document.getElementById('file-upload');
+  const btnSamplePortrait = document.getElementById('btn-sample-portrait');
+  const btnSampleLandscape = document.getElementById('btn-sample-landscape');
+  const btnSampleStill = document.getElementById('btn-sample-still');
   
-  // Adjustable Control Elements
-  const rangeStroke = document.getElementById('range-stroke');
-  const rangeContrast = document.getElementById('range-contrast');
-  const rangeBrightness = document.getElementById('range-brightness');
-  const rangeColorMix = document.getElementById('range-color-mix');
-  const valStroke = document.getElementById('val-stroke');
+  const canvasOriginal = document.getElementById('canvas-original');
+  const canvasSketch = document.getElementById('canvas-sketch');
+  const sketchLayerWrapper = document.getElementById('sketch-layer-wrapper');
+  const rangeSplit = document.getElementById('range-split');
+  const splitDivider = document.getElementById('split-divider');
+  
+  // Sliders
+  const sliderBlur = document.getElementById('slider-blur');
+  const sliderIntensity = document.getElementById('slider-intensity');
+  const sliderContrast = document.getElementById('slider-contrast');
+  const sliderBrightness = document.getElementById('slider-brightness');
+  
+  const valBlur = document.getElementById('val-blur');
+  const valIntensity = document.getElementById('val-intensity');
   const valContrast = document.getElementById('val-contrast');
   const valBrightness = document.getElementById('val-brightness');
-  const valColorMix = document.getElementById('val-color-mix');
-
-  const selectTint = document.getElementById('select-tint');
-  const selectTexture = document.getElementById('select-texture');
-
-  // Preview Elements
-  const workspaceEmptyState = document.getElementById('workspace-empty-state');
-  const btnLoadQuick = document.getElementById('btn-load-quick');
-  const originalPreviewImg = document.getElementById('original-preview-img');
-  const originalContainer = document.getElementById('original-container');
-  const previewContainer = document.getElementById('preview-container');
-  const sliderHandle = document.getElementById('slider-handle');
-  const statusBadge = document.getElementById('status-badge');
-  const spinnerIcon = document.getElementById('spinner-icon');
-
-  // Canvases
-  const sourceCanvas = document.getElementById('source-canvas');
-  const outputCanvas = document.getElementById('output-canvas');
-  const ctxOutput = outputCanvas.getContext('2d');
-
-  // Action Buttons
-  const btnReset = document.getElementById('btn-reset');
-  const btnCompareToggle = document.getElementById('btn-compare-toggle');
+  
+  // Style buttons
+  const presetClassic = document.getElementById('preset-classic');
+  const presetCharcoal = document.getElementById('preset-charcoal');
+  const presetColor = document.getElementById('preset-color');
+  const presetSepia = document.getElementById('preset-sepia');
+  
+  // Actions
+  const btnResetSliders = document.getElementById('btn-reset-sliders');
   const btnDownload = document.getElementById('btn-download');
-  const btnFormatPng = document.getElementById('btn-format-png');
-  const btnFormatJpg = document.getElementById('btn-format-jpg');
+  const btnClearLogs = document.getElementById('btn-clear-logs');
+  const viewModeSplit = document.getElementById('view-mode-split');
+  const viewModeFull = document.getElementById('view-mode-full');
+  
+  // Extra Indicators
+  const statusText = document.getElementById('status-text');
+  const resIndicator = document.getElementById('res-indicator');
+  const activityLogs = document.getElementById('activity-logs');
+  const processingSpinner = document.getElementById('processing-spinner');
+  
+  // State Variables
+  let originalImg = new Image();
+  let isLoaded = false;
+  let sketchMode = 'classic'; // 'classic' | 'charcoal' | 'color' | 'sepia'
+  let currentViewMode = 'split'; // 'split' | 'full'
+  
+  // --- Sample Canvas Creators (100% CORS Proof Synthetic Images) ---
+  function createSamplePortraits() {
+    // Create pre-rendered beautiful canvas portraits/landscapes for instant quick try
+    const setupSample = (id, type) => {
+      const c = document.getElementById(id);
+      if (!c) return;
+      c.width = 160;
+      c.height = 100;
+      const ctx = c.getContext('2d');
+      
+      if (type === 'portrait') {
+        // Draw beautiful abstract portrait shape
+        ctx.fillStyle = '#1e1e38';
+        ctx.fillRect(0,0,160,100);
+        // Background glow
+        const gradient = ctx.createRadialGradient(80, 50, 10, 80, 50, 60);
+        gradient.addColorStop(0, '#4f46e5');
+        gradient.addColorStop(1, '#1e1e38');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0,0,160,100);
+        // Face
+        ctx.fillStyle = '#ffedd5';
+        ctx.beginPath();
+        ctx.arc(80, 42, 22, 0, Math.PI * 2);
+        ctx.fill();
+        // Neck
+        ctx.fillStyle = '#fdba74';
+        ctx.fillRect(75, 58, 10, 15);
+        // Hair / Cap
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(80, 36, 24, Math.PI, 0);
+        ctx.fill();
+        // Clothes
+        ctx.fillStyle = '#e11d48';
+        ctx.beginPath();
+        ctx.moveTo(40, 100);
+        ctx.quadraticCurveTo(80, 65, 120, 100);
+        ctx.fill();
+      } else if (type === 'landscape') {
+        // Draw mountain range sunset
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0,0,160,100);
+        // Sun glow
+        const gradient = ctx.createRadialGradient(110, 50, 5, 110, 50, 50);
+        gradient.addColorStop(0, '#fbbf24');
+        gradient.addColorStop(0.5, '#f97316');
+        gradient.addColorStop(1, '#0f172a');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0,0,160,100);
+        // Mountain 1
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.moveTo(-10, 100);
+        ctx.lineTo(50, 40);
+        ctx.lineTo(110, 100);
+        ctx.fill();
+        // Mountain 2
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.moveTo(40, 100);
+        ctx.lineTo(110, 30);
+        ctx.lineTo(180, 100);
+        ctx.fill();
+      } else if (type === 'still') {
+        // Geometric still-life shapes
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(0,0,160,100);
+        // Floor table
+        ctx.fillStyle = '#1f2937';
+        ctx.fillRect(0, 70, 160, 30);
+        // Sphere
+        const rad = ctx.createRadialGradient(55, 45, 2, 60, 50, 18);
+        rad.addColorStop(0, '#f87171');
+        rad.addColorStop(1, '#7f1d1d');
+        ctx.fillStyle = rad;
+        ctx.beginPath();
+        ctx.arc(60, 50, 18, 0, Math.PI * 2);
+        ctx.fill();
+        // Pyramid
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath();
+        ctx.moveTo(90, 70);
+        ctx.lineTo(110, 35);
+        ctx.lineTo(130, 70);
+        ctx.fill();
+      }
+    };
+    setupSample('canvas-sample-portrait', 'portrait');
+    setupSample('canvas-sample-landscape', 'landscape');
+    setupSample('canvas-sample-still', 'still');
+  }
 
-  // 1. Initial configuration setup
-  const defaultSettings = {
-    stroke: 5,
-    contrast: 1.5,
-    brightness: 0,
-    colorMix: 0,
-    tint: 'none',
-    texture: 'none'
-  };
-
-  // Initialize controls
-  function resetToDefaults() {
-    rangeStroke.value = defaultSettings.stroke;
-    rangeContrast.value = defaultSettings.contrast;
-    rangeBrightness.value = defaultSettings.brightness;
-    rangeColorMix.value = defaultSettings.colorMix;
-    selectTint.value = defaultSettings.tint;
-    selectTexture.value = defaultSettings.texture;
+  // Generates custom High-res canvas versions of presets when selected
+  function generateSampleImageToWork(type) {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 720;
+    tempCanvas.height = 540;
+    const ctx = tempCanvas.getContext('2d');
     
-    updateSliderValueLabels();
+    if (type === 'portrait') {
+      // Full scale rendering of stylized modern art vector
+      ctx.fillStyle = '#1e1e38';
+      ctx.fillRect(0,0,720,540);
+      let grad = ctx.createRadialGradient(360, 270, 50, 360, 270, 400);
+      grad.addColorStop(0, '#4f46e5');
+      grad.addColorStop(0.5, '#3b82f6');
+      grad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0,0,720,540);
+      
+      // Face shade shadow shadow
+      ctx.fillStyle = '#111827';
+      ctx.beginPath();
+      ctx.arc(365, 245, 120, 0, Math.PI * 2);
+      ctx.fill();
+      // Main face
+      ctx.fillStyle = '#ffe4e6';
+      ctx.beginPath();
+      ctx.arc(360, 240, 120, 0, Math.PI * 2);
+      ctx.fill();
+      // Cheeks rosy
+      ctx.fillStyle = '#fecdd3';
+      ctx.beginPath();
+      ctx.arc(290, 260, 20, 0, Math.PI * 2);
+      ctx.arc(430, 260, 20, 0, Math.PI * 2);
+      ctx.fill();
+      // Eyes
+      ctx.fillStyle = '#1e293b';
+      ctx.beginPath();
+      ctx.arc(310, 220, 12, 0, Math.PI * 2);
+      ctx.arc(410, 220, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(313, 217, 4, 0, Math.PI * 2);
+      ctx.arc(413, 217, 4, 0, Math.PI * 2);
+      ctx.fill();
+      // Mouth
+      ctx.strokeStyle = '#e11d48';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.arc(360, 280, 25, 0, Math.PI);
+      ctx.stroke();
+      // Hair Cap
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.arc(360, 190, 130, Math.PI, 0);
+      ctx.fill();
+      // Neck
+      ctx.fillStyle = '#fda4af';
+      ctx.fillRect(330, 320, 60, 70);
+      // Red sweater
+      ctx.fillStyle = '#e11d48';
+      ctx.beginPath();
+      ctx.moveTo(180, 540);
+      ctx.quadraticCurveTo(360, 360, 540, 540);
+      ctx.fill();
+    } else if (type === 'landscape') {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0,0,720,540);
+      // Sky sunset gradient
+      let sky = ctx.createLinearGradient(0, 0, 0, 300);
+      sky.addColorStop(0, '#f43f5e');
+      sky.addColorStop(0.4, '#f97316');
+      sky.addColorStop(0.8, '#eab308');
+      sky.addColorStop(1, '#0f172a');
+      ctx.fillStyle = sky;
+      ctx.fillRect(0,0,720,350);
+      
+      // Radiant glowing sun
+      let sun = ctx.createRadialGradient(360, 280, 10, 360, 280, 120);
+      sun.addColorStop(0, '#ffffff');
+      sun.addColorStop(0.3, '#fef08a');
+      sun.addColorStop(0.7, '#f97316');
+      sun.addColorStop(1, 'transparent');
+      ctx.fillStyle = sun;
+      ctx.beginPath();
+      ctx.arc(360, 280, 120, 0, Math.PI*2);
+      ctx.fill();
+      
+      // Mountain Peaks
+      ctx.fillStyle = '#1e1b4b';
+      ctx.beginPath();
+      ctx.moveTo(-50, 350);
+      ctx.lineTo(200, 140);
+      ctx.lineTo(450, 350);
+      ctx.fill();
+      
+      ctx.fillStyle = '#0f172a';
+      ctx.beginPath();
+      ctx.moveTo(250, 350);
+      ctx.lineTo(520, 100);
+      ctx.lineTo(800, 350);
+      ctx.fill();
+      
+      // Lake reflect
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 350, 720, 190);
+      // Draw soft lines in lake
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 3;
+      for (let i = 370; i < 520; i += 25) {
+        ctx.beginPath();
+        ctx.moveTo(280 - (i-350)*1.5, i);
+        ctx.lineTo(440 + (i-350)*1.5, i);
+        ctx.stroke();
+      }
+    } else {
+      // Abstract geometric still
+      ctx.fillStyle = '#111827';
+      ctx.fillRect(0,0,720,540);
+      
+      // Table top
+      ctx.fillStyle = '#1f2937';
+      ctx.beginPath();
+      ctx.moveTo(0, 400);
+      ctx.lineTo(720, 360);
+      ctx.lineTo(720, 540);
+      ctx.lineTo(0, 540);
+      ctx.fill();
+      
+      // Sphere
+      let ball = ctx.createRadialGradient(250, 270, 5, 270, 290, 90);
+      ball.addColorStop(0, '#f87171');
+      ball.addColorStop(0.5, '#ef4444');
+      ball.addColorStop(1, '#450a0a');
+      ctx.fillStyle = ball;
+      ctx.beginPath();
+      ctx.arc(280, 300, 90, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Tall Cube shape
+      ctx.fillStyle = '#059669';
+      ctx.beginPath();
+      ctx.moveTo(430, 360);
+      ctx.lineTo(510, 320);
+      ctx.lineTo(510, 160);
+      ctx.lineTo(430, 200);
+      ctx.fill();
+      
+      ctx.fillStyle = '#34d399';
+      ctx.beginPath();
+      ctx.moveTo(510, 320);
+      ctx.lineTo(590, 350);
+      ctx.lineTo(590, 190);
+      ctx.lineTo(510, 160);
+      ctx.fill();
+      
+      ctx.fillStyle = '#064e3b';
+      ctx.beginPath();
+      ctx.moveTo(430, 200);
+      ctx.lineTo(510, 160);
+      ctx.lineTo(590, 190);
+      ctx.lineTo(510, 230);
+      ctx.fill();
+    }
+    
+    // Load this into image state dynamically
+    originalImg.onload = () => {
+      setupCanvases();
+    };
+    originalImg.src = tempCanvas.toDataURL();
+  }
+
+  // --- Console Log Helper ---
+  function addLog(msg, type = 'info') {
+    const div = document.createElement('div');
+    const time = new Date().toLocaleTimeString();
+    if (type === 'error') {
+      div.className = 'text-rose-400 font-semibold';
+      div.innerText = `[${time}] ❌ ${msg}`;
+    } else if (type === 'success') {
+      div.className = 'text-emerald-400 font-semibold';
+      div.innerText = `[${time}] ✓ ${msg}`;
+    } else if (type === 'preset') {
+      div.className = 'text-amber-400';
+      div.innerText = `[${time}] ⚡ ${msg}`;
+    } else {
+      div.className = 'text-slate-300';
+      div.innerText = `[${time}] ${msg}`;
+    }
+    activityLogs.appendChild(div);
+    activityLogs.scrollTop = activityLogs.scrollHeight;
+  }
+
+  // --- Initialize canvas layouts and sizes ---
+  function setupCanvases() {
+    isLoaded = true;
+    
+    // Adjust canvas layout to match standard size ratios
+    const w = originalImg.width;
+    const h = originalImg.height;
+    
+    canvasOriginal.width = w;
+    canvasOriginal.height = h;
+    canvasSketch.width = w;
+    canvasSketch.height = h;
+    
+    // Draw original on standard base canvas
+    const ctxOrig = canvasOriginal.getContext('2d');
+    ctxOrig.drawImage(originalImg, 0, 0);
+    
+    resIndicator.innerText = `${w} x ${h}px`;
+    addLog(`Image parsed and loaded into studio viewport (${w}x${h}px).`);
+    
+    // Run sketch render loop
     triggerRender();
   }
 
-  function updateSliderValueLabels() {
-    valStroke.textContent = `${rangeStroke.value}px`;
-    valContrast.textContent = parseFloat(rangeContrast.value).toFixed(1);
-    valBrightness.textContent = `${rangeBrightness.value > 0 ? '+' : ''}${rangeBrightness.value}%`;
-    valColorMix.textContent = `${rangeColorMix.value}%`;
+  // --- Core Fast Image Processing Algorithm ---
+  // Performs high performance monochrome convert -> negate -> fast blur -> dodge blend -> adjustment
+  function processPencilSketch() {
+    const w = canvasOriginal.width;
+    const h = canvasOriginal.height;
+    
+    const ctxOrig = canvasOriginal.getContext('2d');
+    const ctxSketch = canvasSketch.getContext('2d');
+    
+    // Read original pixels safely
+    const imgData = ctxOrig.getImageData(0, 0, w, h);
+    const pixels = imgData.data;
+    const len = pixels.length;
+    
+    // Get state options
+    const blurRad = parseInt(sliderBlur.value, 10);
+    const lineIntensity = parseInt(sliderIntensity.value, 10) / 100;
+    const contrast = parseInt(sliderContrast.value, 10);
+    const brightness = parseInt(sliderBrightness.value, 10);
+    
+    // Phase 1: Standardized grayscale mapping
+    const gray = new Uint8ClampedArray(len / 4);
+    for (let i = 0; i < len; i += 4) {
+      // Luminosity formula (human perception weighting)
+      gray[i/4] = 0.299 * pixels[i] + 0.587 * pixels[i+1] + 0.114 * pixels[i+2];
+    }
+    
+    // Phase 2: Invert grayscale values
+    const inverted = new Uint8ClampedArray(gray.length);
+    for (let i = 0; i < gray.length; i++) {
+      inverted[i] = 255 - gray[i];
+    }
+    
+    // Phase 3: Box Blur (Inverted layer blur)
+    const blurred = boxBlur(inverted, w, h, blurRad);
+    
+    // Phase 4: Color Dodge blend formula -> Result = (Gray * 255) / (255 - Blurred)
+    const dodge = new Uint8ClampedArray(gray.length);
+    for (let i = 0; i < gray.length; i++) {
+      let b = blurred[i];
+      let g = gray[i];
+      let val = 255;
+      if (b < 255) {
+        val = (g * 255) / (255 - b);
+      }
+      // Blend with line intensity to harden details
+      if (lineIntensity > 0) {
+        val = val * (1 - lineIntensity) + g * lineIntensity;
+      }
+      dodge[i] = val < 0 ? 0 : (val > 255 ? 255 : val);
+    }
+    
+    // Phase 5: Final output compilation based on Style Choice
+    const outImgData = ctxSketch.createImageData(w, h);
+    const outPixels = outImgData.data;
+    
+    // Contrast Factor mapping formula
+    const factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+    
+    for (let i = 0; i < len; i += 4) {
+      let idx = i / 4;
+      let finalG = dodge[idx];
+      
+      // Contrast and Brightness correction
+      let val = factor * (finalG - 128) + 128 + brightness;
+      val = Math.max(0, Math.min(255, val));
+      
+      if (sketchMode === 'color') {
+        // Colored sketch mode: Blend original pixel colors with the sketch line shading value
+        let r = pixels[i];
+        let g = pixels[i+1];
+        let b = pixels[i+2];
+        
+        // Blending using multiply mode
+        outPixels[i] = (r * val) / 240;
+        outPixels[i+1] = (g * val) / 240;
+        outPixels[i+2] = (b * val) / 240;
+        outPixels[i+3] = 255;
+      } else if (sketchMode === 'sepia') {
+        // Vintage sepia coloring
+        outPixels[i] = Math.min(255, val * 0.95);
+        outPixels[i+1] = Math.min(255, val * 0.85);
+        outPixels[i+2] = Math.min(255, val * 0.68);
+        outPixels[i+3] = 255;
+      } else if (sketchMode === 'charcoal') {
+        // Deep dark charcoal style
+        let charVal = val < 140 ? val * 0.7 : val;
+        outPixels[i] = charVal;
+        outPixels[i+1] = charVal;
+        outPixels[i+2] = charVal;
+        outPixels[i+3] = 255;
+      } else {
+        // Classic slate/pencil gray style
+        outPixels[i] = val;
+        outPixels[i+1] = val;
+        outPixels[i+2] = val;
+        outPixels[i+3] = 255;
+      }
+    }
+    
+    // Put generated pixels back onto Sketch Canvas
+    ctxSketch.putImageData(outImgData, 0, 0);
   }
 
-  // 2. Drag & Drop & Upload triggers
-  dropZone.addEventListener('click', () => fileInput.click());
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('border-indigo-500', 'bg-slate-900');
-  });
-  dropZone.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-indigo-500', 'bg-slate-900');
-  });
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('border-indigo-500', 'bg-slate-900');
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      loadImage(e.dataTransfer.files[0]);
+  // Fast Box Blur implementation for 1D Array
+  function boxBlur(src, w, h, radius) {
+    if (radius < 1) radius = 1;
+    const dst = new Uint8ClampedArray(src.length);
+    const temp = new Uint8ClampedArray(src.length);
+
+    // Pass 1: Horizontal Blur
+    for (let y = 0; y < h; y++) {
+      let rowOffset = y * w;
+      for (let x = 0; x < w; x++) {
+        let sum = 0;
+        let count = 0;
+        for (let k = -radius; k <= radius; k++) {
+          let nx = x + k;
+          if (nx >= 0 && nx < w) {
+            sum += src[rowOffset + nx];
+            count++;
+          }
+        }
+        temp[rowOffset + x] = sum / count;
+      }
     }
-  });
 
-  fileInput.addEventListener('change', (e) => {
-    if (e.target.files && e.target.files[0]) {
-      loadImage(e.target.files[0]);
+    // Pass 2: Vertical Blur
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        let sum = 0;
+        let count = 0;
+        for (let k = -radius; k <= radius; k++) {
+          let ny = y + k;
+          if (ny >= 0 && ny < h) {
+            sum += temp[ny * w + x];
+            count++;
+          }
+        }
+        dst[y * w + x] = sum / count;
+      }
     }
-  });
-
-  btnLoadQuick.addEventListener('click', () => {
-    // Load first sample
-    loadSampleUrl(sampleBtns[0].getAttribute('data-url'));
-  });
-
-  sampleBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      loadSampleUrl(btn.getAttribute('data-url'));
-    });
-  });
-
-  // 3. Load Image Logic
-  function loadSampleUrl(url) {
-    showLoading(true);
-    statusBadge.textContent = 'Fetching Sample...';
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function() {
-      setSourceImage(img);
-    };
-    img.onerror = function() {
-      statusBadge.textContent = 'Failed to load sample image';
-      showLoading(false);
-    };
-    img.src = url;
+    
+    return dst;
   }
 
-  function loadImage(file) {
-    showLoading(true);
-    statusBadge.textContent = 'Reading File...';
+  // Debounced Render with Performance Profiling
+  let renderTimer = null;
+  function triggerRender() {
+    if (!isLoaded) return;
+    
+    // Activate loading overlay visually
+    processingSpinner.classList.remove('opacity-0');
+    statusText.innerText = "Processing...";
+    
+    if (renderTimer) clearTimeout(renderTimer);
+    renderTimer = setTimeout(() => {
+      const startTime = performance.now();
+      try {
+        processPencilSketch();
+        updateSplitMask();
+        const endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(1);
+        
+        statusText.innerText = `Sketch updated in ${duration}ms`;
+        addLog(`Sketch re-drawn. Detail Rad: ${sliderBlur.value}px | Contrast: ${sliderContrast.value} | Speed: ${duration}ms.`, 'success');
+      } catch (err) {
+        addLog(`Failed to draw sketch: ${err.message}`, 'error');
+      }
+      processingSpinner.classList.add('opacity-0');
+    }, 45);
+  }
+
+  // --- Update Split Comparison Mask Width ---
+  function updateSplitMask() {
+    const percentage = rangeSplit.value;
+    
+    if (currentViewMode === 'full') {
+      // Full sketch view
+      sketchLayerWrapper.style.clipPath = 'none';
+      splitDivider.style.display = 'none';
+    } else {
+      // Split view mode
+      sketchLayerWrapper.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
+      splitDivider.style.display = 'flex';
+      splitDivider.style.left = `${percentage}%`;
+    }
+  }
+
+  // --- Event Listeners: Image Upload Handling ---
+  fileUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    addLog(`Reading file upload: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = (event) => {
       const img = new Image();
-      img.onload = function() {
-        setSourceImage(img);
+      img.onload = () => {
+        // Resize large images automatically to keep viewport rendering ultra fast
+        const maxDim = 800;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+          addLog(`Large dimension. Auto-resized preview canvas to optimal ${w}x${h}px.`);
+        }
+        
+        // Draw resized image onto dynamic canvas first
+        const resizeCanvas = document.createElement('canvas');
+        resizeCanvas.width = w;
+        resizeCanvas.height = h;
+        resizeCanvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        
+        originalImg.onload = () => {
+          setupCanvases();
+        };
+        originalImg.src = resizeCanvas.toDataURL();
       };
-      img.src = e.target.result;
+      img.src = event.target.result;
     };
     reader.readAsDataURL(file);
-  }
+  });
 
-  function setSourceImage(img) {
-    sourceImage = img;
-    
-    // Populate Before image preview container
-    originalPreviewImg.src = img.src;
-    workspaceEmptyState.classList.add('hidden');
-    
-    // Resize source canvas
-    // Constrain max dimensions to 900px for speed and real-time processing performance
-    const maxDim = 900;
-    let width = img.naturalWidth || img.width;
-    let height = img.naturalHeight || img.height;
-    
-    if (width > maxDim || height > maxDim) {
-      if (width > height) {
-        height = Math.round((height * maxDim) / width);
-        width = maxDim;
-      } else {
-        width = Math.round((width * maxDim) / height);
-        height = maxDim;
-      }
+  // Drag and drop handler
+  const dropzone = document.querySelector('label[for="file-upload"]');
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-indigo-500', 'bg-slate-900');
+    }, false);
+  });
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropzone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-indigo-500', 'bg-slate-900');
+    }, false);
+  });
+  dropzone.addEventListener('drop', (e) => {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    if (files.length > 0) {
+      fileUpload.files = files;
+      fileUpload.dispatchEvent(new Event('change'));
     }
+  });
 
-    sourceCanvas.width = width;
-    sourceCanvas.height = height;
-    const sCtx = sourceCanvas.getContext('2d');
-    sCtx.drawImage(img, 0, 0, width, height);
+  // --- Slider Event Listeners ---
+  sliderBlur.addEventListener('input', () => {
+    valBlur.innerText = `${sliderBlur.value}px`;
+    triggerRender();
+  });
+  sliderIntensity.addEventListener('input', () => {
+    valIntensity.innerText = `${sliderIntensity.value}%`;
+    triggerRender();
+  });
+  sliderContrast.addEventListener('input', () => {
+    valContrast.innerText = sliderContrast.value;
+    triggerRender();
+  });
+  sliderBrightness.addEventListener('input', () => {
+    valBrightness.innerText = sliderBrightness.value;
+    triggerRender();
+  });
+  
+  // Compare Split View range slider update
+  rangeSplit.addEventListener('input', () => {
+    updateSplitMask();
+  });
 
-    // Configure Output Canvas scale to match
-    outputCanvas.width = width;
-    outputCanvas.height = height;
-    outputCanvas.style.aspectRatio = `${width} / ${height}`;
-
-    showLoading(false);
+  // --- Preset Preset Style buttons ---
+  function clearActivePresets() {
+    const btns = [presetClassic, presetCharcoal, presetColor, presetSepia];
+    btns.forEach(b => {
+      b.classList.remove('bg-indigo-500/10', 'text-indigo-300', 'border-indigo-500/30', 'border-indigo-500/50');
+      b.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+    });
+  }
+  
+  function setActivePreset(btn, modeName) {
+    clearActivePresets();
+    btn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+    btn.classList.add('bg-indigo-500/10', 'text-indigo-300', 'border-indigo-500/50');
+    sketchMode = modeName;
+    addLog(`Changed preset style to: [${modeName.toUpperCase()}]`, 'preset');
     triggerRender();
   }
 
-  // Show/Hide loader indicators
-  function showLoading(isLoading) {
-    if (isLoading) {
-      spinnerIcon.classList.remove('hidden');
-      statusBadge.textContent = 'Processing Sketch...';
-    } else {
-      spinnerIcon.classList.add('hidden');
-      statusBadge.textContent = 'Done';
-    }
-  }
-
-  // 4. Sketch Processing Algorithm
-  let renderTimeout = null;
-  function triggerRender() {
-    if (!sourceImage) return;
-    showLoading(true);
+  presetClassic.addEventListener('click', () => {
+    sliderBlur.value = 4;
+    sliderIntensity.value = 50;
+    sliderContrast.value = 10;
+    sliderBrightness.value = 15;
     
-    // Debounce to keep slider dragging responsive
-    if (renderTimeout) clearTimeout(renderTimeout);
-    renderTimeout = setTimeout(() => {
-      renderSketch();
-    }, 20); 
-  }
-
-  function renderSketch() {
-    if (!sourceImage) return;
+    valBlur.innerText = "4px";
+    valIntensity.innerText = "50%";
+    valContrast.innerText = "10";
+    valBrightness.innerText = "15";
     
-    const width = sourceCanvas.width;
-    const height = sourceCanvas.height;
+    setActivePreset(presetClassic, 'classic');
+  });
+  
+  presetCharcoal.addEventListener('click', () => {
+    sliderBlur.value = 7;
+    sliderIntensity.value = 65;
+    sliderContrast.value = 35;
+    sliderBrightness.value = -10;
     
-    // Get clean input
-    const sCtx = sourceCanvas.getContext('2d');
-    const srcData = sCtx.getImageData(0, 0, width, height);
-    const pixels = srcData.data;
-    const totalPixels = width * height;
+    valBlur.innerText = "7px";
+    valIntensity.innerText = "65%";
+    valContrast.innerText = "35";
+    valBrightness.innerText = "-10";
     
-    // Extract control parameters
-    const strokeWidth = parseInt(rangeStroke.value);
-    const contrastVal = parseFloat(rangeContrast.value);
-    const brightnessVal = parseInt(rangeBrightness.value);
-    const colorMixVal = parseInt(rangeColorMix.value) / 100;
-    const tintMode = selectTint.value;
-    const textureMode = selectTexture.value;
+    setActivePreset(presetCharcoal, 'charcoal');
+  });
 
-    // Buffer variables
-    const gray = new Uint8ClampedArray(totalPixels);
-    const blurred = new Uint8ClampedArray(totalPixels);
+  presetColor.addEventListener('click', () => {
+    sliderBlur.value = 3;
+    sliderIntensity.value = 40;
+    sliderContrast.value = 15;
+    sliderBrightness.value = 25;
+    
+    valBlur.innerText = "3px";
+    valIntensity.innerText = "40%";
+    valContrast.innerText = "15";
+    valBrightness.innerText = "25";
+    
+    setActivePreset(presetColor, 'color');
+  });
 
-    // Step 1: Grayscale Conversion
-    for (let i = 0; i < totalPixels; i++) {
-      const r = pixels[i * 4];
-      const g = pixels[i * 4 + 1];
-      const b = pixels[i * 4 + 2];
-      // Standard human eye response weights
-      gray[i] = 0.299 * r + 0.587 * g + 0.114 * b;
-    }
+  presetSepia.addEventListener('click', () => {
+    sliderBlur.value = 5;
+    sliderIntensity.value = 50;
+    sliderContrast.value = 12;
+    sliderBrightness.value = 10;
+    
+    valBlur.innerText = "5px";
+    valIntensity.innerText = "50%";
+    valContrast.innerText = "12";
+    valBrightness.innerText = "10";
+    
+    setActivePreset(presetSepia, 'sepia');
+  });
 
-    // Step 2: Box Blur on Grayscale for line width estimation
-    // We perform a horizontal pass then a vertical pass to achieve fast multi-pixel blurring
-    boxBlur(gray, blurred, width, height, strokeWidth);
+  // --- View mode toggles ---
+  viewModeSplit.addEventListener('click', () => {
+    currentViewMode = 'split';
+    viewModeSplit.classList.add('bg-indigo-500', 'text-white');
+    viewModeSplit.classList.remove('hover:bg-slate-800', 'text-slate-300');
+    viewModeFull.classList.remove('bg-indigo-500', 'text-white');
+    viewModeFull.classList.add('hover:bg-slate-800', 'text-slate-300');
+    updateSplitMask();
+    addLog('Compare Split View active.');
+  });
 
-    // Step 3: Color Dodge Blend inverted blurred pass over the grayscale pass
-    const sketchGray = new Uint8ClampedArray(totalPixels);
-    for (let i = 0; i < totalPixels; i++) {
-      const base = gray[i];
-      // Invert the blurred pixel
-      const blend = 255 - blurred[i];
-      
-      // Color Dodge Blend Formula: (Base / (255 - Blend)) * 255
-      let dodge = 255;
-      if (blend < 255) {
-        dodge = (base * 255) / (255 - blend);
-        if (dodge > 255) dodge = 255;
-      }
-      
-      // Contrast enhancement: push midtones / shadows deeper
-      let val = dodge;
-      if (contrastVal !== 1.0) {
-        val = ((val / 255 - 0.5) * contrastVal + 0.5) * 255;
-        if (val < 0) val = 0;
-        if (val > 255) val = 255;
-      }
+  viewModeFull.addEventListener('click', () => {
+    currentViewMode = 'full';
+    viewModeFull.classList.add('bg-indigo-500', 'text-white');
+    viewModeFull.classList.remove('hover:bg-slate-800', 'text-slate-300');
+    viewModeSplit.classList.remove('bg-indigo-500', 'text-white');
+    viewModeSplit.classList.add('hover:bg-slate-800', 'text-slate-300');
+    updateSplitMask();
+    addLog('Full Pencil Sketch View active.');
+  });
 
-      // Brightness adjustments
-      if (brightnessVal !== 0) {
-        val += (brightnessVal * 2.55);
-        if (val < 0) val = 0;
-        if (val > 255) val = 255;
-      }
+  // --- Reset All Sliders Button ---
+  btnResetSliders.addEventListener('click', () => {
+    sliderBlur.value = 4;
+    sliderIntensity.value = 50;
+    sliderContrast.value = 10;
+    sliderBrightness.value = 15;
+    
+    valBlur.innerText = "4px";
+    valIntensity.innerText = "50%";
+    valContrast.innerText = "10";
+    valBrightness.innerText = "15";
+    
+    addLog('Sliders restored to default classic values.');
+    triggerRender();
+  });
 
-      sketchGray[i] = val;
-    }
+  // --- Sample Selectors ---
+  btnSamplePortrait.addEventListener('click', () => generateSampleImageToWork('portrait'));
+  btnSampleLandscape.addEventListener('click', () => generateSampleImageToWork('landscape'));
+  btnSampleStill.addEventListener('click', () => generateSampleImageToWork('still'));
 
-    // Step 4: Write result image back, supporting optional color mixing and color tinting
-    const outData = ctxOutput.createImageData(width, height);
-    const outPixels = outData.data;
+  // --- Clear console logs ---
+  btnClearLogs.addEventListener('click', () => {
+    activityLogs.innerHTML = '';
+    addLog('System log cleared.');
+  });
 
-    // Configure custom tints
-    let rTint = 1, gTint = 1, bTint = 1;
-    if (tintMode === 'sepia') {
-      rTint = 1.0; gTint = 0.88; bTint = 0.72;
-    } else if (tintMode === 'blueprint') {
-      rTint = 0.15; gTint = 0.35; bTint = 0.85;
-    } else if (tintMode === 'green') {
-      rTint = 0.35; gTint = 0.65; bTint = 0.45;
-    } else if (tintMode === 'sangine') {
-      rTint = 0.82; gTint = 0.36; bTint = 0.28;
-    }
-
-    for (let i = 0; i < totalPixels; i++) {
-      const skVal = sketchGray[i];
-      
-      // Grayscale Sketch base color with tint multipliers
-      let rSketch = skVal * rTint;
-      let gSketch = skVal * gTint;
-      let bSketch = skVal * bTint;
-
-      // Clamp values
-      if (rSketch > 255) rSketch = 255;
-      if (gSketch > 255) gSketch = 255;
-      if (bSketch > 255) bSketch = 255;
-
-      if (colorMixVal > 0) {
-        // Mix original pixel colors underneath with opacity control
-        const rOrig = pixels[i * 4];
-        const gOrig = pixels[i * 4 + 1];
-        const bOrig = pixels[i * 4 + 2];
-
-        // Formula blends base pencil dark areas with colored highlights
-        // Multiplicative/linear combination looks gorgeous
-        const mixR = (skVal / 255) * rOrig;
-        const mixG = (skVal / 255) * gOrig;
-        const mixB = (skVal / 255) * bOrig;
-
-        outPixels[i * 4] = rSketch * (1 - colorMixVal) + mixR * colorMixVal;
-        outPixels[i * 4 + 1] = gSketch * (1 - colorMixVal) + mixG * colorMixVal;
-        outPixels[i * 4 + 2] = bSketch * (1 - colorMixVal) + mixB * colorMixVal;
-      } else {
-        outPixels[i * 4] = rSketch;
-        outPixels[i * 4 + 1] = gSketch;
-        outPixels[i * 4 + 2] = bSketch;
-      }
-      outPixels[i * 4 + 3] = 255; // Alpha channel
-    }
-
-    ctxOutput.putImageData(outData, 0, 0);
-
-    // Step 5: Texture Overlay Rendering onto Output Canvas if active
-    if (textureMode !== 'none') {
-      ctxOutput.save();
-      if (textureMode === 'parchment') {
-        ctxOutput.globalCompositeOperation = 'multiply';
-        ctxOutput.fillStyle = 'rgba(235, 218, 185, 0.45)';
-        ctxOutput.fillRect(0, 0, width, height);
-      } else if (textureMode === 'noise') {
-        // Procedural noise drawing
-        ctxOutput.globalCompositeOperation = 'multiply';
-        for (let j = 0; j < 4000; j++) {
-          const rx = Math.random() * width;
-          const ry = Math.random() * height;
-          ctxOutput.fillStyle = `rgba(0, 0, 0, ${0.03 + Math.random() * 0.05})`;
-          ctxOutput.fillRect(rx, ry, 1, 1);
-        }
-      } else if (textureMode === 'canvas') {
-        // Draw soft woven structure
-        ctxOutput.globalCompositeOperation = 'overlay';
-        ctxOutput.strokeStyle = 'rgba(0, 0, 0, 0.06)';
-        ctxOutput.lineWidth = 0.5;
-        for (let x = 0; x < width; x += 5) {
-          ctxOutput.beginPath();
-          ctxOutput.moveTo(x, 0);
-          ctxOutput.lineTo(x, height);
-          ctxOutput.stroke();
-        }
-        for (let y = 0; y < height; y += 5) {
-          ctxOutput.beginPath();
-          ctxOutput.moveTo(0, y);
-          ctxOutput.lineTo(width, y);
-          ctxOutput.stroke();
-        }
-      }
-      ctxOutput.restore();
-    }
-
-    showLoading(false);
-  }
-
-  // Fast Box Blur implementation
-  function boxBlur(src, dest, w, h, radius) {
-    if (radius < 1) radius = 1;
-    // Simple horizontal blur & vertical blur cascade
-    boxBlurH(src, dest, w, h, radius);
-    boxBlurV(dest, src, w, h, radius);
-    // Re-transfer back to dest safely
-    for (let i = 0; i < w * h; i++) {
-      dest[i] = src[i];
-    }
-  }
-
-  function boxBlurH(s, d, w, h, r) {
-    const arr = 1 / (r + r + 1);
-    for (let i = 0; i < h; i++) {
-      let ti = i * w;
-      let li = ti;
-      let ri = ti + r;
-      let fv = s[ti];
-      let lv = s[ti + w - 1];
-      let val = (r + 1) * fv;
-      
-      for (let j = 0; j < r; j++) val += s[ti + j];
-      for (let j = 0; j <= r; j++) {
-        val += s[ri++] - fv;
-        d[ti++] = val * arr;
-      }
-      for (let j = r + 1; j < w - r; j++) {
-        val += s[ri++] - s[li++];
-        d[ti++] = val * arr;
-      }
-      for (let j = w - r; j < w; j++) {
-        val += lv - s[li++];
-        d[ti++] = val * arr;
-      }
-    }
-  }
-
-  function boxBlurV(s, d, w, h, r) {
-    const arr = 1 / (r + r + 1);
-    for (let i = 0; i < w; i++) {
-      let ti = i;
-      let li = ti;
-      let ri = ti + r * w;
-      let fv = s[ti];
-      let lv = s[ti + (h - 1) * w];
-      let val = (r + 1) * fv;
-      
-      for (let j = 0; j < r; j++) val += s[ti + j * w];
-      for (let j = 0; j <= r; j++) {
-        val += s[ri] - fv;
-        d[ti] = val * arr;
-        ri += w;
-        ti += w;
-      }
-      for (let j = r + 1; j < h - r; j++) {
-        val += s[ri] - s[li];
-        d[ti] = val * arr;
-        li += w;
-        ri += w;
-        ti += w;
-      }
-      for (let j = h - r; j < h; j++) {
-        val += lv - s[li];
-        d[ti] = val * arr;
-        li += w;
-        ti += w;
-      }
-    }
-  }
-
-  // 5. Comparison Split-Screen Control Logic
-  function updateSplitView() {
-    if (showFullSketch) {
-      originalContainer.style.clipPath = 'polygon(0 0, 0 0, 0 100%, 0 100%)';
-      sliderHandle.style.left = '0%';
+  // --- Download Final Rendered Sketch Canvas ---
+  btnDownload.addEventListener('click', () => {
+    if (!isLoaded) {
+      addLog('Nothing to download yet! Upload or pick a sample photo.', 'error');
       return;
     }
-    
-    // Map percentages
-    originalContainer.style.clipPath = `polygon(0 0, ${sliderPercentage}% 0, ${sliderPercentage}% 100%, 0 100%)`;
-    sliderHandle.style.left = `${sliderPercentage}%`;
-  }
-
-  // Mouse and Touch slide listeners on preview-container
-  function handleSliderMove(e) {
-    if (!isDraggingSlider) return;
-    
-    const rect = previewContainer.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    let offsetX = clientX - rect.left;
-    
-    if (offsetX < 0) offsetX = 0;
-    if (offsetX > rect.width) offsetX = rect.width;
-    
-    sliderPercentage = (offsetX / rect.width) * 100;
-    showFullSketch = false;
-    updateSplitView();
-  }
-
-  // Slider interactive listeners
-  sliderHandle.addEventListener('mousedown', (e) => {
-    isDraggingSlider = true;
-    e.preventDefault();
-  });
-
-  sliderHandle.addEventListener('touchstart', (e) => {
-    isDraggingSlider = true;
-  });
-
-  window.addEventListener('mouseup', () => isDraggingSlider = false);
-  window.addEventListener('touchend', () => isDraggingSlider = false);
-  
-  previewContainer.addEventListener('mousemove', handleSliderMove);
-  previewContainer.addEventListener('touchmove', handleSliderMove, { passive: true });
-
-  btnCompareToggle.addEventListener('click', () => {
-    showFullSketch = !showFullSketch;
-    if (showFullSketch) {
-      btnCompareToggle.classList.add('bg-indigo-600', 'text-white');
-    } else {
-      btnCompareToggle.classList.remove('bg-indigo-600', 'text-white');
-      sliderPercentage = 50;
+    try {
+      const link = document.createElement('a');
+      link.download = `Sketchify_Sketch_${Date.now()}.png`;
+      link.href = canvasSketch.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      addLog('Sketch download initiated successfully!', 'success');
+    } catch (e) {
+      addLog(`Failed download: ${e.message}`, 'error');
     }
-    updateSplitView();
   });
 
-  // Preset Handler
-  presetBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      // Reset visual indicator
-      presetBtns.forEach(b => b.classList.remove('border-indigo-500', 'bg-slate-800'));
-      btn.classList.add('border-indigo-500', 'bg-slate-800');
-
-      const style = btn.getAttribute('data-preset');
-      if (style === 'classic') {
-        rangeStroke.value = 5;
-        rangeContrast.value = 1.5;
-        rangeBrightness.value = 5;
-        rangeColorMix.value = 0;
-        selectTint.value = 'none';
-        selectTexture.value = 'none';
-      } else if (style === 'charcoal') {
-        rangeStroke.value = 12;
-        rangeContrast.value = 2.4;
-        rangeBrightness.value = -10;
-        rangeColorMix.value = 5;
-        selectTint.value = 'none';
-        selectTexture.value = 'noise';
-      } else if (style === 'blueprint') {
-        rangeStroke.value = 3;
-        rangeContrast.value = 1.8;
-        rangeBrightness.value = 10;
-        rangeColorMix.value = 0;
-        selectTint.value = 'blueprint';
-        selectTexture.value = 'canvas';
-      } else if (style === 'colored') {
-        rangeStroke.value = 6;
-        rangeContrast.value = 1.3;
-        rangeBrightness.value = 15;
-        rangeColorMix.value = 55;
-        selectTint.value = 'none';
-        selectTexture.value = 'none';
-      }
-      updateSliderValueLabels();
-      triggerRender();
-    });
-  });
-
-  // Form Format Toggles
-  btnFormatPng.addEventListener('click', () => {
-    currentFormat = 'png';
-    btnFormatPng.className = 'format-toggle px-3 py-1 rounded-md text-xs font-bold bg-indigo-500 text-white transition-all';
-    btnFormatJpg.className = 'format-toggle px-3 py-1 rounded-md text-xs font-bold text-slate-400 hover:text-slate-200 transition-all';
-  });
-
-  btnFormatJpg.addEventListener('click', () => {
-    currentFormat = 'jpeg';
-    btnFormatJpg.className = 'format-toggle px-3 py-1 rounded-md text-xs font-bold bg-indigo-500 text-white transition-all';
-    btnFormatPng.className = 'format-toggle px-3 py-1 rounded-md text-xs font-bold text-slate-400 hover:text-slate-200 transition-all';
-  });
-
-  // Real-time Slider Change Event Listeners
-  [rangeStroke, rangeContrast, rangeBrightness, rangeColorMix, selectTint, selectTexture].forEach(el => {
-    el.addEventListener('input', () => {
-      updateSliderValueLabels();
-      triggerRender();
-    });
-  });
-
-  // Reset Button
-  btnReset.addEventListener('click', resetToDefaults);
-
-  // Download generated canvas
-  btnDownload.addEventListener('click', () => {
-    if (!sourceImage) return;
-    
-    const imageType = currentFormat === 'png' ? 'image/png' : 'image/jpeg';
-    const fileExtension = currentFormat === 'png' ? 'png' : 'jpg';
-    
-    // Create transient anchor to force download
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.download = `sketchify-drawing.${fileExtension}`;
-    downloadAnchor.href = outputCanvas.toDataURL(imageType, 0.95);
-    
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    document.body.removeChild(downloadAnchor);
-  });
-
-  // Default initialization
-  resetToDefaults();
-  
-  // Load first sample as default view if none supplied yet
-  loadSampleUrl('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=85');
+  // Initialize on boot
+  createSamplePortraits();
+  // Load first sample as default view immediately
+  generateSampleImageToWork('portrait');
 });
